@@ -49,6 +49,7 @@ from policy_store import (
 from sre_monitor import SLOStore
 from identity_store import IdentityStore
 from state_store import MetaStore
+from tool_registry import ToolRegistry, ToolError, invoke as _invoke_tool
 from foundry_connector import run_steps_to_events
 from auth import AuthProvider, Principal, ANONYMOUS, DEFAULT_TENANT
 
@@ -253,6 +254,51 @@ def _state_file(name: str) -> "Path | None":
     return (d / name) if d else None
 
 
+def _truthy(name: str) -> bool:
+    """Read an env flag; true only for explicit affirmative values."""
+    return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _require_attestation() -> bool:
+    """When AGT_REQUIRE_ATTESTATION is set, every /tools/call must carry a
+    signed attestation that verifies against the agent's registered key."""
+    return _truthy("AGT_REQUIRE_ATTESTATION")
+
+
+def _tool_allow_private() -> bool:
+    """Permit onboarded tool endpoints that resolve to private/loopback hosts.
+
+    Off by default (SSRF-safe). Set AGT_TOOL_ALLOW_PRIVATE=1 to point tools at
+    a local service, e.g. when developing against a webhook on localhost."""
+    return _truthy("AGT_TOOL_ALLOW_PRIVATE")
+
+
+def _slo_dir() -> "Path | None":
+    """Durable SLO directory under AGT_STATE_DIR, or None for in-memory SLOs."""
+    d = _state_dir()
+    return (d / "slo") if d else None
+
+
+def _runtime_controls() -> dict:
+    """A live snapshot of the security controls enabled on this instance.
+
+    Every value is read from the current process/environment, so the OWASP
+    self-assessment reflects how the platform is actually configured rather
+    than a static claim.
+    """
+    return {
+        "authentication": _auth.enabled,
+        "jwt_validation": bool(os.getenv("AGT_JWT_SECRET", "").strip()),
+        "attestation_required": _require_attestation(),
+        "durable_state": _state_dir() is not None,
+        "durable_slo": _slo.durable,
+        "durable_audit": bool(os.getenv("AGT_AUDIT_FILE") and os.getenv("AGT_AUDIT_KEY")),
+        "cors_allowlist": list(_cors_origins),
+        "kill_switch": True,          # lifecycle suspend is always available
+        "merkle_audit_chain": True,   # audit chain is always hash-linked
+    }
+
+
 _lifecycle = LifecycleManager(
     policy=LifecyclePolicy(require_approval=False, require_owner=True),
     storage_path=_state_file("agents.json"),
@@ -268,8 +314,9 @@ _call_stats: dict[str, dict] = {}            # agent name -> {calls, denials}
 # override with AGT_POLICY_DIR (the test suite points it at a temp dir).
 _policies = PolicyStore(os.getenv("AGT_POLICY_DIR") or Path(__file__).parent / "policies")
 _agent_policies: dict[str, str] = {}         # agent name -> policy name
+_policy_tenant: dict[str, str] = {}          # policy name -> owning tenant (None = shared)
 _trust_scores: dict[str, float] = {}         # agent name -> score
-_slo = SLOStore()                            # real agent_sre SLOs, per agent
+_slo = SLOStore(storage_dir=_slo_dir())      # real agent_sre SLOs, per agent
 
 
 # ── Durable state ─────────────────────────────────────────────────────────────
@@ -281,6 +328,9 @@ _slo = SLOStore()                            # real agent_sre SLOs, per agent
 # agent keeps a stable DID but the caller retains its once-issued private key.
 _identity = IdentityStore(storage_path=_state_file("identities.json"))
 _meta = MetaStore(_state_file("agent_meta.json"))
+_policy_meta = MetaStore(_state_file("policy_owners.json"))  # policy -> {tenant}
+_tool_meta = MetaStore(_state_file("tools.json"))            # onboarded tool defs
+_tools = ToolRegistry(_tool_meta)            # user-onboarded tools for evaluation
 _governed_tools: dict[tuple, Any] = {}       # (tool, policy, agent, ring) -> GovernedCallable
 _agent_tenant: dict[str, str] = {}           # agent name -> owning tenant
 _agent_foundry: dict[str, dict] = {}         # agent name -> Foundry onboarding metadata
@@ -344,6 +394,46 @@ def _authorize_agent(agent, principal: Principal) -> None:
     owner = _agent_tenant.get(agent.name, DEFAULT_TENANT)
     if owner != principal.tenant:
         raise HTTPException(status_code=403, detail="Agent belongs to another tenant")
+
+
+# ── Per-tenant policy ownership ────────────────────────────────────────────
+# A policy created through the API is stamped with its author's tenant. Only
+# that tenant (and any admin) may see, edit, delete or enforce it. Policies
+# with no owner — the seeded default-policy — are shared and usable by all,
+# so single-tenant playground behaviour is unchanged (the anonymous caller is
+# a local admin and every seeded agent lives in the default tenant).
+def _policy_owner(name: str) -> "str | None":
+    return _policy_tenant.get(name)
+
+
+def _policy_visible(name: str, principal: Principal) -> bool:
+    owner = _policy_owner(name)
+    return owner is None or principal.is_admin or owner == principal.tenant
+
+
+def _set_policy_owner(name: str, tenant: str) -> None:
+    _policy_tenant[name] = tenant
+    _persist_policy_owners()
+
+
+def _drop_policy_owner(name: str) -> None:
+    if _policy_tenant.pop(name, None) is not None:
+        _persist_policy_owners()
+
+
+def _persist_policy_owners() -> None:
+    _policy_meta.save({n: {"tenant": t} for n, t in _policy_tenant.items()})
+
+
+def _load_policy_owners() -> None:
+    for name, rec in _policy_meta.load().items():
+        if _safe_exists(name):
+            _policy_tenant[name] = rec.get("tenant", DEFAULT_TENANT)
+
+
+def _require_policy_visible(name: str, principal: Principal) -> None:
+    if not _policy_visible(name, principal):
+        raise HTTPException(status_code=403, detail="Policy belongs to another tenant")
 
 
 async def enforce_authn(request: Request) -> None:
@@ -481,7 +571,25 @@ def _register_tool(tool_name: str, policy_name: str = "default-policy",
         return cached
 
     def _tool(action: str = "read", input_text: str = "", **kwargs):
-        return {"tool": tool_name, "action": action, "result": f"Executed {action} on {tool_name}"}
+        # Real execution: if the onboarded tool declares an HTTP(S) endpoint,
+        # actually invoke it (SSRF-guarded) and report the true outcome. With
+        # no endpoint the call is honestly a governance decision only — nothing
+        # is executed and nothing is fabricated.
+        spec = _tools.get(tool_name) or {}
+        endpoint = spec.get("endpoint_url")
+        if not endpoint:
+            return {
+                "tool": tool_name, "action": action, "executed": False,
+                "note": "Governance allowed the call; no endpoint is bound to "
+                        "this tool, so nothing was executed.",
+            }
+        outcome = _invoke_tool(
+            endpoint,
+            {"tool": tool_name, "action": action, "input_text": input_text},
+            timeout_ms=int(spec.get("timeout_ms", 3000)),
+            allow_private=_tool_allow_private(),
+        )
+        return {"tool": tool_name, "action": action, "executed": True, **outcome}
 
     _tool.__name__ = tool_name
     governed = govern(
@@ -552,6 +660,16 @@ DEMO_AGENTS = [
 
 DEMO_TOOLS = ["db_query", "send_email", "web_search", "write_file"]
 
+# Built-in demo tools, seeded into the registry so the playground works out of
+# the box. All decision-only (no endpoint): onboard your own via /tools/register
+# to attach a real webhook. `builtin` marks them undeletable.
+BUILTIN_TOOLS = [
+    ("db_query", "Query a datastore", ["read", "write", "drop"], "high"),
+    ("send_email", "Send an email on the agent's behalf", ["send_email"], "medium"),
+    ("web_search", "Search the public web", ["read", "web_search"], "low"),
+    ("write_file", "Write to the workspace filesystem", ["write"], "medium"),
+]
+
 
 def _persist_meta() -> None:
     """Snapshot the non-secret agent sidecar (trust/tenant/policy) to disk."""
@@ -609,6 +727,18 @@ def seed_state() -> None:
     if not _policies.exists("default-policy"):
         _policies.write("default-policy", DEFAULT_POLICY)
 
+    # Restore which tenant owns each persisted policy (the default is shared).
+    _load_policy_owners()
+
+    # Load onboarded tools, then ensure the built-in demo tools exist so the
+    # playground works even before anything is registered. Registered tools
+    # (durable mode) are preserved; only missing built-ins are (re)added.
+    _tools.load()
+    for name, desc, actions, risk in BUILTIN_TOOLS:
+        if not _tools.exists(name):
+            _tools.register(name, description=desc, actions=actions,
+                            risk=risk, builtin=True)
+
     persisted = list(_lifecycle.agents)
     if persisted:
         _rehydrate_state(persisted)
@@ -618,8 +748,14 @@ def seed_state() -> None:
         # populated by real registrations, not fixtures.
         _seed_demo_agents()
 
-    for agent_id in list(_agent_ids.keys())[:2]:
-        _slo.ensure(agent_id)
+    if _slo.durable:
+        # Durable mode: reload every persisted agent's SLO so its stored
+        # measurements and error-budget burn come back after a restart.
+        for agent_id in _agent_ids:
+            _slo.ensure(agent_id)
+    else:
+        for agent_id in list(_agent_ids.keys())[:2]:
+            _slo.ensure(agent_id)
 
     for tool in DEMO_TOOLS:
         try:
@@ -638,13 +774,13 @@ def teardown_state(clear_policies: bool = False) -> None:
     The durable stores are reconstructed from AGT_STATE_DIR here, so this
     doubles as a restart: any persisted agents/identities are reloaded.
     """
-    global _lifecycle, _audit, _identity, _meta
+    global _lifecycle, _audit, _identity, _meta, _slo, _policy_meta, _tool_meta, _tools
     if clear_policies:
         for name in _policies.names():
             _policies.path(name).unlink(missing_ok=True)
     for store in (_agent_policies, _trust_scores,
-                  _slo, _identity, _governed_tools, _agent_ids, _call_stats,
-                  _agent_tenant, _agent_foundry):
+                  _identity, _governed_tools, _agent_ids, _call_stats,
+                  _agent_tenant, _agent_foundry, _policy_tenant, _tools):
         store.clear()
     # AGT keeps breach detectors in its own module globals, so clearing our
     # stores is not enough to give a test a clean process.
@@ -655,7 +791,13 @@ def teardown_state(clear_policies: bool = False) -> None:
     )
     _identity = IdentityStore(storage_path=_state_file("identities.json"))
     _meta = MetaStore(_state_file("agent_meta.json"))
+    _policy_meta = MetaStore(_state_file("policy_owners.json"))
+    _tool_meta = MetaStore(_state_file("tools.json"))
+    _tools = ToolRegistry(_tool_meta)
     _audit = AuditStore()
+    # Rebuilt from the environment too, so a durable SLO directory is picked
+    # up (or dropped) exactly like the other state stores on a restart.
+    _slo = SLOStore(storage_dir=_slo_dir())
 
 
 def reset_state() -> None:
@@ -758,6 +900,16 @@ class ToolCallIn(BaseModel):
     # When absent, the agent_id is self-asserted (legacy) and flagged as such.
     attestation: Optional[AttestationIn] = None
 
+class ToolRegisterIn(BaseModel):
+    name: str
+    description: str = ""
+    actions: list[str] = []
+    risk: str = "medium"
+    # Optional HTTP(S) webhook. When set, an allowed call really invokes it
+    # (SSRF-guarded); when absent the tool is governance-decision-only.
+    endpoint_url: Optional[str] = None
+    timeout_ms: int = 3000
+
 class ChallengeIn(BaseModel):
     agent_id: str
 
@@ -857,6 +1009,7 @@ def _policy_view(name: str) -> dict:
     doc = _policies.read(name)
     return {
         **doc,
+        "owner_tenant": _policy_owner(name),
         "warnings": _policy_warnings(doc),
         "dependents": _policies.dependents(name),
     }
@@ -1013,8 +1166,9 @@ def policy_schema():
 
 
 @app.get("/policies")
-def list_policies():
-    return [_policy_view(n) for n in _policies.names()]
+def list_policies(principal: Principal = Depends(current_principal)):
+    return [_policy_view(n) for n in _policies.names()
+            if _policy_visible(n, principal)]
 
 
 @app.post("/policies")
@@ -1022,7 +1176,12 @@ def create_policy(body: PolicyIn, principal: Principal = Depends(require_operato
     try:
         if _policies.exists(body.name):
             raise HTTPException(400, f"Policy '{body.name}' already exists")
-        return _save_policy(body.name, body, creating=True)
+        view = _save_policy(body.name, body, creating=True)
+        # Stamp the new policy with its author's tenant so only that tenant
+        # (or an admin) can later see, edit, delete or enforce it.
+        _set_policy_owner(body.name, principal.tenant)
+        view["owner_tenant"] = _policy_owner(body.name)
+        return view
     except PolicyError as e:
         _reject(e)
 
@@ -1056,7 +1215,13 @@ def _validate_policy(body: PolicyIn):
 
 
 @app.get("/policies/{name}")
-def get_policy(name: str):
+def get_policy(name: str, principal: Principal = Depends(current_principal)):
+    try:
+        if not _policies.exists(name):
+            raise HTTPException(404, "Policy not found")
+    except PolicyError:
+        raise HTTPException(404, "Policy not found")
+    _require_policy_visible(name, principal)
     try:
         return _policy_view(name)
     except PolicyError:
@@ -1069,16 +1234,18 @@ def update_policy(name: str, body: PolicyUpdateIn,
     try:
         if not _policies.exists(name):
             raise HTTPException(404, "Policy not found")
+        _require_policy_visible(name, principal)
         return _save_policy(name, body, creating=False)
     except PolicyError as e:
         _reject(e)
 
 
 @app.get("/policies/{name}/yaml")
-def get_policy_yaml(name: str):
+def get_policy_yaml(name: str, principal: Principal = Depends(current_principal)):
     """The policy exactly as it sits on disk, for the read-only YAML pane."""
     if not _safe_exists(name):
         raise HTTPException(404, "Policy not found")
+    _require_policy_visible(name, principal)
     return {"name": name, "yaml": _policies.yaml_text(name)}
 
 
@@ -1091,7 +1258,7 @@ def _safe_exists(name: str) -> bool:
 
 
 @app.get("/policies/{name}/resolved")
-def get_policy_resolved(name: str):
+def get_policy_resolved(name: str, principal: Principal = Depends(current_principal)):
     """The merged policy AGT enforces, with each rule's origin.
 
     Differs from the authored document whenever `extends` is used: inherited
@@ -1099,6 +1266,7 @@ def get_policy_resolved(name: str):
     """
     if not _safe_exists(name):
         raise HTTPException(404, "Policy not found")
+    _require_policy_visible(name, principal)
     try:
         return _policies.resolved_detail(name)
     except PolicyError as e:
@@ -1111,10 +1279,12 @@ def delete_policy(name: str, principal: Principal = Depends(require_admin)):
         raise HTTPException(400, "Cannot delete the default policy")
     if not _safe_exists(name):
         raise HTTPException(404, "Policy not found")
+    _require_policy_visible(name, principal)
     try:
         _policies.delete(name)
     except PolicyError as e:
         raise HTTPException(409, str(e))
+    _drop_policy_owner(name)
     for key in [k for k in _governed_tools if k[1] == name]:
         _governed_tools.pop(key, None)
     _emit_audit("policy.deleted", "system", {"policy": name})
@@ -1201,11 +1371,63 @@ def _build_call_context(governed, action: str, input_text: str, extra: dict) -> 
 
 @app.get("/tools")
 def list_tools():
+    """The onboarded tool registry plus the governed callables built so far.
+
+    `available` and `registered` are driven by the registry, not a hardcoded
+    list: onboard a tool via POST /tools/register and it appears here.
+    """
     return {
         "tools": sorted({k[0] for k in _governed_tools}),
-        "available": ["db_query", "send_email", "web_search", "write_file",
-                      "delete_file", "shell_exec", "drop_table"],
+        "available": _tools.names(),
+        "registered": _tools.all(),
+        "allow_private_endpoints": _tool_allow_private(),
     }
+
+
+@app.post("/tools/register")
+def register_tool(body: ToolRegisterIn,
+                  principal: Principal = Depends(require_operator)):
+    """Onboard (or update) a tool the platform will govern and evaluate.
+
+    A tool with an `endpoint_url` is really invoked on an allowed call; without
+    one it is a governance-decision-only tool. Endpoints are SSRF-validated at
+    registration: non-HTTP schemes and private/loopback targets are rejected
+    unless AGT_TOOL_ALLOW_PRIVATE is set for local development.
+    """
+    try:
+        spec = _tools.register(
+            body.name, description=body.description, actions=body.actions,
+            risk=body.risk, endpoint_url=body.endpoint_url,
+            timeout_ms=body.timeout_ms, created_by=principal.subject or None,
+            allow_private=_tool_allow_private(),
+        )
+    except ToolError as e:
+        raise HTTPException(400, str(e))
+    # Drop any cached governed callables for this tool so the new endpoint takes
+    # effect immediately rather than through a stale wrapper.
+    for key in [k for k in _governed_tools if k[0] == spec["name"]]:
+        _governed_tools.pop(key, None)
+    _emit_audit("tool.registered", principal.subject or "system", {
+        "tool": spec["name"], "risk": spec["risk"],
+        "endpoint": bool(spec.get("endpoint_url")),
+    }, allowed=True)
+    return spec
+
+
+@app.delete("/tools/{name}")
+def delete_tool(name: str, principal: Principal = Depends(require_admin)):
+    """Remove an onboarded tool. Built-in demo tools are protected."""
+    spec = _tools.get(name)
+    if spec is None:
+        raise HTTPException(404, f"Tool '{name}' not found")
+    if spec.get("builtin"):
+        raise HTTPException(400, "Built-in demo tools cannot be removed")
+    _tools.remove(name)
+    for key in [k for k in _governed_tools if k[0] == name]:
+        _governed_tools.pop(key, None)
+    _emit_audit("tool.removed", principal.subject or "system",
+                {"tool": name}, allowed=True)
+    return {"removed": name}
 
 
 def _deny(agent_name: str, tool: str, action: str, policy: str,
@@ -1279,6 +1501,26 @@ def call_tool(body: ToolCallIn, principal: Principal = Depends(require_operator)
                          "identity", start, rule="identity:attestation_failed",
                          slo_agent=agent.name)
 
+    if _require_attestation() and not identity_verified:
+        return _deny(agent.name, body.tool_name, body.action, body.policy_name,
+                     "tool.call.denied.identity",
+                     "Attestation required — present a signed attestation "
+                     "(AGT_REQUIRE_ATTESTATION is enabled)",
+                     "identity", start, rule="identity:attestation_required",
+                     slo_agent=agent.name)
+
+    # ── Per-tenant policy isolation ────────────────────────────────────
+    # An agent may only be governed by a shared policy or one owned by its own
+    # tenant. Reaching for another tenant's policy is denied before any gate.
+    policy_owner = _policy_owner(body.policy_name)
+    agent_tenant = _agent_tenant.get(agent.name, DEFAULT_TENANT)
+    if policy_owner is not None and policy_owner != agent_tenant:
+        return _deny(agent.name, body.tool_name, body.action, body.policy_name,
+                     "tool.call.denied.policy",
+                     f"Policy '{body.policy_name}' belongs to another tenant",
+                     "policy", start, rule="policy:tenant_isolation",
+                     slo_agent=agent.name)
+
     # ── Gate 2: trust (AGT TrustPolicy / PolicyEvaluator) ──────────────
     trust_score = _trust_scores.get(agent.name, 0.0)
     trust_decision, _ = _evaluate_trust(agent.name, trust_score)
@@ -1324,16 +1566,24 @@ def call_tool(body: ToolCallIn, principal: Principal = Depends(require_operator)
                      f"tool.call.denied.{gate}", d.reason or "Denied",
                      gate, start, rule=d.matched_rule or "", slo_agent=agent.name)
 
+    # Governance allowed the call. If a real endpoint ran, task success reflects
+    # the actual HTTP outcome; a decision-only tool (no endpoint) counts as a
+    # successful governed call.
+    executed = isinstance(outcome, dict) and outcome.get("executed") is True
+    execution_ok = bool(outcome.get("ok")) if executed else True
+
     _emit_audit("tool.call.allowed", agent.name, {
         "tool": body.tool_name, "action": body.action,
         "policy": body.policy_name, "ring": ring.name, "latency_ms": latency_ms,
         "did": _identity.did(agent.name), "identity_verified": identity_verified,
+        "executed": executed, "execution_ok": execution_ok,
     }, allowed=True)
     _bump(agent.name, "calls")
-    _slo.record_call(agent.name, allowed=True, policy_denied=False,
+    _slo.record_call(agent.name, allowed=execution_ok, policy_denied=False,
                      latency_ms=latency_ms)
     return {
         "allowed": True, "result": outcome,
+        "executed": executed, "execution_ok": execution_ok,
         "passed_gates": ["lifecycle", "trust", "ring", "policy"],
         "trust_score": trust_score, "ring": ring.name,
         "did": _identity.did(agent.name), "identity_verified": identity_verified,
@@ -1803,27 +2053,57 @@ def scan_prompt(body: ComplianceIn):
 
 @app.get("/compliance/owasp")
 def owasp_coverage():
-    """Reference map of AGT capabilities to OWASP Agentic AI risks.
+    """AGT capabilities mapped to OWASP Agentic AI risks, assessed against the
+    controls *actually enabled on this running instance*.
 
-    `status` is the honest enforcement state of each control *in this
-    platform*: `enforced` (a gate actively blocks), `partial` (a control
-    exists but is advisory or incomplete), or `not_implemented`. This is a
-    reference mapping, not a certified security assessment.
+    `runtime_controls` is a live snapshot of the security posture (auth,
+    attestation, durable state/audit, CORS allowlist, kill switch). Each
+    coverage `status` reflects that posture — `enforced` (a gate actively
+    blocks), `partial` (a control exists but is advisory or optional) or
+    `not_implemented` — recomputed per request rather than hard-coded. This is
+    a self-assessment of configuration, not a certified security audit.
     """
+    ctrls = _runtime_controls()
+
+    # Two risks change enforcement level with the live configuration.
+    attested = ctrls["attestation_required"]
+    asi03 = {
+        "id": "ASI-03", "name": "Identity & Privilege Abuse",
+        "status": "enforced" if attested else "partial",
+        "control": (
+            "TrustPolicy + lifecycle gates + mandatory Ed25519 attestation "
+            "(AGT_REQUIRE_ATTESTATION enabled)"
+            if attested else
+            "TrustPolicy + lifecycle gates; agent_id attestation optional "
+            "(set AGT_REQUIRE_ATTESTATION to enforce)"
+        ),
+    }
+    authn_enforced = ctrls["authentication"]
+    asi09 = {
+        "id": "ASI-09", "name": "Excessive Autonomy",
+        "status": "enforced" if authn_enforced else "partial",
+        "control": (
+            "Lifecycle state machine + role-gated API (authentication enabled)"
+            if authn_enforced else
+            "Lifecycle state machine + require_approval option; API auth is off "
+            "(set AGT_API_KEYS or AGT_JWT_SECRET to gate callers)"
+        ),
+    }
+
     return {
         "framework": "OWASP Agentic AI Top 10 (2026)",
         "note": (
-            "Reference mapping of AGT capabilities to OWASP Agentic AI risks, "
-            "annotated with the enforcement status of each control in this "
-            "platform. Not a certified assessment."
+            "AGT capabilities mapped to OWASP Agentic AI risks, assessed live "
+            "against the controls enabled on this instance. Statuses are "
+            "recomputed per request, not a certified assessment."
         ),
+        "runtime_controls": ctrls,
         "coverage": [
             {"id": "ASI-01", "name": "Agent Goal Hijack", "status": "partial",
              "control": "PromptDefenseEvaluator (system-prompt hardening, advisory)"},
             {"id": "ASI-02", "name": "Tool Misuse & Exploitation", "status": "enforced",
              "control": "govern() + PolicyEngine (fail-closed at pre_tool)"},
-            {"id": "ASI-03", "name": "Identity & Privilege Abuse", "status": "partial",
-             "control": "TrustPolicy + lifecycle gates; agent_id not yet attested"},
+            asi03,
             {"id": "ASI-04", "name": "Unsafe Code Execution", "status": "enforced",
              "control": "ExecutionRing resource constraints via govern(ring=...)"},
             {"id": "ASI-05", "name": "Uncontrolled Side-Effects", "status": "enforced",
@@ -1834,10 +2114,14 @@ def owasp_coverage():
              "control": "PromptDefenseEvaluator (advisory grade, not blocking)"},
             {"id": "ASI-08", "name": "Insecure Plugin Use", "status": "not_implemented",
              "control": "No marketplace/plugin trust scoring in this platform"},
-            {"id": "ASI-09", "name": "Excessive Autonomy", "status": "partial",
-             "control": "Lifecycle state machine + require_approval option"},
-            {"id": "ASI-10", "name": "Audit Tampering", "status": "enforced",
-             "control": "MerkleAuditChain hash-linked, verifiable"},
+            asi09,
+            {"id": "ASI-10", "name": "Audit Tampering",
+             "status": "enforced",
+             "control": (
+                 "MerkleAuditChain hash-linked, verifiable"
+                 + (" + durable HMAC-signed sink (AGT_AUDIT_FILE)"
+                    if ctrls["durable_audit"] else "")
+             )},
         ]
     }
 

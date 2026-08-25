@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Terminal, Play, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Terminal, Play, CheckCircle, XCircle, Clock, Plus, Trash2, Globe, ShieldOff } from 'lucide-react';
 import { api } from '../api';
 
 const DEMO_CALLS = [
@@ -21,8 +21,12 @@ const GATE_LABEL = {
 };
 const GATES = ['lifecycle', 'trust', 'ring', 'policy'];
 
+const RISK_TAG = { low: 'allow', medium: 'warn', high: 'deny', critical: 'deny' };
+
 export default function ToolPanel() {
   const [tools, setTools] = useState({ tools: [], available: [] });
+  const [registered, setRegistered] = useState([]);
+  const [allowPrivate, setAllowPrivate] = useState(false);
   const [policies, setPolicies] = useState([]);
   const [form, setForm] = useState({
     tool_name: 'db_query', policy_name: 'default-policy',
@@ -31,11 +35,46 @@ export default function ToolPanel() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [onb, setOnb] = useState({
+    name: '', description: '', actions: '', risk: 'medium',
+    endpoint_url: '', timeout_ms: 3000,
+  });
+  const [onbMsg, setOnbMsg] = useState(null);
+
+  const refreshTools = () => api.tools.list().then(r => {
+    setTools(r);
+    setRegistered(r.registered || []);
+    setAllowPrivate(!!r.allow_private_endpoints);
+  }).catch(() => {});
 
   useEffect(() => {
-    api.tools.list().then(setTools).catch(() => {});
+    refreshTools();
     api.policies.list().then(setPolicies).catch(() => {});
   }, []);
+
+  const onboard = async () => {
+    setOnbMsg(null);
+    try {
+      const spec = await api.tools.register({
+        name: onb.name,
+        description: onb.description,
+        actions: onb.actions.split(',').map(s => s.trim()).filter(Boolean),
+        risk: onb.risk,
+        endpoint_url: onb.endpoint_url.trim() || null,
+        timeout_ms: Number(onb.timeout_ms) || 3000,
+      });
+      setOnbMsg({ ok: true, text: `Onboarded “${spec.name}”` });
+      setOnb({ name: '', description: '', actions: '', risk: 'medium', endpoint_url: '', timeout_ms: 3000 });
+      setForm(f => ({ ...f, tool_name: spec.name }));
+      refreshTools();
+    } catch (e) {
+      setOnbMsg({ ok: false, text: typeof e.message === 'string' ? e.message : 'Registration failed' });
+    }
+  };
+
+  const removeTool = async (name) => {
+    try { await api.tools.remove(name); refreshTools(); } catch (e) { /* keep UI responsive */ }
+  };
 
   const run = async () => {
     setLoading(true);
@@ -77,6 +116,102 @@ export default function ToolPanel() {
               {d.label}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Onboard a real tool */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+        <div className="card">
+          <div className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Plus size={14} /> Onboard a Tool for Evaluation
+          </div>
+          <p style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 12 }}>
+            Register a real tool the platform will govern. Add an HTTP(S) endpoint to have
+            allowed calls <strong>actually invoked</strong> (SSRF-guarded) and their real
+            latency/success fed into the SLOs — or leave it blank for a governance-decision-only tool.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={lbl}>Name</label>
+              <input value={onb.name} onChange={e => setOnb(o => ({ ...o, name: e.target.value }))}
+                placeholder="payments_api" style={{ width: '100%', marginBottom: 10 }} />
+            </div>
+            <div>
+              <label style={lbl}>Risk</label>
+              <select value={onb.risk} onChange={e => setOnb(o => ({ ...o, risk: e.target.value }))}
+                style={{ width: '100%', marginBottom: 10 }}>
+                {['low', 'medium', 'high', 'critical'].map(r => <option key={r}>{r}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <label style={lbl}>Description</label>
+          <input value={onb.description} onChange={e => setOnb(o => ({ ...o, description: e.target.value }))}
+            placeholder="What the tool does" style={{ width: '100%', marginBottom: 10 }} />
+
+          <label style={lbl}>Actions (comma-separated)</label>
+          <input value={onb.actions} onChange={e => setOnb(o => ({ ...o, actions: e.target.value }))}
+            placeholder="read, write, refund" style={{ width: '100%', marginBottom: 10 }} />
+
+          <label style={lbl}>Endpoint URL (optional — real webhook)</label>
+          <input value={onb.endpoint_url} onChange={e => setOnb(o => ({ ...o, endpoint_url: e.target.value }))}
+            placeholder="https://example.com/hook" style={{ width: '100%', marginBottom: 10 }} />
+
+          <label style={lbl}>Timeout (ms)</label>
+          <input type="number" value={onb.timeout_ms} onChange={e => setOnb(o => ({ ...o, timeout_ms: e.target.value }))}
+            style={{ width: '100%', marginBottom: 12 }} />
+
+          {!allowPrivate && (
+            <div style={{ fontSize: 10, color: 'var(--text-3)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 5 }}>
+              <ShieldOff size={11} color="var(--yellow)" /> Private/loopback endpoints are blocked. Set <code>AGT_TOOL_ALLOW_PRIVATE=1</code> for local testing.
+            </div>
+          )}
+
+          <button className="btn btn-primary" onClick={onboard} disabled={!onb.name.trim()}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <Plus size={14} /> Onboard Tool
+          </button>
+          {onbMsg && (
+            <div style={{ marginTop: 10, fontSize: 11, color: onbMsg.ok ? 'var(--green)' : 'var(--red)' }}>
+              {onbMsg.text}
+            </div>
+          )}
+        </div>
+
+        {/* Registered tools */}
+        <div className="card">
+          <div className="card-title">Registered Tools</div>
+          {registered.length === 0
+            ? <div style={{ color: 'var(--text-3)', fontSize: 12 }}>No tools onboarded yet.</div>
+            : <div style={{ maxHeight: 360, overflowY: 'auto' }}>
+                {registered.map(t => (
+                  <div key={t.name} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                    {t.endpoint_url
+                      ? <Globe size={14} color="var(--green)" style={{ flexShrink: 0, marginTop: 3 }} />
+                      : <Terminal size={14} color="var(--text-3)" style={{ flexShrink: 0, marginTop: 3 }} />}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <code style={{ fontSize: 12, fontWeight: 600 }}>{t.name}</code>
+                        <span className={`tag ${RISK_TAG[t.risk] || 'warn'}`} style={{ fontSize: 9 }}>{t.risk}</span>
+                        {t.builtin && <span style={{ fontSize: 9, color: 'var(--text-3)' }}>built-in</span>}
+                        {t.endpoint_url
+                          ? <span style={{ fontSize: 9, color: 'var(--green)' }}>webhook</span>
+                          : <span style={{ fontSize: 9, color: 'var(--text-3)' }}>decision-only</span>}
+                      </div>
+                      {t.description && <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{t.description}</div>}
+                      {t.endpoint_url && <div style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--mono)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.endpoint_url}</div>}
+                    </div>
+                    {!t.builtin && (
+                      <button className="btn btn-ghost" onClick={() => removeTool(t.name)}
+                        title="Remove tool" style={{ padding: '2px 6px', flexShrink: 0 }}>
+                        <Trash2 size={12} color="var(--red)" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+          }
         </div>
       </div>
 
@@ -158,6 +293,16 @@ export default function ToolPanel() {
               )}
 
               {result.reason && <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 8 }}>{result.reason}</div>}
+              {result.allowed && result.executed !== undefined && (
+                <div style={{ fontSize: 11, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6,
+                  color: result.executed ? (result.execution_ok ? 'var(--green)' : 'var(--red)') : 'var(--text-3)' }}>
+                  {result.executed
+                    ? (result.execution_ok
+                        ? <><Globe size={12} /> Endpoint invoked — HTTP {result.result?.http_status}</>
+                        : <><XCircle size={12} /> Endpoint call failed{result.result?.http_status ? ` — HTTP ${result.result.http_status}` : ''}{result.result?.error ? ` (${result.result.error})` : ''}</>)
+                    : <>Governance decision only — no endpoint bound to this tool</>}
+                </div>
+              )}
               {result.result && (
                 <pre style={{ fontSize: 11, color: 'var(--text)', background: 'var(--bg-3)', padding: 10, borderRadius: 6, overflow: 'auto' }}>
                   {JSON.stringify(result.result, null, 2)}

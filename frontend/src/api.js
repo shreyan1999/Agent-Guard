@@ -53,6 +53,8 @@ export const api = {
   tools: {
     list: () => req('GET', '/tools'),
     call: (b) => req('POST', '/tools/call', b),
+    register: (b) => req('POST', '/tools/register', b),
+    remove: (name) => req('DELETE', `/tools/${name}`),
   },
   trust: {
     overview: () => req('GET', '/trust'),

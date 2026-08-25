@@ -11,6 +11,22 @@ const DEMO_PROMPTS = [
 
 const GRADE_COLOR = { A: 'var(--green)', B: 'var(--green)', C: 'var(--yellow)', D: 'var(--yellow)', F: 'var(--red)' };
 
+// The runtime controls surfaced from GET /compliance/owasp (runtime_controls),
+// in display order. Each reflects a real, live-configured control.
+const POSTURE = [
+  { key: 'authentication', label: 'API auth' },
+  { key: 'jwt_validation', label: 'JWT bearer' },
+  { key: 'attestation_required', label: 'Attestation required' },
+  { key: 'durable_state', label: 'Durable state' },
+  { key: 'durable_slo', label: 'Durable SLOs' },
+  { key: 'durable_audit', label: 'Durable audit' },
+  { key: 'kill_switch', label: 'Kill switch' },
+  { key: 'merkle_audit_chain', label: 'Merkle audit chain' },
+];
+
+// A control is "on" when truthy; the CORS allowlist is an array of origins.
+const controlOn = (v) => Array.isArray(v) ? v.length > 0 : Boolean(v);
+
 export default function CompliancePanel() {
   const [prompt, setPrompt] = useState('');
   const [agentId, setAgentId] = useState('research-agent');
@@ -125,6 +141,29 @@ export default function CompliancePanel() {
             : <>
                 <div style={{ marginBottom: 8, fontSize: 12, color: 'var(--text-2)' }}>{owasp.framework}</div>
                 {owasp.note && <div style={{ marginBottom: 12, fontSize: 10, color: 'var(--text-3)', fontStyle: 'italic' }}>{owasp.note}</div>}
+                {owasp.runtime_controls && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 8 }}>
+                      Live posture on this instance
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {POSTURE.map(({ key, label }) => {
+                        const on = controlOn(owasp.runtime_controls[key]);
+                        return (
+                          <span key={key} style={{
+                            fontSize: 10, padding: '3px 8px', borderRadius: 6,
+                            display: 'inline-flex', alignItems: 'center', gap: 5,
+                            background: on ? 'var(--green-dim)' : 'var(--bg-3)',
+                            color: on ? 'var(--green)' : 'var(--text-3)',
+                            border: `1px solid ${on ? 'var(--green)' : 'var(--border)'}44`,
+                          }}>
+                            {on ? <CheckCircle size={10} /> : <XCircle size={10} />}{label}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 {owasp.coverage.map(c => (
                   <div key={c.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
                     {c.status === 'enforced'

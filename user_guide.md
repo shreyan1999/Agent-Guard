@@ -26,7 +26,7 @@ says so plainly.
 **Feature honesty at a glance:**
 
 - **Real AGT enforcement:** Tool Playground, Policy Engine, Trust & Identity, Agents (lifecycle), Agent SRE (SLOs), Audit Log, Prompt scan.
-- **Reference only (not an automated check):** the Compliance panel's OWASP Agentic AI mapping.
+- **Live self-assessment (not a certified audit):** the Compliance panel's OWASP Agentic AI mapping now reports the controls actually enabled on the running instance.
 - **Observational (monitoring, not enforcement):** telemetry ingestion and Microsoft Foundry onboarding.
 
 ---
@@ -101,9 +101,22 @@ set AGT_API_KEYS=s3cret:ana:acme:admin,readonly:bob:acme:viewer
 - Roles form a hierarchy: `viewer` < `operator` < `admin`.
 - Mutating endpoints require `operator`; destructive ones require `admin`.
 - Agents are scoped to the tenant that registered them; an admin sees all.
+- **Policies are scoped to the tenant that created them.** A policy authored by
+  one tenant is invisible to another and cannot govern its agents; the seeded
+  `default-policy` has no owner and stays shared. Admins see every tenant's
+  policies. (In the single-tenant default, everything lives in one tenant, so
+  this is transparent.)
 - In the UI, store the token in the browser: `localStorage.setItem('agt_api_token', '<token>')`.
 
 Alternative: point `AGT_API_KEYS_FILE` at a JSON file instead of an inline list.
+
+**Static JWT bearer tokens (optional).** Set `AGT_JWT_SECRET` and the platform
+also accepts HS256 JSON Web Tokens signed with that shared secret; the principal
+is read from the token's `sub`, `tenant` and `roles` claims, with `exp`/`nbf`
+and optional `AGT_JWT_ISSUER` / `AGT_JWT_AUDIENCE` enforced. This is a
+deliberately **static** verifier — one symmetric secret, algorithm pinned to
+HS256. It does **not** do OIDC discovery, JWKS, asymmetric keys or key
+rotation; those need an external identity provider.
 
 ### 4.2 Persistence (off by default)
 
@@ -111,14 +124,17 @@ Alternative: point `AGT_API_KEYS_FILE` at a JSON file instead of an inline list.
 set AGT_STATE_DIR=C:\path\to\state
 ```
 
-When set, **agents, trust scores, tenant assignments, public DIDs and Foundry
-links survive a restart**. Two honest caveats:
+When set, **agents, trust scores, tenant assignments, public DIDs, Foundry
+links, policy ownership and agent_sre SLO measurements survive a restart**. Two
+honest caveats:
 
 - **Private keys are never written.** The private key of an agent's identity is
   issued once at registration; store it yourself.
-- **SLO measurements are in-memory only.** Even with persistence on, `agent_sre`
-  counters and error budgets reset on restart. Only the durable state above is
-  reloaded.
+- **SLO measurements persist** to a durable per-agent SQLite database (agent_sre's
+  own `SQLiteMeasurementStore`) under `AGT_STATE_DIR/slo/`. The recorded SLIs,
+  their computed compliance and the error-budget burn are reloaded on restart.
+  With `AGT_STATE_DIR` unset the SLO stores are in-memory and reset with the
+  process.
 - With `AGT_STATE_DIR` set, the app **starts empty** — no demo agents are
   seeded. Real registrations populate it.
 
@@ -135,6 +151,10 @@ Persists the tamper-evident audit chain across restarts.
 
 | Variable | Purpose | Default |
 |---|---|---|
+| `AGT_REQUIRE_ATTESTATION` | When set (`1`/`true`), every `/tools/call` must carry a signed attestation that verifies against the agent's key, or it is denied | unset (optional) |
+| `AGT_JWT_SECRET` | Accept static HS256 JWT bearer tokens signed with this secret | unset |
+| `AGT_JWT_ISSUER` / `AGT_JWT_AUDIENCE` | Optional `iss` / `aud` claims enforced on JWTs | unset |
+| `AGT_TOOL_ALLOW_PRIVATE` | Allow onboarded tool endpoints that resolve to private/loopback hosts (for local webhook testing). Off = SSRF-safe: private, loopback and cloud-metadata targets are refused | unset (blocked) |
 | `AGT_HOST` | Bind address passed to uvicorn by `start.bat` / `start.sh` | `127.0.0.1` |
 | `AGT_CORS_ORIGINS` | Comma-separated allowlist | `http://localhost:3000,http://127.0.0.1:3000` |
 
@@ -150,7 +170,7 @@ Persists the tamper-evident audit chain across restarts.
 | **Trust & Identity** | Evaluate trust; view/attest Ed25519 identities | Real AGT `TrustPolicy` + `AgentIdentity` |
 | **Agents** | Register, inspect, decommission; onboard Foundry agents | Real AGT `LifecycleManager` |
 | **Agent SRE** | Per-agent SLOs, error budget, kill switch | Real AGT `agent_sre` |
-| **Compliance** | Prompt-defense grade (real) + OWASP mapping (reference) | Mixed — see below |
+| **Compliance** | Prompt-defense grade (real) + OWASP live self-assessment | Mixed — see below |
 | **Audit Log** | Merkle-chained event stream with integrity verification | Real AGT `MerkleAuditChain` |
 
 ---
@@ -198,6 +218,17 @@ Notes that are true of the grammar:
 This is the reference integration: it wraps the tool in AGT's `govern()` and the
 decision is real. A denial here is an actual enforcement outcome, and it is
 written to the audit log.
+
+**Onboarding your own tools.** The tool list is a durable registry, not a
+hardcoded set. Use *Onboard a Tool for Evaluation* to add a tool (name, actions,
+risk, optional webhook). Give it an HTTP(S) `endpoint_url` and an allowed call
+is **really invoked** — the actual HTTP status and latency are recorded and feed
+the SLO; a failing endpoint is reported as a failed execution, never a faked
+success. Leave the endpoint blank and the tool is governance-decision-only
+(honestly reported as "nothing was executed"). Endpoints are SSRF-validated:
+non-HTTP schemes and private/loopback/cloud-metadata targets are refused unless
+`AGT_TOOL_ALLOW_PRIVATE` is set for local testing. Built-in demo tools cannot be
+deleted; your own can.
 
 ### SOP 6.4 — Onboard a Microsoft Foundry agent (observational)
 
@@ -247,8 +278,10 @@ if verdict["allowed"]:
     agent.report_call("web_search", allowed=True, latency_ms=42)
 ```
 
-Attestation is currently **optional**: an unattested call is honoured on its
-self-asserted `agent_id` but flagged `identity_verified: false`.
+Attestation is **optional by default**: an unattested call is honoured on its
+self-asserted `agent_id` but flagged `identity_verified: false`. Set
+`AGT_REQUIRE_ATTESTATION` (Section 4.4) to make it mandatory — then an
+unattested or wrongly-signed call is denied at the identity gate.
 
 ### SOP 6.6 — Monitor SLOs and use the kill switch
 
@@ -259,7 +292,8 @@ self-asserted `agent_id` but flagged `identity_verified: false`.
    kill switch — so a suspended agent is denied every call.
 3. **Resume** returns it to active and clears its ring-violation budget.
 
-Remember SLO measurements are volatile (Section 4.2).
+Remember SLO measurements are in-memory unless `AGT_STATE_DIR` is set, in which
+case they persist across restarts (Section 4.2).
 
 ### SOP 6.7 — Verify audit integrity
 
@@ -290,19 +324,20 @@ With auth disabled, every caller is an anonymous admin.
 
 ## 8. Known limitations — do not rely on these
 
-- **Compliance → OWASP mapping is reference material**, a hardcoded table of AGT
-  controls against the OWASP Agentic AI Top 10. It is **not** an automated scan
-  of this or your codebase.
+- **Compliance → OWASP mapping is a self-assessment**, not a certified audit. It
+  reports the controls actually enabled on the running instance (auth,
+  attestation, durable state/audit, CORS, kill switch) and the enforcement
+  status of each risk — but it does **not** scan your codebase or guarantee
+  compliance.
 - **Prompt scan grades a *system prompt*'s defensive language** (A–F). It is
   static analysis of the prompt, **not** a detector for malicious user input.
 - **Foundry onboarding and `/ingest/events` are observational.** They feed SLOs
-  and audit notes from self-reported data; they do not enforce anything.
-- **SLO measurements do not persist** even when `AGT_STATE_DIR` is set.
+  and audit notes from self-reported data; they do not enforce anything. (This
+  is inherent: replayed telemetry describes calls that already happened.)
 - **PII/credential detection is pattern-limited** to AGT's `CredentialRedactor`.
-- **Attestation is optional**; mandatory attestation, SPIFFE/mTLS are not
-  implemented.
-- **No secret rotation or OIDC/JWT** — API keys are static bearer tokens.
-- **Policies are shared globally**, not isolated per tenant (agents are).
+- **SPIFFE/mTLS and full OIDC + secret rotation are not implemented** — they need
+  an external identity provider / PKI. JWT support here is a static HS256
+  verifier only (see Section 4.1).
 
 ---
 

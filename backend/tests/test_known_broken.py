@@ -50,12 +50,14 @@ def test_prompt_defense_evaluator_grades_system_prompts_not_user_input():
 
 @pytest.mark.known_broken
 def test_unattested_agent_id_is_still_self_asserted(client):
-    """Attestation is real but optional: an unattested call trusts the agent_id.
+    """By default an unattested call trusts the self-asserted agent_id.
 
-    Agents now have Ed25519 identities and a call *can* be cryptographically
-    attested (see test_identity.py). The residual gap is that a call with no
-    attestation is still honoured on the self-asserted agent_id — only flagged
-    ``identity_verified: false``. Making attestation mandatory is the next step.
+    Agents have Ed25519 identities and a call *can* be cryptographically
+    attested (see test_identity.py). Mandatory attestation is now available as
+    an opt-in gate — set AGT_REQUIRE_ATTESTATION and an unattested call is
+    denied (see test_attestation_required.py). This test pins the shipped
+    default, where attestation stays optional and an unattested call is merely
+    flagged ``identity_verified: false``.
     """
     impersonated = client.post("/tools/call", json={
         "tool_name": "db_query", "action": "read", "agent_id": "research-agent",

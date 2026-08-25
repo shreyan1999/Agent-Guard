@@ -11,6 +11,7 @@ A local playground for exploring the [Microsoft Agent Governance Toolkit](https:
 | Area | Endpoint | Status | What actually runs |
 |---|---|---|---|
 | **Tool Playground** | `POST /tools/call` | **Real AGT** | `agentmesh.governance.govern()` wraps the tool; AGT's `PolicyEngine` makes the decision and raises `GovernanceDenied`. This is the reference integration. |
+| **Tool onboarding** | `POST /tools/register` | **Real** | Onboard your own tools (name, actions, risk, optional webhook) into a durable registry — the tool list is registry-driven, not hardcoded. A tool with an `endpoint_url` is *really* invoked on an allowed call (SSRF-guarded: non-HTTP schemes and private/loopback/metadata targets are refused unless `AGT_TOOL_ALLOW_PRIVATE` is set), and its actual HTTP status/latency feed the SLO. A tool with no endpoint is honestly reported as a governance decision only — nothing is fabricated. |
 | **Telemetry ingestion** | `POST /ingest/events` | **Real AGT** | Out-of-band counterpart to `/tools/call`: a running agent streams the events it already executed, which feed the real `agent_sre` SLOs and a summarised, source-tagged audit note. Self-reported telemetry, never an authoritative verdict. |
 | **Foundry connector** | `backend/foundry_connector.py`, `POST /agents/{id}/foundry/sync` | **Real schema** | Maps Microsoft Foundry (Azure AI Agents) `RunStep` telemetry — `tool_calls` steps, status, timestamps, `last_error` — into ingestion events. It never calls the Foundry SDK itself (the caller pastes `run_steps.list(...).as_dict()`), so a Foundry agent's tool use feeds the same SLOs and audit trail. Onboardable from the Agents panel: register a twin with the Foundry link, then paste run steps to sync. |
 | **Trust evaluation** | `POST /trust/evaluate` | **Real AGT** | Genuine `TrustPolicy` + `PolicyEvaluator`, and the *same* policy object `/tools/call` enforces with — a verdict shown here is the verdict the runtime applies. |
@@ -21,8 +22,8 @@ A local playground for exploring the [Microsoft Agent Governance Toolkit](https:
 | **Agent SRE** | `/sre/*` | **Real AGT** | Per-agent `agent_sre.SLO` objects with `TaskSuccessRate`, `PolicyCompliance` and `ResponseLatency` indicators over a real `ErrorBudget`. Governed tool calls feed measurements into the SLO, so error-budget burn rate and firing alerts are computed by AGT, not by this app. |
 | **Audit log** | `GET /audit` | **Real AGT** | AGT's `AuditLog` over a `MerkleAuditChain`. Every entry is SHA-256 hashed over its own fields plus the previous entry's hash. `GET /audit/verify` re-walks the chain; `GET /audit/proof/{id}` returns a Merkle inclusion proof. |
 | **Prompt scan** | `POST /compliance/scan-prompt` | **Real AGT** | AGT's `PromptDefenseEvaluator` grades a **system prompt**'s defensive posture (A–F over 12 vectors). It is static analysis of a prompt's own defensive language — not a detector for malicious user input. |
-| **OWASP coverage** | `GET /compliance/owasp` | **Reference** | A hardcoded mapping of AGT controls to the OWASP Agentic AI Top 10, each marked `enforced` / `partial` / `not_implemented`. It is reference material about AGT, **not** an automated assessment of this codebase. |
-| **Access control** | all endpoints | **App-layer** | Not an AGT primitive — this is FastAPI guarding who reaches the API. Off by default (anonymous local admin); set `AGT_API_KEYS` to require bearer tokens, a `viewer`/`operator`/`admin` role hierarchy, and per-tenant agent isolation. |
+| **OWASP coverage** | `GET /compliance/owasp` | **Self-assessment** | A live self-assessment: it snapshots the controls actually enabled on the running instance (auth, attestation, durable state/audit, CORS, kill switch) and recomputes each risk's `enforced` / `partial` / `not_implemented` status per request. It reports real posture, **not** a certified audit of your codebase. |
+| **Access control** | all endpoints | **App-layer** | Not an AGT primitive — this is FastAPI guarding who reaches the API. Off by default (anonymous local admin); set `AGT_API_KEYS` (or `AGT_JWT_SECRET` for static HS256 JWTs) to require bearer tokens, a `viewer`/`operator`/`admin` role hierarchy, per-tenant agent **and policy** isolation. |
 
 ---
 
@@ -33,11 +34,11 @@ AGT organises governance under four pillars. Here is where this playground hones
 | Pillar | AGT capability | This project |
 |---|---|---|
 | **Policy** — fail-closed decisions | `PolicyEngine`, `govern()`, `FacetRegistry`, `Policy.extends` | **Implemented.** One `PolicyEngine` serves both the Policy panel and enforcement. Policies are file-backed, support inheritance and per-policy conflict strategy, and every way a rule can silently fail to fire is reported. |
-| **Trust** — DID, SPIFFE, mTLS | `TrustPolicy`, identity primitives | **Enforced and attestable.** A shared `TrustPolicy` gates every call below `MIN_TRUST`, `agent_id` reaches `govern()` so AGT evaluates as that agent, and the score selects the execution ring. Each agent now has a real Ed25519 `AgentIdentity` (`did:mesh` DID); a call can be cryptographically attested by signing a challenge nonce, verified against the agent's public key. Attestation is currently *optional* — an unattested call is honoured on its self-asserted `agent_id` but flagged `identity_verified: false`. Making attestation mandatory, and SPIFFE/mTLS, are the remaining steps. |
+| **Trust** — DID, SPIFFE, mTLS | `TrustPolicy`, identity primitives | **Enforced and attestable.** A shared `TrustPolicy` gates every call below `MIN_TRUST`, `agent_id` reaches `govern()` so AGT evaluates as that agent, and the score selects the execution ring. Each agent now has a real Ed25519 `AgentIdentity` (`did:mesh` DID); a call can be cryptographically attested by signing a challenge nonce, verified against the agent's public key. Attestation is *optional by default* (an unattested call is flagged `identity_verified: false`), but set `AGT_REQUIRE_ATTESTATION` and it becomes a hard gate — unattested or wrongly-signed calls are denied. SPIFFE/mTLS binding remains out of scope (needs external PKI). |
 | **Runtime** — isolation, kill switches | `hypervisor.rings`, `ExecutionRing`, `LifecycleManager` | **Implemented.** The kill switch is AGT's `SUSPENDED` lifecycle state, enforced before policy and not overridable by policy; invalid transitions are rejected by AGT's state machine. Trust derives an `ExecutionRing` via `ExecutionRing.from_eff_score()`, and `govern(ring=…)` enforces its resource constraints inside AGT, with a per-session circuit breaker. |
 | **Evidence** — tamper-evident audit | `MerkleAuditChain` | **Implemented.** Backed by AGT's `AuditLog` / `MerkleAuditChain`. Editing, deleting or reordering an entry breaks verification — including when the attacker recomputes the edited entry's own hash, because the next entry's chain link still fails. Durable storage is opt-in (see below). |
 
-The **Compliance** panel does not map onto any AGT pillar. The prompt-defense grade is a real AGT evaluator, but the OWASP list is reference material, not a control.
+The **Compliance** panel does not map onto any AGT pillar. The prompt-defense grade is a real AGT evaluator, and the OWASP report is a live self-assessment of the instance's configuration, not a certified audit.
 
 ---
 
@@ -212,17 +213,17 @@ naming the offending atom, and existing policies show a warning in the panel.
 
 **Rule priority is descending.** Higher priority numbers evaluate first. The bundled default policy numbers its rules the other way round; the default `deny_overrides` conflict strategy currently hides this.
 
-**Agent identity is real but attestation is optional.** Every agent is minted an Ed25519 `AgentIdentity` with a `did:mesh` DID; the platform retains only the public key and issues the private key once, at registration. A tool call *can* be cryptographically attested: `POST /identity/challenge` issues a single-use nonce, the agent signs it, and `/tools/call` verifies the signature against the agent's public key (`identity_verified: true`). The residual gap is that an **unattested** call is still honoured on its self-asserted `agent_id` — only flagged `identity_verified: false` — for backward compatibility and the browser UI. Making attestation mandatory, plus SPIFFE/mTLS binding, is the next step for the Trust pillar.
+**Agent identity is real; attestation is optional by default and enforceable on demand.** Every agent is minted an Ed25519 `AgentIdentity` with a `did:mesh` DID; the platform retains only the public key and issues the private key once, at registration. A tool call *can* be cryptographically attested: `POST /identity/challenge` issues a single-use nonce, the agent signs it, and `/tools/call` verifies the signature against the agent's public key (`identity_verified: true`). By default an **unattested** call is still honoured on its self-asserted `agent_id` — only flagged `identity_verified: false` — for backward compatibility and the browser UI. Set `AGT_REQUIRE_ATTESTATION` and attestation becomes mandatory: an unattested or wrongly-signed call is denied at the identity gate, before trust, ring or policy run. SPIFFE/mTLS binding remains out of scope (it needs external PKI).
 
 **Agent persistence is opt-in.** By default the registry is in-memory: demo agents are re-seeded on every restart, and there is no durable record. Set `AGT_STATE_DIR` and the registry becomes durable — AGT's `LifecycleManager` persists agent records (`agents.json`, so a suspended kill-switch survives a restart), a sidecar `agent_meta.json` keeps trust/tenant/policy, and `identities.json` keeps the public DIDs so an agent's DID is **stable** across restarts. Private keys are never written: the once-issued private key stays with the caller, and the reloaded public key still verifies its attestations. A durable deployment starts **empty** (no demo agents) and is populated by real registrations.
 
 **The prompt scanner grades system prompts, not user input.** `POST /compliance/scan-prompt` runs AGT's `PromptDefenseEvaluator`, which performs *static analysis of a system prompt*, grading whether defensive language is present (A–F over 12 vectors). It is **not** a detector for malicious user input, and it does no PII detection. A benign question like "What is the weather today?" grades **F, 0/12**, because it contains no defensive language — that is correct behaviour, not a bug. Feed it an agent's system prompt, not an end-user message.
 
-**Authentication is off by default.** The playground ships open: with no keys configured every request runs as an anonymous local admin, exactly as before. Set `AGT_API_KEYS` (`token:subject:tenant:roles`, e.g. `s3cret:ana:acme:operator`) or `AGT_API_KEYS_FILE` and the same endpoints require a bearer token, enforce a three-tier role hierarchy (`viewer` ⊂ `operator` ⊂ `admin`), and scope agents by tenant — a caller sees and mutates only its own tenant's agents, while an `admin` spans tenants. Reads need `viewer`; creating agents/policies, invoking tools and updating trust need `operator`; deleting agents/policies, the kill switch and resetting the audit chain need `admin`. `/health` and the OpenAPI docs stay public so the browser can reach `/docs` to authenticate. CORS is now an allowlist (`AGT_CORS_ORIGINS`, default the local React origin) rather than `*`, and the launch scripts bind `127.0.0.1` by default (`AGT_HOST` to expose). The frontend attaches a bearer token from `localStorage['agt_api_token']` or `REACT_APP_API_TOKEN` when present. **Still missing:** token rotation, an OIDC/JWT path, and per-tenant policy isolation (policies remain a shared global library).
+**Authentication is off by default.** The playground ships open: with no keys configured every request runs as an anonymous local admin, exactly as before. Set `AGT_API_KEYS` (`token:subject:tenant:roles`, e.g. `s3cret:ana:acme:operator`) or `AGT_API_KEYS_FILE` and the same endpoints require a bearer token, enforce a three-tier role hierarchy (`viewer` ⊂ `operator` ⊂ `admin`), and scope agents by tenant — a caller sees and mutates only its own tenant's agents, while an `admin` spans tenants. Reads need `viewer`; creating agents/policies, invoking tools and updating trust need `operator`; deleting agents/policies, the kill switch and resetting the audit chain need `admin`. `/health` and the OpenAPI docs stay public so the browser can reach `/docs` to authenticate. CORS is now an allowlist (`AGT_CORS_ORIGINS`, default the local React origin) rather than `*`, and the launch scripts bind `127.0.0.1` by default (`AGT_HOST` to expose). The frontend attaches a bearer token from `localStorage['agt_api_token']` or `REACT_APP_API_TOKEN` when present. As an alternative credential, set `AGT_JWT_SECRET` to accept static HS256 JSON Web Tokens (principal read from `sub`/`tenant`/`roles`, with `exp`/`nbf` and optional `AGT_JWT_ISSUER`/`AGT_JWT_AUDIENCE` enforced). Policies created through the API are now **scoped to the author's tenant** — another tenant cannot see, edit or govern its agents with them, while the seeded `default-policy` stays shared and admins span tenants. **Still out of scope:** secret rotation and full OIDC/JWKS discovery (the JWT path is a static HS256 verifier only, no key rotation).
 
 **Audit durability is opt-in.** The chain is held in memory and starts empty on restart. Set `AGT_AUDIT_FILE` and `AGT_AUDIT_KEY` to also stream entries to an append-only, HMAC-signed JSON-lines file via AGT's `FileAuditSink`. This is not the default because re-verifying on-disk entries requires the same key across restarts, and key management is out of scope for a playground.
 
-**SLO measurements are in-memory.** With `AGT_STATE_DIR` set, agents, trust, tenant and public DIDs persist (above), and policies are file-backed by default; SLO measurements are the remaining volatile state and are rebuilt empty on restart. The SLO registry is guarded by a lock, as is the audit chain; the remaining handlers mutate shared dictionaries without locking.
+**SLO measurements persist when `AGT_STATE_DIR` is set.** With a state directory, agents, trust, tenant, public DIDs and policy ownership persist (above), policies are file-backed, and each agent's `agent_sre` SLO is backed by a durable per-agent `SQLiteMeasurementStore` under `AGT_STATE_DIR/slo/` — so recorded SLIs, computed compliance and the error-budget burn reload on restart. With no state directory the SLO stores are in-memory and rebuilt empty on restart. The SLO registry is guarded by a lock, as is the audit chain; the remaining handlers mutate shared dictionaries without locking.
 
 ---
 
@@ -340,11 +341,14 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-244 tests covering the four gates, cryptographic identity attestation, API-key
-auth with role and tenant enforcement, opt-in durable state, out-of-band
-telemetry ingestion, the client SDK, the Foundry connector and UI onboarding,
-single-container static hosting, policy agreement, tamper detection, the real
-agent_sre SLOs and the lifecycle API. They run against the FastAPI app
+292 tests covering the four gates, cryptographic identity attestation (optional
+and the mandatory `AGT_REQUIRE_ATTESTATION` gate), API-key **and static HS256
+JWT** auth with role and tenant enforcement, per-tenant policy isolation, opt-in
+durable state **including durable agent_sre SLOs**, the live OWASP
+self-assessment, **tool onboarding with real SSRF-guarded webhook invocation**,
+out-of-band telemetry ingestion, the client SDK, the Foundry connector and UI
+onboarding, single-container static hosting, policy agreement, tamper detection,
+the real agent_sre SLOs and the lifecycle API. They run against the FastAPI app
 in-process; each test rebuilds every module-level store via `reset_state()`,
 including AGT's own breach-detector registry, so the suite is order-independent.
 
@@ -362,6 +366,12 @@ including AGT's own breach-detector registry, so the suite is order-independent.
 | `test_sdk.py` | The client SDK, driven against the live app: registration captures the issued key, authorization signs a real challenge nonce, and reporting streams telemetry |
 | `test_foundry_connector.py` | Foundry `RunStep` telemetry maps to ingestion events — only `tool_calls` steps, function names, failure/error, timestamp latency — and streams into the SLOs |
 | `test_foundry_sync.py` | The onboarding endpoint: registration records the Foundry link and it survives a restart, pasted run steps feed the SLOs and one `foundry.telemetry` note, and empty/unknown/oversized inputs are handled |
+| `test_attestation_required.py` | `AGT_REQUIRE_ATTESTATION` turns attestation into a hard gate — unattested and forged calls are denied at the identity gate, a properly signed call passes, and the default stays optional |
+| `test_slo_persistence.py` | With `AGT_STATE_DIR` set the agent_sre SLO measurements and reconstructed error budget survive a restart via a durable per-agent `SQLiteMeasurementStore`; the default stays in-memory |
+| `test_jwt_auth.py` | Static HS256 JWT bearer validation — real signature check, role enforcement, and rejection of forged, expired, not-yet-valid, `alg:none`, subject-less and wrong-issuer tokens |
+| `test_owasp_runtime.py` | The OWASP report is a live self-assessment: toggling attestation or auth promotes the matching risk to `enforced`, and statuses stay honest enforcement states |
+| `test_policy_tenant_isolation.py` | Policies are scoped to the author's tenant — another tenant cannot list, read, edit or govern its agents with them; the default stays shared; admins span tenants; ownership survives a restart |
+| `test_tool_registry.py` | Onboarded tools are registry-driven; a real local HTTP server proves webhook tools are actually invoked (status/body flow back), failures are reported truthfully, governance still gates the call, the SSRF guard blocks non-HTTP and private/metadata targets, built-ins are protected, and definitions survive a restart |
 | `test_packaging.py` | The single-container static mount serves index.html at the root without shadowing an API route, and stays off when `AGT_STATIC_DIR` is unset |
 | `test_policy_store.py` | Persistence, name safety, inheritance, conflict strategy, and the schema-vs-linter drift guard |
 | `test_condition_builder.py` | The schema contract: every operator renders, parses and lints; the frontend fixture matches the live endpoint |
@@ -425,7 +435,7 @@ agt-dashboard/
 │   │       ├── TrustPanel.js      ← Trust evaluation (enforced; same policy as /tools/call)
 │   │       ├── AgentsPanel.js     ← Agent registry (AGT LifecycleManager, in-memory)
 │   │       ├── SREPanel.js        ← Real agent_sre SLOs; kill switch via lifecycle (enforced)
-│   │       ├── CompliancePanel.js ← System-prompt hardening grade + OWASP reference
+│   │       ├── CompliancePanel.js ← System-prompt hardening grade + OWASP live self-assessment
 │   │       └── AuditPanel.js      ← In-memory event log
 │   └── package.json
 ├── Dockerfile               ← Multi-stage: build the SPA, serve it + the API
@@ -511,7 +521,9 @@ GET  /policies/{name}/resolved   Merged policy: rule origins and dropped rules
 POST /policies/evaluate          Evaluate via the same PolicyEngine that enforces
 
 POST /tools/call                 Execute a governed tool call through four gates
-GET  /tools                      List available tools
+GET  /tools                      List onboarded tools (registry-driven)
+POST /tools/register             Onboard a tool for evaluation (optional real webhook)
+DELETE /tools/{name}             Remove an onboarded tool (built-ins protected)
 POST /ingest/events              Ingest a batch of self-reported execution telemetry
 
 GET  /trust                      Trust scores for all agents
@@ -519,7 +531,7 @@ POST /trust/evaluate             TrustPolicy evaluation (same policy /tools/call
 POST /trust/update               Update an agent's trust score
 
 POST /compliance/scan-prompt     Grade a system prompt's defensive posture (A–F)
-GET  /compliance/owasp           OWASP Agentic AI mapping (enforced/partial/not_implemented)
+GET  /compliance/owasp           OWASP Agentic AI live self-assessment (enforced/partial/not_implemented)
 
 GET  /sre/slos                   List per-agent agent_sre SLOs
 POST /sre/slos                   Create/reset an agent's SLO target
@@ -610,7 +622,7 @@ This project pins AGT **4.1.0** and builds on `govern()`. The current toolkit do
 
 The limitations above are the roadmap. The highest-value fixes, roughly in order:
 
-1. Extend access control: token rotation, an OIDC/JWT path, and per-tenant policy isolation (agents are tenant-scoped today; policies are still a shared global library).
-2. Make identity attestation *mandatory* (it is real but optional today), and add SPIFFE/mTLS binding.
+1. Extend access control further: secret/token rotation and full OIDC/JWKS discovery (a static HS256 JWT path and per-tenant policy isolation now exist; asymmetric keys and rotation do not).
+2. Add SPIFFE/mTLS identity binding (attestation is now real and can be made mandatory via `AGT_REQUIRE_ATTESTATION`; transport-level identity is the remaining gap).
 3. Replace the static `_trust_scores` map with AGT's `TrustTracker`, so trust moves with observed behaviour instead of manual edits.
 4. Evaluate migrating from `govern()` to the Agent Control Specification (ACS), the canonical AGT 5 policy runtime.
