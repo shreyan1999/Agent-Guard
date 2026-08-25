@@ -1,0 +1,14 @@
+# Azure Developer CLI (azd) service map.
+# `azd up` builds the Dockerfile, pushes to the provisioned registry, and
+# deploys to the Container App tagged azd-service-name: web.
+name: agt-governance-dashboard
+metadata:
+  template: agt-governance-dashboard@1.0.0
+services:
+  web:
+    project: .
+    language: docker
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .

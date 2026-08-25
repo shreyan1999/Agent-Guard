@@ -1,0 +1,15 @@
+# Keep the build context small and reproducible.
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/node_modules
+frontend/build
+backend/policies
+backend/*.log
+.git
+.github
+.gitignore
+*.md
+infra
+azure.yaml

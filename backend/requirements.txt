@@ -1,0 +1,4 @@
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pyyaml>=6.0
+agent-governance-toolkit[full]>=4.1.0

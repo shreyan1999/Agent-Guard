@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node
+node_modules/
+/frontend/build/
+
+# Audit sink output (see AGT_AUDIT_FILE)
+*.jsonl
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Saved policies (file-backed store)
+/backend/policies/
+
+# Local preview launcher
+/.claude/
