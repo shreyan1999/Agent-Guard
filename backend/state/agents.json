@@ -1,0 +1,544 @@
+[
+  {
+    "agent_id": "agent:d777d13f8a6d",
+    "name": "research-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:1d7f346249ea4054",
+    "credential_issued_at": "2026-09-26T10:08:35.119017Z",
+    "credential_expires_at": "2026-09-27T10:08:35.119017Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.119017Z",
+    "updated_at": "2026-09-26T10:08:35.119017Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:d777d13f8a6d",
+        "timestamp": "2026-09-26T10:08:35.119017Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "research-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:d777d13f8a6d",
+        "timestamp": "2026-09-26T10:08:35.119017Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:c44b33924620",
+    "name": "data-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:76d09a74f17e4bd6",
+    "credential_issued_at": "2026-09-26T10:08:35.135288Z",
+    "credential_expires_at": "2026-09-27T10:08:35.135288Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.132296Z",
+    "updated_at": "2026-09-26T10:08:35.134290Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:c44b33924620",
+        "timestamp": "2026-09-26T10:08:35.132296Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "data-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:c44b33924620",
+        "timestamp": "2026-09-26T10:08:35.134290Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:b0c92c9e3930",
+    "name": "email-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:f1404c897d93436f",
+    "credential_issued_at": "2026-09-26T10:08:35.142128Z",
+    "credential_expires_at": "2026-09-27T10:08:35.142128Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.140134Z",
+    "updated_at": "2026-09-26T10:08:35.141130Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:b0c92c9e3930",
+        "timestamp": "2026-09-26T10:08:35.140134Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "email-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:b0c92c9e3930",
+        "timestamp": "2026-09-26T10:08:35.141130Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:57d8dbed35cf",
+    "name": "untrusted-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:531c063cb60d48b4",
+    "credential_issued_at": "2026-09-26T10:08:35.146649Z",
+    "credential_expires_at": "2026-09-27T10:08:35.146649Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.146649Z",
+    "updated_at": "2026-09-26T10:08:35.146649Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:57d8dbed35cf",
+        "timestamp": "2026-09-26T10:08:35.146649Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "untrusted-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:57d8dbed35cf",
+        "timestamp": "2026-09-26T10:08:35.146649Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:6309cadab7f9",
+    "name": "billing-agent",
+    "owner": "finance@acme.test",
+    "purpose": "Reconciles invoices",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:5b6a1ca03d794169",
+    "credential_issued_at": "2026-09-26T10:08:35.153779Z",
+    "credential_expires_at": "2026-09-27T10:08:35.153779Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.153779Z",
+    "updated_at": "2026-09-26T10:08:35.153779Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:6309cadab7f9",
+        "timestamp": "2026-09-26T10:08:35.153779Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "billing-agent",
+          "owner": "finance@acme.test",
+          "purpose": "Reconciles invoices"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:6309cadab7f9",
+        "timestamp": "2026-09-26T10:08:35.153779Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:019f758722bc",
+    "name": "support-agent",
+    "owner": "support@acme.test",
+    "purpose": "Answers customer tickets",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:6de9a8464e484a40",
+    "credential_issued_at": "2026-09-26T10:08:35.161037Z",
+    "credential_expires_at": "2026-09-27T10:08:35.161037Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.161037Z",
+    "updated_at": "2026-09-26T10:08:35.161037Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:019f758722bc",
+        "timestamp": "2026-09-26T10:08:35.161037Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "support-agent",
+          "owner": "support@acme.test",
+          "purpose": "Answers customer tickets"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:019f758722bc",
+        "timestamp": "2026-09-26T10:08:35.161037Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:4fd74496b228",
+    "name": "etl-agent",
+    "owner": "data@acme.test",
+    "purpose": "Moves records between stores",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:0b62df0b50cd4939",
+    "credential_issued_at": "2026-09-26T10:08:35.167926Z",
+    "credential_expires_at": "2026-09-27T10:08:35.167926Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.167926Z",
+    "updated_at": "2026-09-26T10:08:35.167926Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:4fd74496b228",
+        "timestamp": "2026-09-26T10:08:35.167926Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "etl-agent",
+          "owner": "data@acme.test",
+          "purpose": "Moves records between stores"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:4fd74496b228",
+        "timestamp": "2026-09-26T10:08:35.167926Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:661536cc92fd",
+    "name": "scraper-agent",
+    "owner": "research@acme.test",
+    "purpose": "Collects public pages",
+    "agent_type": "autonomous",
+    "state": "suspended",
+    "credential_id": "cred:8563627807604544",
+    "credential_issued_at": "2026-09-26T10:08:35.174739Z",
+    "credential_expires_at": "2026-09-27T10:08:35.174739Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.174739Z",
+    "updated_at": "2026-11-11T08:04:58.034187Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:661536cc92fd",
+        "timestamp": "2026-09-26T10:08:35.174739Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "scraper-agent",
+          "owner": "research@acme.test",
+          "purpose": "Collects public pages"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:661536cc92fd",
+        "timestamp": "2026-09-26T10:08:35.174739Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      },
+      {
+        "event_type": "suspended",
+        "agent_id": "agent:661536cc92fd",
+        "timestamp": "2026-09-26T10:08:36.334221Z",
+        "actor": "operator",
+        "details": {
+          "reason": "Kill switch activated"
+        },
+        "previous_state": "active",
+        "new_state": "suspended"
+      },
+      {
+        "event_type": "resumed",
+        "agent_id": "agent:661536cc92fd",
+        "timestamp": "2026-10-07T13:37:31.034533Z",
+        "actor": "operator",
+        "details": {},
+        "previous_state": "suspended",
+        "new_state": "active"
+      },
+      {
+        "event_type": "suspended",
+        "agent_id": "agent:661536cc92fd",
+        "timestamp": "2026-10-07T13:37:32.077814Z",
+        "actor": "operator",
+        "details": {
+          "reason": "Kill switch activated"
+        },
+        "previous_state": "active",
+        "new_state": "suspended"
+      },
+      {
+        "event_type": "resumed",
+        "agent_id": "agent:661536cc92fd",
+        "timestamp": "2026-11-11T08:04:57.050412Z",
+        "actor": "operator",
+        "details": {},
+        "previous_state": "suspended",
+        "new_state": "active"
+      },
+      {
+        "event_type": "suspended",
+        "agent_id": "agent:661536cc92fd",
+        "timestamp": "2026-11-11T08:04:58.034187Z",
+        "actor": "operator",
+        "details": {
+          "reason": "Kill switch activated"
+        },
+        "previous_state": "active",
+        "new_state": "suspended"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:e0bd42b021ba",
+    "name": "intern-agent",
+    "owner": "labs@acme.test",
+    "purpose": "Unproven, sandboxed",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:17dd5cb9a419423d",
+    "credential_issued_at": "2026-09-26T10:08:35.181813Z",
+    "credential_expires_at": "2026-09-27T10:08:35.181813Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T10:08:35.181813Z",
+    "updated_at": "2026-09-26T10:08:35.181813Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:e0bd42b021ba",
+        "timestamp": "2026-09-26T10:08:35.181813Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "intern-agent",
+          "owner": "labs@acme.test",
+          "purpose": "Unproven, sandboxed"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:e0bd42b021ba",
+        "timestamp": "2026-09-26T10:08:35.181813Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:1936f4db5cf5",
+    "name": "chaos-attacker-2719fbd1",
+    "owner": "chaos@localhost",
+    "purpose": "Ephemeral adversarial test agent",
+    "agent_type": "autonomous",
+    "state": "decommissioned",
+    "credential_id": null,
+    "credential_issued_at": "2026-09-26T11:00:16.541385Z",
+    "credential_expires_at": null,
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T11:00:16.528419Z",
+    "updated_at": "2026-09-26T11:00:17.684524Z",
+    "decommissioned_at": "2026-09-26T11:00:17.686715Z",
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:1936f4db5cf5",
+        "timestamp": "2026-09-26T11:00:16.528419Z",
+        "actor": "chaos",
+        "details": {
+          "name": "chaos-attacker-2719fbd1",
+          "owner": "chaos@localhost",
+          "purpose": "Ephemeral adversarial test agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:1936f4db5cf5",
+        "timestamp": "2026-09-26T11:00:16.535401Z",
+        "actor": "chaos",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      },
+      {
+        "event_type": "decommission_started",
+        "agent_id": "agent:1936f4db5cf5",
+        "timestamp": "2026-09-26T11:00:17.681534Z",
+        "actor": "chaos",
+        "details": {
+          "reason": "Chaos run complete"
+        },
+        "previous_state": "active",
+        "new_state": "decommissioning"
+      },
+      {
+        "event_type": "decommissioned",
+        "agent_id": "agent:1936f4db5cf5",
+        "timestamp": "2026-09-26T11:00:17.684524Z",
+        "actor": "chaos",
+        "details": {},
+        "previous_state": "decommissioning",
+        "new_state": "decommissioned"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:6c2a093e8c22",
+    "name": "chaos-sandboxed-2719fbd1",
+    "owner": "chaos@localhost",
+    "purpose": "Ephemeral adversarial test agent",
+    "agent_type": "autonomous",
+    "state": "decommissioned",
+    "credential_id": null,
+    "credential_issued_at": "2026-09-26T11:00:16.561387Z",
+    "credential_expires_at": null,
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-26T11:00:16.548366Z",
+    "updated_at": "2026-09-26T11:00:17.690794Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:6c2a093e8c22",
+        "timestamp": "2026-09-26T11:00:16.548366Z",
+        "actor": "chaos",
+        "details": {
+          "name": "chaos-sandboxed-2719fbd1",
+          "owner": "chaos@localhost",
+          "purpose": "Ephemeral adversarial test agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:6c2a093e8c22",
+        "timestamp": "2026-09-26T11:00:16.555349Z",
+        "actor": "chaos",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      },
+      {
+        "event_type": "decommission_started",
+        "agent_id": "agent:6c2a093e8c22",
+        "timestamp": "2026-09-26T11:00:17.688529Z",
+        "actor": "chaos",
+        "details": {
+          "reason": "Chaos run complete"
+        },
+        "previous_state": "active",
+        "new_state": "decommissioning"
+      },
+      {
+        "event_type": "decommissioned",
+        "agent_id": "agent:6c2a093e8c22",
+        "timestamp": "2026-09-26T11:00:17.690794Z",
+        "actor": "chaos",
+        "details": {},
+        "previous_state": "decommissioning",
+        "new_state": "decommissioned"
+      }
+    ]
+  }
+]

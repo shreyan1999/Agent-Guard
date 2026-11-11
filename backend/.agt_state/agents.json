@@ -1,0 +1,382 @@
+[
+  {
+    "agent_id": "agent:263143163b35",
+    "name": "research-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:b27dcb8b03994a4e",
+    "credential_issued_at": "2026-09-15T18:39:00.490534Z",
+    "credential_expires_at": "2026-09-16T18:39:00.490534Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.482549Z",
+    "updated_at": "2026-09-15T18:39:00.485540Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:263143163b35",
+        "timestamp": "2026-09-15T18:39:00.482549Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "research-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:263143163b35",
+        "timestamp": "2026-09-15T18:39:00.485540Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:52dd1e2026c6",
+    "name": "data-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:16a8d3ce316343fe",
+    "credential_issued_at": "2026-09-15T18:39:00.528426Z",
+    "credential_expires_at": "2026-09-16T18:39:00.528426Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.522443Z",
+    "updated_at": "2026-09-15T18:39:00.525435Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:52dd1e2026c6",
+        "timestamp": "2026-09-15T18:39:00.522443Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "data-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:52dd1e2026c6",
+        "timestamp": "2026-09-15T18:39:00.525435Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:999bd3161797",
+    "name": "email-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:70d5b9aefd0d44f4",
+    "credential_issued_at": "2026-09-15T18:39:00.552362Z",
+    "credential_expires_at": "2026-09-16T18:39:00.552362Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.543389Z",
+    "updated_at": "2026-09-15T18:39:00.548379Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:999bd3161797",
+        "timestamp": "2026-09-15T18:39:00.543389Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "email-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:999bd3161797",
+        "timestamp": "2026-09-15T18:39:00.548379Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:15c7479b4f5b",
+    "name": "untrusted-agent",
+    "owner": "demo@localhost",
+    "purpose": "Seeded demo agent",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:678c0fcfcada4505",
+    "credential_issued_at": "2026-09-15T18:39:00.580818Z",
+    "credential_expires_at": "2026-09-16T18:39:00.580818Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.561868Z",
+    "updated_at": "2026-09-15T18:39:00.566860Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:15c7479b4f5b",
+        "timestamp": "2026-09-15T18:39:00.562865Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "untrusted-agent",
+          "owner": "demo@localhost",
+          "purpose": "Seeded demo agent"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:15c7479b4f5b",
+        "timestamp": "2026-09-15T18:39:00.566860Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:e0c3747ad7f8",
+    "name": "billing-agent",
+    "owner": "finance@acme.test",
+    "purpose": "Reconciles invoices",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:0fe9557e3f844d54",
+    "credential_issued_at": "2026-09-15T18:39:00.603757Z",
+    "credential_expires_at": "2026-09-16T18:39:00.603757Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.596776Z",
+    "updated_at": "2026-09-15T18:39:00.600772Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:e0c3747ad7f8",
+        "timestamp": "2026-09-15T18:39:00.596776Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "billing-agent",
+          "owner": "finance@acme.test",
+          "purpose": "Reconciles invoices"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:e0c3747ad7f8",
+        "timestamp": "2026-09-15T18:39:00.600772Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:39759eab89b8",
+    "name": "support-agent",
+    "owner": "support@acme.test",
+    "purpose": "Answers customer tickets",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:44ab66b6726e4539",
+    "credential_issued_at": "2026-09-15T18:39:00.629228Z",
+    "credential_expires_at": "2026-09-16T18:39:00.629228Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.618716Z",
+    "updated_at": "2026-09-15T18:39:00.624700Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:39759eab89b8",
+        "timestamp": "2026-09-15T18:39:00.618716Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "support-agent",
+          "owner": "support@acme.test",
+          "purpose": "Answers customer tickets"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:39759eab89b8",
+        "timestamp": "2026-09-15T18:39:00.624700Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:50805de5702c",
+    "name": "etl-agent",
+    "owner": "data@acme.test",
+    "purpose": "Moves records between stores",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:462b4fb253764d9e",
+    "credential_issued_at": "2026-09-15T18:39:00.649166Z",
+    "credential_expires_at": "2026-09-16T18:39:00.649166Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.640184Z",
+    "updated_at": "2026-09-15T18:39:00.644173Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:50805de5702c",
+        "timestamp": "2026-09-15T18:39:00.640184Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "etl-agent",
+          "owner": "data@acme.test",
+          "purpose": "Moves records between stores"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:50805de5702c",
+        "timestamp": "2026-09-15T18:39:00.644173Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:4afc3ae648fe",
+    "name": "scraper-agent",
+    "owner": "research@acme.test",
+    "purpose": "Collects public pages",
+    "agent_type": "autonomous",
+    "state": "suspended",
+    "credential_id": "cred:09a7bd97dbfd4cdd",
+    "credential_issued_at": "2026-09-15T18:39:00.670105Z",
+    "credential_expires_at": "2026-09-16T18:39:00.670105Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.661129Z",
+    "updated_at": "2026-09-15T18:39:02.234003Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:4afc3ae648fe",
+        "timestamp": "2026-09-15T18:39:00.661129Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "scraper-agent",
+          "owner": "research@acme.test",
+          "purpose": "Collects public pages"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:4afc3ae648fe",
+        "timestamp": "2026-09-15T18:39:00.665117Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      },
+      {
+        "event_type": "suspended",
+        "agent_id": "agent:4afc3ae648fe",
+        "timestamp": "2026-09-15T18:39:02.234003Z",
+        "actor": "operator",
+        "details": {
+          "reason": "Kill switch activated"
+        },
+        "previous_state": "active",
+        "new_state": "suspended"
+      }
+    ]
+  },
+  {
+    "agent_id": "agent:141ca0b89810",
+    "name": "intern-agent",
+    "owner": "labs@acme.test",
+    "purpose": "Unproven, sandboxed",
+    "agent_type": "autonomous",
+    "state": "active",
+    "credential_id": "cred:615c0cd6ef5547a6",
+    "credential_issued_at": "2026-09-15T18:39:00.697031Z",
+    "credential_expires_at": "2026-09-16T18:39:00.697031Z",
+    "last_heartbeat": null,
+    "heartbeat_count": 0,
+    "created_at": "2026-09-15T18:39:00.686062Z",
+    "updated_at": "2026-09-15T18:39:00.692046Z",
+    "decommissioned_at": null,
+    "tags": {},
+    "events": [
+      {
+        "event_type": "requested",
+        "agent_id": "agent:141ca0b89810",
+        "timestamp": "2026-09-15T18:39:00.686062Z",
+        "actor": "dashboard",
+        "details": {
+          "name": "intern-agent",
+          "owner": "labs@acme.test",
+          "purpose": "Unproven, sandboxed"
+        },
+        "previous_state": null,
+        "new_state": "provisioned"
+      },
+      {
+        "event_type": "activated",
+        "agent_id": "agent:141ca0b89810",
+        "timestamp": "2026-09-15T18:39:00.692046Z",
+        "actor": "dashboard",
+        "details": {},
+        "previous_state": "provisioned",
+        "new_state": "active"
+      }
+    ]
+  }
+]

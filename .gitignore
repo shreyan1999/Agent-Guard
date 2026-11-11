@@ -11,10 +11,19 @@ node_modules/
 # Audit sink output (see AGT_AUDIT_FILE)
 *.jsonl
 
+# Local env overrides. `frontend/.env` IS committed (it carries build flags,
+# not secrets), so anything credential-shaped belongs in a .local file — the
+# frontend reads REACT_APP_API_TOKEN, and that is a bearer token.
+.env.local
+.env.*.local
+
 # Editors / OS
 .DS_Store
 .idea/
 .vscode/
+
+# Durable state (see AGT_STATE_DIR)
+/backend/.state/
 
 # Saved policies (file-backed store)
 /backend/policies/

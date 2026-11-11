@@ -1,0 +1,106 @@
+# MCP security detection rules - policy as code.
+#
+# The Agent Governance Toolkit warns that MCPSecurityScanner()'s built-in rules
+# "may not cover all MCP tool poisoning techniques" and asks for an explicit
+# config. This is that config: backend/mcp_security_config.py loads it with
+# AGT's own load_mcp_security_config() and hands the result to AGT's scanner,
+# which compiles and runs these patterns in place of its defaults.
+#
+# Three things worth knowing before editing.
+#
+# This file REPLACES the built-in rule set rather than extending it. Every
+# default AGT ships is reproduced below verbatim, and a test asserts that is
+# still true - delete a line here and you delete a detection, with nothing to
+# warn you. Entries marked "AgentGuard addition" are what this platform adds on
+# top; everything else is AGT's own.
+#
+# An invalid regex is REFUSED at load. AGT's loader logs a warning and skips the
+# bad pattern, so a typo silently removes a detection while the platform goes on
+# reporting a healthy config. AgentGuard treats that as a failure and keeps
+# running the last good config instead.
+#
+# Prompt-injection rules live in prompt-injection.yaml beside this file. They
+# are a separate document because AGT's two loaders each expect their own
+# `detection_patterns` at the top level.
+
+detection_patterns:
+  invisible_unicode:
+    - '[\u200b\u200c\u200d\ufeff]'
+    - '[\u202a-\u202e]'
+    - '[\u2066-\u2069]'
+    - '[\u00ad]'
+    - '[\u2060\u180e]'
+  hidden_comments:
+    - '<!--.*?-->'
+    - '\[//\]:\s*#\s*\(.*?\)'
+    - '\[comment\]:\s*<>\s*\(.*?\)'
+  hidden_instructions:
+    - 'ignore\s+(all\s+)?previous'
+    - 'override\s+(the\s+)?(previous|above|original)'
+    - 'instead\s+of\s+(the\s+)?(above|previous|described)'
+    - 'actually\s+do'
+    - '\bsystem\s*:'
+    - '\bassistant\s*:'
+    - 'do\s+not\s+follow'
+    - 'disregard\s+(all\s+)?(above|prior|previous)'
+    - 'before\s+(?:using|calling|invoking)\s+(?:any\s+)?(?:other\s+)?tool'   # AgentGuard addition
+    - '(?:read|cat|open)\s+[~./]*(?:\.ssh|\.aws|\.env|id_rsa|credentials)'   # AgentGuard addition
+    - 'do\s+not\s+(?:mention|tell|inform|reveal|show)\s+(?:the\s+)?(?:user|human|operator)'   # AgentGuard addition
+  encoded_payloads:
+    - '[A-Za-z0-9+/]{40,}={0,2}'
+    - '(?:\\x[0-9a-fA-F]{2}){4,}'
+  exfiltration:
+    - '\bcurl\b'
+    - '\bwget\b'
+    - '\bfetch\s*\('
+    - 'https?://'
+    - '\bsend\s+email\b'
+    - '\bsend\s+to\b'
+    - '\bpost\s+to\b'
+    - 'include\s+the\s+contents?\s+of\b'
+    - '(?:webhook\.site|requestbin|pipedream\.net|ngrok\.io|burpcollaborator)'   # AgentGuard addition
+  privilege_escalation:
+    - '\bsudo\b'
+    - '\badmin\s+access\b'
+    - '\broot\s+access\b'
+    - '\belevate\s+privile'
+    - '\bexec\s*\('
+    - '\beval\s*\('
+    - '(?:already|pre)[- ]?(?:approved|authori[sz]ed|permitted)'   # AgentGuard addition
+    - 'no\s+(?:further\s+)?(?:approval|confirmation|permission)\s+(?:is\s+)?(?:needed|required)'   # AgentGuard addition
+  role_override:
+    - 'you\s+are\b'
+    - 'your\s+task\s+is\b'
+    - 'respond\s+with\b'
+    - 'always\s+return\b'
+    - 'you\s+must\b'
+    - '\bmust\s+be\s+called\b'
+    - '\balways\s+call\b'
+    - '\bmandatory\b'
+    - 'your\s+role\s+is\b'
+  excessive_whitespace: '\n{5,}.+'
+
+suspicious_decoded_keywords:
+  - 'ignore'
+  - 'override'
+  - 'system'
+  - 'password'
+  - 'secret'
+  - 'admin'
+  - 'root'
+  - 'exec'
+  - 'eval'
+  - 'import os'
+  - 'send'
+  - 'curl'
+  - 'fetch'
+  - 'id_rsa'   # AgentGuard addition
+  - 'authorized_keys'   # AgentGuard addition
+  - 'service_account'   # AgentGuard addition
+  - 'bearer '   # AgentGuard addition
+
+disclaimer: >-
+  Pattern matching over descriptor text. It catches known shapes and will not
+  catch a payload written to avoid them, so it is one layer beside the
+  connector's own grading, the trust proxy's argument scan and the response
+  scanner - not a guarantee.

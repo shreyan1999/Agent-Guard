@@ -1,4 +1,4 @@
-// Resource-group-scoped resources for the AGT Governance Dashboard.
+// Resource-group-scoped resources for AgentGuard.
 // One container running the FastAPI API and the built React dashboard, on
 // Azure Container Apps, pulling from a private registry via a managed identity.
 @description('Region for all resources.')
@@ -147,8 +147,17 @@ resource containerApp 'Microsoft.App/containerApps@2025-01-01' = {
         }
       ]
       scale: {
+        // Pinned to one replica, deliberately. Every piece of governance state
+        // this app holds — the agent registry, trust scores, the in-memory
+        // Merkle audit chain, MCP rate-limit budgets and AGT's ring
+        // circuit-breaker counters — lives in the process. A second replica
+        // does not share any of it: the audit chain forks, an agent registered
+        // on one replica is unregistered on the other, and an agent probing
+        // its sandbox gets a fresh violation budget per replica. Scaling this
+        // out needs shared state first; until then more replicas would produce
+        // wrong governance answers rather than more throughput.
         minReplicas: 1
-        maxReplicas: 3
+        maxReplicas: 1
       }
     }
   }

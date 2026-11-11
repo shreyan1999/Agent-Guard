@@ -1,0 +1,61 @@
+{
+  "trace_id": "9437258ef3d646e084c6b56f5f1cc989",
+  "agent_id": "research-agent",
+  "task_input": "read db_query",
+  "task_output": "denied at signature",
+  "start_time": 1790375438.1006682,
+  "end_time": 1790375438.1016803,
+  "duration_ms": 1.0120868682861328,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:5006fde00ad4c9e82ac4a689233a6bf3",
+    "agent.trust_score": 0.9,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "b723e39fac18bd4c",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "72916870bece40f4",
+      "parent_id": null,
+      "trace_id": "9437258ef3d646e084c6b56f5f1cc989",
+      "kind": "policy_check",
+      "name": "gate:signature",
+      "start_time": 1790375438.1006682,
+      "end_time": 1790375438.1016803,
+      "duration_ms": 1.0120868682861328,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "call_signature:invalid: Signed call rejected \u2014 Invalid signature.",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "8d3b4db4e6414f11",
+      "parent_id": null,
+      "trace_id": "9437258ef3d646e084c6b56f5f1cc989",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375438.1016803,
+      "end_time": 1790375438.1016803,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

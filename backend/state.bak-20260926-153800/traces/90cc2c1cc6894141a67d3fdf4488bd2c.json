@@ -1,0 +1,61 @@
+{
+  "trace_id": "90cc2c1cc6894141a67d3fdf4488bd2c",
+  "agent_id": "scraper-agent",
+  "task_input": "web_search web_search",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375748.3577216,
+  "end_time": 1790375748.3826544,
+  "duration_ms": 24.932861328125,
+  "metadata": {
+    "agent.task.name": "web_search",
+    "agent.tool.name": "web_search",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "fa55973604391227",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "a386bec82cbf4dab",
+      "parent_id": null,
+      "trace_id": "90cc2c1cc6894141a67d3fdf4488bd2c",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375748.3577216,
+      "end_time": 1790375748.3577216,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'scraper-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "c1ed9ad02d73448c",
+      "parent_id": null,
+      "trace_id": "90cc2c1cc6894141a67d3fdf4488bd2c",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375748.3577216,
+      "end_time": 1790375748.3826544,
+      "duration_ms": 24.932861328125,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

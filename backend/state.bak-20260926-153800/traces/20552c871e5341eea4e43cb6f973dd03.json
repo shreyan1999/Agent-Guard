@@ -1,0 +1,61 @@
+{
+  "trace_id": "20552c871e5341eea4e43cb6f973dd03",
+  "agent_id": "billing-agent",
+  "task_input": "invoke mcp.demo-notes.echo",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375737.995664,
+  "end_time": 1790375738.0215957,
+  "duration_ms": 25.931835174560547,
+  "metadata": {
+    "agent.task.name": "invoke",
+    "agent.tool.name": "mcp.demo-notes.echo",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "e2088e2cbc9e83c8",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "7be32305c7af4de5",
+      "parent_id": null,
+      "trace_id": "20552c871e5341eea4e43cb6f973dd03",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375737.995664,
+      "end_time": 1790375737.995664,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'billing-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "a507f40bc6ed4ce0",
+      "parent_id": null,
+      "trace_id": "20552c871e5341eea4e43cb6f973dd03",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375737.995664,
+      "end_time": 1790375738.0215957,
+      "duration_ms": 25.931835174560547,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

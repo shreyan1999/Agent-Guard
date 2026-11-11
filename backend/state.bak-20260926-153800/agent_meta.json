@@ -1,0 +1,708 @@
+{
+  "research-agent": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "data-agent": {
+    "trust": 1.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "email-agent": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "untrusted-agent": {
+    "trust": 0.3,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "billing-agent": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "support-agent": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "etl-agent": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "scraper-agent": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "intern-agent": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-a7a193a3": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-a7a193a3": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "foundry-agent": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "foundry-twin": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": {
+      "project_endpoint": "https://x.services.ai.azure.com/api/projects/p",
+      "foundry_agent_id": "asst_abc123"
+    },
+    "capabilities": []
+  },
+  "plain": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "crypto-agent": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "agent-a": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "agent-b": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "ingest-agent": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "jwt-made": {
+    "trust": 0.8,
+    "tenant": "acme",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "qa-agent": {
+    "trust": 0.7,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "dupe": {
+    "trust": 0.7,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "second": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "local-caller": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "middling": {
+    "trust": 0.35,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "trusted-ish": {
+    "trust": 0.7,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "acme-agent": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "globex-agent": {
+    "trust": 0.8,
+    "tenant": "globex",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "a1": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "a2": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "a3": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "sandboxed": {
+    "trust": 0.45,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "standard": {
+    "trust": 0.72,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "r3": {
+    "trust": 0.45,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "sdk-agent": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "worker": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "low": {
+    "trust": 0.45,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "outsider": {
+    "trust": 0.9,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "grower": {
+    "trust": 0.45,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "acme-slo": {
+    "trust": 0.9,
+    "tenant": "acme",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "acme-sig": {
+    "trust": 0.9,
+    "tenant": "acme",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "acme-reset": {
+    "trust": 0.9,
+    "tenant": "acme",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "instant": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "newbie": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "denied": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "gated": {
+    "trust": 0.8,
+    "tenant": "acme",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "traced": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "acme-trail": {
+    "trust": 0.8,
+    "tenant": "acme",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "shown": {
+    "trust": 0.8,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": [
+      "db:read",
+      "notes:write"
+    ]
+  },
+  "acme-svc": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "globex-svc": {
+    "trust": 0.8,
+    "tenant": "globex",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-3d81f53c": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-3d81f53c": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-73f1507c": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-73f1507c": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-fae091d9": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-fae091d9": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-11d32623": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-11d32623": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-e4f69262": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-e4f69262": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-e7e53423": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-e7e53423": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-388c6876": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-388c6876": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-67e4cf62": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-67e4cf62": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-8e804381": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-8e804381": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-87d5bbaa": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-87d5bbaa": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-9ddb7bdb": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-9ddb7bdb": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-68c4e9e9": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-68c4e9e9": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-83811393": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-83811393": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-96c6063e": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-96c6063e": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-97f687a9": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-97f687a9": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-e0c0ec0e": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-e0c0ec0e": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-9328d319": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-9328d319": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-63c81988": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-63c81988": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-c5a8c646": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-c5a8c646": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-98f2872b": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-98f2872b": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-97ac5fe0": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-97ac5fe0": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-9e3c89da": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-9e3c89da": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-5fca1532": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-5fca1532": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-ea1c8de1": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-ea1c8de1": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-attacker-98310a45": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "chaos-sandboxed-98310a45": {
+    "trust": 0.0,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  }
+}

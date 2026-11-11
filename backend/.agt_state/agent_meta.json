@@ -1,0 +1,65 @@
+{
+  "research-agent": {
+    "trust": 0.92,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "data-agent": {
+    "trust": 0.75,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "email-agent": {
+    "trust": 0.55,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "untrusted-agent": {
+    "trust": 0.18,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "billing-agent": {
+    "trust": 0.88,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "support-agent": {
+    "trust": 0.72,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "etl-agent": {
+    "trust": 0.64,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "scraper-agent": {
+    "trust": 0.45,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  },
+  "intern-agent": {
+    "trust": 0.22,
+    "tenant": "default",
+    "policy": "default-policy",
+    "foundry": null,
+    "capabilities": []
+  }
+}

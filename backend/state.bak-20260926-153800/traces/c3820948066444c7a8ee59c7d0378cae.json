@@ -1,0 +1,61 @@
+{
+  "trace_id": "c3820948066444c7a8ee59c7d0378cae",
+  "agent_id": "research-agent",
+  "task_input": "read web_search",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375610.4338465,
+  "end_time": 1790375610.459777,
+  "duration_ms": 25.93064308166504,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "web_search",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:5006fde00ad4c9e82ac4a689233a6bf3",
+    "agent.trust_score": 0.9,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "d0c2d4b4eb380baa",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "d9056a68e23645b0",
+      "parent_id": null,
+      "trace_id": "c3820948066444c7a8ee59c7d0378cae",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375610.4338465,
+      "end_time": 1790375610.434846,
+      "duration_ms": 0.99945068359375,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:suspended: Agent 'research-agent' is suspended, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "5a68290a15534b21",
+      "parent_id": null,
+      "trace_id": "c3820948066444c7a8ee59c7d0378cae",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375610.434846,
+      "end_time": 1790375610.459777,
+      "duration_ms": 24.93119239807129,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

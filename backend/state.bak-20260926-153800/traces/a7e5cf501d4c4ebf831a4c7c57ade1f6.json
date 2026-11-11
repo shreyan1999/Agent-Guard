@@ -1,0 +1,139 @@
+{
+  "trace_id": "a7e5cf501d4c4ebf831a4c7c57ade1f6",
+  "agent_id": "chaos-sandboxed-97f687a9",
+  "task_input": "web_search web_search",
+  "task_output": "denied at ring",
+  "start_time": 1790375696.3077772,
+  "end_time": 1790375696.3571615,
+  "duration_ms": 49.384355545043945,
+  "metadata": {
+    "agent.task.name": "web_search",
+    "agent.tool.name": "web_search",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:ea787b3205340b57981e5fd38eb14f2f",
+    "agent.trust_score": 0.4,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "40e47e289a8bf1e5",
+  "span_count": 6,
+  "spans": [
+    {
+      "span_id": "9df6248542324792",
+      "parent_id": null,
+      "trace_id": "a7e5cf501d4c4ebf831a4c7c57ade1f6",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375696.3077772,
+      "end_time": 1790375696.3077772,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "9576b819ab8c4213",
+      "parent_id": null,
+      "trace_id": "a7e5cf501d4c4ebf831a4c7c57ade1f6",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1790375696.3077772,
+      "end_time": 1790375696.3077772,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "identity_verified": false
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "233b674cf7254ede",
+      "parent_id": null,
+      "trace_id": "a7e5cf501d4c4ebf831a4c7c57ade1f6",
+      "kind": "policy_check",
+      "name": "gate:tenant",
+      "start_time": 1790375696.3077772,
+      "end_time": 1790375696.3077772,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "tenant": "default"
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "5c67b426f8dc4d2b",
+      "parent_id": null,
+      "trace_id": "a7e5cf501d4c4ebf831a4c7c57ade1f6",
+      "kind": "policy_check",
+      "name": "gate:trust",
+      "start_time": 1790375696.3077772,
+      "end_time": 1790375696.3077772,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "trust_score": 0.4
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "fe465f36ff8345c8",
+      "parent_id": null,
+      "trace_id": "a7e5cf501d4c4ebf831a4c7c57ade1f6",
+      "kind": "policy_check",
+      "name": "gate:ring",
+      "start_time": 1790375696.3077772,
+      "end_time": 1790375696.317753,
+      "duration_ms": 9.975910186767578,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "ring_enforcement: Ring 3 agent cannot perform network: network access denied at ring 3",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "c291b32f66324353",
+      "parent_id": null,
+      "trace_id": "a7e5cf501d4c4ebf831a4c7c57ade1f6",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375696.317753,
+      "end_time": 1790375696.3571615,
+      "duration_ms": 39.40844535827637,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

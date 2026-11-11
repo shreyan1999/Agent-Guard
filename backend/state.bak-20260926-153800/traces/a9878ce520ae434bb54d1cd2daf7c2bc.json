@@ -1,0 +1,61 @@
+{
+  "trace_id": "a9878ce520ae434bb54d1cd2daf7c2bc",
+  "agent_id": "scraper-agent",
+  "task_input": "read db_query",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790374518.0911477,
+  "end_time": 1790374518.120062,
+  "duration_ms": 28.914451599121094,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:f9b694fdf286d27a22442c0d6009a37a",
+    "agent.trust_score": 0.45,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "9dcbe3963446167f",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "37c794f5e52f4d51",
+      "parent_id": null,
+      "trace_id": "a9878ce520ae434bb54d1cd2daf7c2bc",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790374518.0911477,
+      "end_time": 1790374518.0911477,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:suspended: Agent 'scraper-agent' is suspended, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "7550d8235d164e1b",
+      "parent_id": null,
+      "trace_id": "a9878ce520ae434bb54d1cd2daf7c2bc",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790374518.0911477,
+      "end_time": 1790374518.120062,
+      "duration_ms": 28.914451599121094,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

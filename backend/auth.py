@@ -243,9 +243,18 @@ class AuthProvider:
         """
         if not token:
             return None
+        # compare_digest refuses a str carrying non-ASCII and raises TypeError.
+        # Headers reach here decoded as latin-1, so a single high byte in an
+        # Authorization header turned a 401 into an unhandled 500. Compare the
+        # UTF-8 bytes instead: same constant-time comparison, no input that can
+        # make it throw.
+        try:
+            candidate = token.encode("utf-8")
+        except (UnicodeEncodeError, AttributeError):
+            return None
         match: Principal | None = None
         for known, principal in self._by_token.items():
-            if secrets.compare_digest(token, known):
+            if secrets.compare_digest(candidate, known.encode("utf-8")):
                 match = principal
         if match is not None:
             return match

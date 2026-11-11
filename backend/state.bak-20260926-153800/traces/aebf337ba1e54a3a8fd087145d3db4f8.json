@@ -1,0 +1,139 @@
+{
+  "trace_id": "aebf337ba1e54a3a8fd087145d3db4f8",
+  "agent_id": "billing-agent",
+  "task_input": "export db_query",
+  "task_output": "denied at policy",
+  "start_time": 1790375383.7488177,
+  "end_time": 1790375383.7717326,
+  "duration_ms": 22.914886474609375,
+  "metadata": {
+    "agent.task.name": "export",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "finance-policy",
+    "agent.did": "did:mesh:afed32a156cd94e2cc731fb96b4f833a",
+    "agent.trust_score": 0.88,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "4462ada239fe151d",
+  "span_count": 6,
+  "spans": [
+    {
+      "span_id": "00ccf60440bf4f73",
+      "parent_id": null,
+      "trace_id": "aebf337ba1e54a3a8fd087145d3db4f8",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375383.7488177,
+      "end_time": 1790375383.7488177,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "b0c1c85150f94b4a",
+      "parent_id": null,
+      "trace_id": "aebf337ba1e54a3a8fd087145d3db4f8",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1790375383.7488177,
+      "end_time": 1790375383.7497842,
+      "duration_ms": 0.9665489196777344,
+      "status": "ok",
+      "attributes": {
+        "identity_verified": false
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "fe0e3838abfc4abc",
+      "parent_id": null,
+      "trace_id": "aebf337ba1e54a3a8fd087145d3db4f8",
+      "kind": "policy_check",
+      "name": "gate:tenant",
+      "start_time": 1790375383.7497842,
+      "end_time": 1790375383.7497842,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "tenant": "default"
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "b26fb800585c436d",
+      "parent_id": null,
+      "trace_id": "aebf337ba1e54a3a8fd087145d3db4f8",
+      "kind": "policy_check",
+      "name": "gate:trust",
+      "start_time": 1790375383.7497842,
+      "end_time": 1790375383.7497842,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "trust_score": 0.88
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "0c1fc8a40981486e",
+      "parent_id": null,
+      "trace_id": "aebf337ba1e54a3a8fd087145d3db4f8",
+      "kind": "policy_check",
+      "name": "gate:policy",
+      "start_time": 1790375383.7497842,
+      "end_time": 1790375383.75178,
+      "duration_ms": 1.9958019256591797,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "no-bulk-export: Bulk export of finance records is refused.",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "82546b4bd55f4979",
+      "parent_id": null,
+      "trace_id": "aebf337ba1e54a3a8fd087145d3db4f8",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375383.75178,
+      "end_time": 1790375383.7717326,
+      "duration_ms": 19.95253562927246,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

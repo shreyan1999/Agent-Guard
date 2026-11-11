@@ -1,0 +1,61 @@
+{
+  "trace_id": "fe6136cb049642f780d3cb71bc21f5bc",
+  "agent_id": "acme-agent",
+  "task_input": "read db_query",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375617.5330281,
+  "end_time": 1790375617.5599542,
+  "duration_ms": 26.926040649414062,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "8e86c58f179b39ab",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "bd4beb2a507e4a57",
+      "parent_id": null,
+      "trace_id": "fe6136cb049642f780d3cb71bc21f5bc",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375617.5330281,
+      "end_time": 1790375617.5330281,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'acme-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "d15740d44b64440e",
+      "parent_id": null,
+      "trace_id": "fe6136cb049642f780d3cb71bc21f5bc",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375617.5330281,
+      "end_time": 1790375617.5599542,
+      "duration_ms": 26.926040649414062,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

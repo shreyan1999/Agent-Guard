@@ -1,0 +1,73 @@
+{
+  "db_query": {
+    "description": "Query a datastore",
+    "actions": [
+      "read",
+      "write",
+      "drop"
+    ],
+    "risk": "high",
+    "category": "data_write",
+    "endpoint_url": null,
+    "timeout_ms": 3000,
+    "builtin": true,
+    "created_by": null,
+    "kind": "webhook",
+    "mcp": null,
+    "evaluation": null,
+    "required_capabilities": [],
+    "quarantined": false
+  },
+  "send_email": {
+    "description": "Send an email on the agent's behalf",
+    "actions": [
+      "send_email"
+    ],
+    "risk": "medium",
+    "category": "communication",
+    "endpoint_url": null,
+    "timeout_ms": 3000,
+    "builtin": true,
+    "created_by": null,
+    "kind": "webhook",
+    "mcp": null,
+    "evaluation": null,
+    "required_capabilities": [],
+    "quarantined": false
+  },
+  "web_search": {
+    "description": "Search the public web",
+    "actions": [
+      "read",
+      "web_search"
+    ],
+    "risk": "low",
+    "category": "search",
+    "endpoint_url": null,
+    "timeout_ms": 3000,
+    "builtin": true,
+    "created_by": null,
+    "kind": "webhook",
+    "mcp": null,
+    "evaluation": null,
+    "required_capabilities": [],
+    "quarantined": false
+  },
+  "write_file": {
+    "description": "Write to the workspace filesystem",
+    "actions": [
+      "write"
+    ],
+    "risk": "medium",
+    "category": "filesystem",
+    "endpoint_url": null,
+    "timeout_ms": 3000,
+    "builtin": true,
+    "created_by": null,
+    "kind": "webhook",
+    "mcp": null,
+    "evaluation": null,
+    "required_capabilities": [],
+    "quarantined": false
+  }
+}

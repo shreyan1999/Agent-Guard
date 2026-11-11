@@ -1,0 +1,61 @@
+{
+  "trace_id": "6694cf49e9ab4057b77f99710d079716",
+  "agent_id": "chaos-ghost-fa98450d",
+  "task_input": "db_query db_query",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375360.3777668,
+  "end_time": 1790375360.3777668,
+  "duration_ms": 0.0,
+  "metadata": {
+    "agent.task.name": "db_query",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "932568cee348a659",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "fc54e37fbfe1486f",
+      "parent_id": null,
+      "trace_id": "6694cf49e9ab4057b77f99710d079716",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375360.3777668,
+      "end_time": 1790375360.3777668,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:unregistered: Agent 'chaos-ghost-fa98450d' is not registered \u2014 unknown agents are untrusted",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "d1d88df594844798",
+      "parent_id": null,
+      "trace_id": "6694cf49e9ab4057b77f99710d079716",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375360.3777668,
+      "end_time": 1790375360.3777668,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

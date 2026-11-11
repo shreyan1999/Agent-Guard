@@ -1,4 +1,8 @@
 fastapi>=0.111.0
 uvicorn[standard]>=0.29.0
 pyyaml>=6.0
-agent-governance-toolkit[full]>=4.1.0
+# Compatible-release, not a floor: this project reads a few AGT internals
+# (AuditLog._chain, ComplianceEngine._controls/._violations, govern's
+# shared breach-detector registry) that carry no compatibility promise, so
+# a minor release could break it silently. Widen this deliberately.
+agent-governance-toolkit[full]~=4.1.0

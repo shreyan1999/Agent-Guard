@@ -10,9 +10,16 @@ persistence existed.
 """
 
 import json
+import os
 import threading
+import uuid
 from pathlib import Path
 from typing import Optional
+
+import observability
+
+
+_log = observability.get_logger(__name__)
 
 
 class MetaStore:
@@ -32,14 +39,35 @@ class MetaStore:
             data = json.loads(self._path.read_text(encoding="utf-8"))
             return data if isinstance(data, dict) else {}
         except (OSError, json.JSONDecodeError):
+            # Falling back to {} resets every agent's trust to 0.0 (fails
+            # closed, fine) *and* its tenant to the default (fails open, not
+            # fine). An operator has to be told this happened.
+            observability.record_failure(
+                observability.STATE, _log,
+                "state: could not read %s; trust, tenant and policy bindings "
+                "fall back to defaults for every agent", self._path)
             return {}
 
     def save(self, meta: dict[str, dict]) -> None:
+        """Write the sidecar atomically.
+
+        Written to a temp file and moved into place, the same way PolicyStore
+        writes a policy. A torn write here is not a lost file: load() falls back
+        to {} on a JSONDecodeError, which resets every agent's trust to 0.0
+        (fails closed, fine) *and* its tenant to the default (fails open, not
+        fine) — so the half-written state is worse than no state, and os.replace
+        is what makes it unreachable.
+        """
         if not self._path:
             return
         with self._lock:
             self._path.parent.mkdir(parents=True, exist_ok=True)
-            self._path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+            tmp = self._path.with_name(f".{uuid.uuid4().hex}.tmp")
+            try:
+                tmp.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+                os.replace(tmp, self._path)
+            finally:
+                tmp.unlink(missing_ok=True)
 
     def wipe(self) -> None:
         """Delete the backing file. For test isolation, never at app shutdown."""

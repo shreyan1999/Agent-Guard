@@ -174,3 +174,79 @@ export function describeGrouping(clauses, schema) {
 /** Whether every clause is complete enough to serialize. */
 export const isComplete = (clauses, schema) =>
   clauses.length > 0 && clauses.every((c) => serializeClause(c, schema) !== '');
+
+/* ── plain English ────────────────────────────────────────────────────────
+ * A rule is only as accountable as the sentence you can say about it. These
+ * two maps cover the closed field list and operator set the backend publishes;
+ * anything outside them falls back to the raw path or symbol rather than being
+ * silently dropped, so a condition can never read as saying less than it does.
+ */
+
+const FIELD_PHRASE = {
+  'action.type': 'the action',
+  'agent.id': 'the agent name',
+  'agent.agent_id': "the agent's lifecycle id",
+  'agent.state': "the agent's lifecycle state",
+  'agent.ring': "the agent's execution ring",
+  'agent.trust_score': "the agent's trust score",
+  'tool.name': 'the tool name',
+  'tool.category': "the tool's category",
+  'tool.risk': "the tool's risk tier",
+  'tool.kind': "the tool's kind",
+  'sql.verb': 'the SQL verb',
+  'sql.target': 'the SQL target',
+};
+
+/** Boolean facets read as a whole clause, so `truthy` needs no verb after them. */
+const FLAG_PHRASE = {
+  'input_text.has_pii': 'the input text contains PII',
+  'input_text.has_credentials': 'the input text contains credentials',
+};
+
+const OPERATOR_PHRASE = {
+  eq: 'is', ne: 'is not', in: 'is one of',
+  gt: 'is above', gte: 'is at least', lt: 'is below', lte: 'is at most',
+};
+
+const fieldPhrase = (path) =>
+  FIELD_PHRASE[path] || FLAG_PHRASE[path] || String(path ?? '').replace(/[._]/g, ' ');
+
+function humanizeClause(clause, schema) {
+  const op = findOperator(schema, clause.operator);
+  if (op?.value === 'none') {
+    return FLAG_PHRASE[clause.field] || `${fieldPhrase(clause.field)} is set`;
+  }
+  const verb = OPERATOR_PHRASE[clause.operator] || op?.label || clause.operator;
+  const raw = String(clause.value ?? '').trim();
+  const value = op?.value === 'list'
+    ? splitList(clause.value).map((v) => `“${v}”`).join(' or ')
+    : op?.value === 'number' ? raw : `“${raw}”`;
+  return `${fieldPhrase(clause.field)} ${verb} ${value}`;
+}
+
+/**
+ * Say a condition out loud, honouring AGT's precedence.
+ *
+ * Returns null when the condition uses something the grammar model cannot
+ * read, which is the signal to show the raw condition instead of a sentence
+ * that might not mean the same thing.
+ */
+export function humanize(condition, schema) {
+  const clauses = parse(condition, schema);
+  if (!clauses) return null;
+
+  // No parentheses in the grammar: " or " splits first, so `A and B or C`
+  // is `(A and B) or C`. Group the same way before wording it.
+  const groups = [];
+  let current = [];
+  clauses.forEach((clause, i) => {
+    if (i > 0 && clause.joiner === 'or') {
+      groups.push(current);
+      current = [];
+    }
+    current.push(humanizeClause(clause, schema));
+  });
+  groups.push(current);
+
+  return groups.map((g) => g.join(' and ')).join(', or ');
+}

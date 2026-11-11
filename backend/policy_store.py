@@ -138,6 +138,27 @@ class PolicyStore:
                 continue
         return sorted(out)
 
+    def descendants(self, name: str) -> list[str]:
+        """Every policy that inherits from *name*, directly or transitively.
+
+        ``dependents`` answers "who names this as a parent". A grandchild names
+        the child, not this policy, yet AGT still merges this policy's rules
+        into it — so anything holding a compiled copy of the subtree has to be
+        invalidated across the whole closure, not just one level of it.
+
+        Walked with a visited set rather than trusting ``validate``'s cycle
+        check: this runs against whatever is on disk, and a loop here would
+        hang the request that is trying to save a policy.
+        """
+        seen: set[str] = set()
+        frontier = [name]
+        while frontier:
+            for child in self.dependents(frontier.pop()):
+                if child not in seen:
+                    seen.add(child)
+                    frontier.append(child)
+        return sorted(seen)
+
     def yaml_text(self, name: str) -> str:
         return self.path(name).read_text(encoding="utf-8")
 

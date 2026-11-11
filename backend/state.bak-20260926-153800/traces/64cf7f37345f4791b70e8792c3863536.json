@@ -1,0 +1,61 @@
+{
+  "trace_id": "64cf7f37345f4791b70e8792c3863536",
+  "agent_id": "intern-agent",
+  "task_input": "read db_query",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375742.0414257,
+  "end_time": 1790375742.0693524,
+  "duration_ms": 27.92668342590332,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "1a61d33f761d85f3",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "2b043cb51e2b4596",
+      "parent_id": null,
+      "trace_id": "64cf7f37345f4791b70e8792c3863536",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375742.0414257,
+      "end_time": 1790375742.0414257,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'intern-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "da5b1c37871d4722",
+      "parent_id": null,
+      "trace_id": "64cf7f37345f4791b70e8792c3863536",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375742.0414257,
+      "end_time": 1790375742.0693524,
+      "duration_ms": 27.92668342590332,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

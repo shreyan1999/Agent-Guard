@@ -1,8 +1,14 @@
-"""Defects that are documented in the README but not yet fixed.
+"""Behaviour that is a known limitation rather than a bug, pinned deliberately.
 
-These are xfail rather than deleted so the suite stays an honest inventory: if
-someone repairs the endpoint, the test flips to XPASS and says so out loud
-instead of quietly staying green.
+`known_broken` is a plain marker registered in `pytest.ini`, **not** `xfail`.
+These tests run and must pass like any other: each one asserts that a
+documented limitation still behaves the way the README says it does. Repairing
+the underlying limitation therefore makes the matching test *fail*, which is the
+intended signal — it is the prompt to update the README in the same change,
+rather than letting the docs drift away from the code.
+
+Use the marker to find them (`pytest -m known_broken`); do not read it as
+"expected to fail".
 """
 
 import pytest

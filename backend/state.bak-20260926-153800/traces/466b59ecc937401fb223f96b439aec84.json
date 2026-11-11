@@ -1,0 +1,61 @@
+{
+  "trace_id": "466b59ecc937401fb223f96b439aec84",
+  "agent_id": "email-agent",
+  "task_input": "write_file write_file",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375775.9600825,
+  "end_time": 1790375775.9890065,
+  "duration_ms": 28.923988342285156,
+  "metadata": {
+    "agent.task.name": "write_file",
+    "agent.tool.name": "write_file",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "a9e281cbe95903fa",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "c0b48b15d23942b8",
+      "parent_id": null,
+      "trace_id": "466b59ecc937401fb223f96b439aec84",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375775.9600825,
+      "end_time": 1790375775.9600825,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'email-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "d8398993daba418f",
+      "parent_id": null,
+      "trace_id": "466b59ecc937401fb223f96b439aec84",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375775.9600825,
+      "end_time": 1790375775.9890065,
+      "duration_ms": 28.923988342285156,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

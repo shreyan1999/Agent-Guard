@@ -1,0 +1,139 @@
+{
+  "trace_id": "469f5dc58bf94e20a9db3130234c802b",
+  "agent_id": "email-agent",
+  "task_input": "read db_query",
+  "task_output": "denied at ring",
+  "start_time": 1790375420.634287,
+  "end_time": 1790375420.6671658,
+  "duration_ms": 32.87863731384277,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:c20c94f67ee18aebf2cbd2a996cf6cd7",
+    "agent.trust_score": 0.4,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "868be9a975ec74f6",
+  "span_count": 6,
+  "spans": [
+    {
+      "span_id": "e3b2ead487f34e5a",
+      "parent_id": null,
+      "trace_id": "469f5dc58bf94e20a9db3130234c802b",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375420.634287,
+      "end_time": 1790375420.634287,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "c78ddaee06634d83",
+      "parent_id": null,
+      "trace_id": "469f5dc58bf94e20a9db3130234c802b",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1790375420.634287,
+      "end_time": 1790375420.634287,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "identity_verified": false
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "fa328acd6e6f467d",
+      "parent_id": null,
+      "trace_id": "469f5dc58bf94e20a9db3130234c802b",
+      "kind": "policy_check",
+      "name": "gate:tenant",
+      "start_time": 1790375420.634287,
+      "end_time": 1790375420.634287,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "tenant": "default"
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "a59e763e92974a64",
+      "parent_id": null,
+      "trace_id": "469f5dc58bf94e20a9db3130234c802b",
+      "kind": "policy_check",
+      "name": "gate:trust",
+      "start_time": 1790375420.634287,
+      "end_time": 1790375420.634287,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "trust_score": 0.4
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "6a2f8835ff1241a3",
+      "parent_id": null,
+      "trace_id": "469f5dc58bf94e20a9db3130234c802b",
+      "kind": "policy_check",
+      "name": "gate:ring",
+      "start_time": 1790375420.634287,
+      "end_time": 1790375420.6432436,
+      "duration_ms": 8.956432342529297,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "ring_breaker: Circuit breaker tripped for agent 'email-agent' \u2014 too many ring violations in session 'email-agent'",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "fd9e42237f9b485c",
+      "parent_id": null,
+      "trace_id": "469f5dc58bf94e20a9db3130234c802b",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375420.6432436,
+      "end_time": 1790375420.6671658,
+      "duration_ms": 23.922204971313477,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+/* ============================================================================
+   Landing hero
+
+   Self-contained: every selector is `lp-` prefixed, no app token is read, and
+   nothing here escapes. Mobile-first, one breakpoint at 768px.
+   ========================================================================= */
+
+.lp {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Centres the text block vertically instead of pinning it to the bottom
+     edge -- "move it upward" from a hard bottom-pin reads as the middle of
+     the page, not the top. */
+  justify-content: center;
+  background: #ffffff;
+  font-family: 'Segoe UI', 'Segoe UI Light', system-ui, Arial, Helvetica, sans-serif;
+  color: #000000;
+  overflow: hidden;
+}
+
+/* ---- background video ---------------------------------------------------- */
+
+.lp-video-wrap {
+  position: absolute;
+  /* Centred with inset+auto margins, not a transform: motion animates `scale`
+     on this element and writes the whole `transform` property, which would
+     wipe a translate-based centring and leave the video offset by half its
+     size. */
+  inset: 0;
+  margin: auto;
+  width: 80%;
+  height: 80%;
+  z-index: 0;
+  overflow: hidden;
+}
+.lp-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- brand ------------------------------------------------------------------
+   No mark, no nav bar: just the wordmark, leading the headline directly above
+   it -- one grouped block. Static, not staged: it fades up once, same as the
+   tagline below it, rather than drawing or revealing itself letter by letter.
+
+   Solid black fill, bold -- the outline treatment (transparent fill, stroked
+   outline) doesn't read as bold no matter the font-weight, since there's no
+   fill to carry the weight. Position and size are unchanged. */
+
+.lp-brand-row {
+  margin: 0 0 4px;
+  font-weight: 800;
+  font-size: clamp(3.5rem, 12vw, 8rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #000000;
+}
+
+/* ---- footer -------------------------------------------------------------- */
+
+.lp-footer {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px;
+}
+
+.lp-heading {
+  margin: 0 0 26px;
+  font-weight: 300;
+  font-size: clamp(2rem, 8vw, 4.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.lp-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.lp-btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  padding: 11px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: opacity 160ms ease, background 160ms ease;
+}
+
+/* ---- desktop ------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+  .lp-video-wrap { width: 100%; height: 100%; }
+
+  .lp-brand-row { margin-bottom: 10px; }
+
+  .lp-footer { padding: 32px; }
+  .lp-heading { font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-video { display: none; }
+}
+
+
+/* ---- hero sizing ------------------------------------------------------------
+   The CTA grows on larger screens.
+   -------------------------------------------------------------------------- */
+
+.lp-btn {
+  font-size: 17px;
+  font-weight: 600;
+  padding: 13px 30px;
+}
+
+@media (min-width: 768px) {
+  .lp-btn { font-size: 19px; padding: 15px 36px; }
+}
+
+
+/* ---- Get started: the flow button --------------------------------------
+   Ported from the shadcn "flow-button" component. That version is Tailwind
+   utility classes end to end; this app has none (see DrawText.js and
+   BentoGrid.js for the same call), so the interaction — an arrow slides in
+   from the left as the label shifts right, a circle expands from the centre,
+   the resting arrow slides out to the right — is built as plain CSS instead,
+   with a hand-authored arrow icon (Landing.js `ArrowRightIcon`) in place of
+   `lucide-react`, which isn't a dependency here either.
+   -------------------------------------------------------------------------- */
+
+.lp-btn-flow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1.5px solid rgba(51, 51, 51, 0.4);
+  border-radius: 100px;
+  background: transparent;
+  color: #111111;
+  transition:
+    border-color 500ms cubic-bezier(.23, 1, .32, 1),
+    border-radius 500ms cubic-bezier(.23, 1, .32, 1),
+    color 500ms cubic-bezier(.23, 1, .32, 1),
+    transform 150ms ease;
+}
+.lp-btn-flow:hover {
+  border-color: transparent;
+  border-radius: 14px;
+  color: #ffffff;
+}
+.lp-btn-flow:active { transform: scale(0.96); }
+
+.lp-flow-arrow {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  z-index: 2;
+  transition:
+    left 650ms cubic-bezier(.34, 1.56, .64, 1),
+    right 650ms cubic-bezier(.34, 1.56, .64, 1),
+    color 650ms cubic-bezier(.34, 1.56, .64, 1);
+}
+.lp-flow-arrow-in { left: -30%; color: #111111; }
+.lp-btn-flow:hover .lp-flow-arrow-in { left: 16px; color: #ffffff; }
+.lp-flow-arrow-out { right: 16px; color: #111111; }
+.lp-btn-flow:hover .lp-flow-arrow-out { right: -30%; color: #ffffff; }
+
+.lp-flow-label {
+  position: relative;
+  z-index: 1;
+  transform: translateX(-10px);
+  transition: transform 650ms ease;
+}
+.lp-btn-flow:hover .lp-flow-label { transform: translateX(10px); }
+
+.lp-flow-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #111111;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition:
+    width 650ms cubic-bezier(.19, 1, .22, 1),
+    height 650ms cubic-bezier(.19, 1, .22, 1),
+    opacity 650ms cubic-bezier(.19, 1, .22, 1);
+  z-index: 0;
+}
+.lp-btn-flow:hover .lp-flow-circle { width: 260px; height: 260px; opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-btn-flow, .lp-flow-arrow, .lp-flow-label, .lp-flow-circle { transition: none; }
+  .lp-btn-flow:active { transform: none; }
+}

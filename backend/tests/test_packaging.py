@@ -22,14 +22,14 @@ def test_spa_is_served_without_shadowing_the_api(tmp_path):
     def stats():
         return {"ok": True}
 
-    (tmp_path / "index.html").write_text("<html>AGT Dashboard</html>", encoding="utf-8")
+    (tmp_path / "index.html").write_text("<html>AgentGuard</html>", encoding="utf-8")
     assert main._mount_spa(app, str(tmp_path)) is True
 
     client = TestClient(app)
     # The API route registered before the mount still resolves.
     assert client.get("/stats").json() == {"ok": True}
     # The SPA is served at the root.
-    assert "AGT Dashboard" in client.get("/").text
+    assert "AgentGuard" in client.get("/").text
 
 
 def test_default_app_has_no_spa_mount():

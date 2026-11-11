@@ -346,6 +346,9 @@ def test_schema_fields_resolve_against_a_real_context(client):
     context = client.post("/policies/evaluate", json={
         "policy_name": "default-policy", "agent_id": "data-agent",
         "action": "read", "input_text": "bob@example.com",
+        # The tool facet is built from a named tool, exactly as /tools/call
+        # builds it from the tool being called.
+        "tool_name": "db_query",
     }).json()["context"]
 
     for field in schema["fields"]:

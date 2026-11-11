@@ -1,0 +1,61 @@
+{
+  "trace_id": "4c5d1518d4c9406598c4c743e25ae9d2",
+  "agent_id": "research-agent",
+  "task_input": "read db_query",
+  "task_output": "denied at lifecycle",
+  "start_time": 1789565315.1591697,
+  "end_time": 1789565315.1591697,
+  "duration_ms": 0.0,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "e9ee58a8a2a5dbd8",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "d7401e049f544455",
+      "parent_id": null,
+      "trace_id": "4c5d1518d4c9406598c4c743e25ae9d2",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1789565315.1591697,
+      "end_time": 1789565315.1591697,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:unregistered: Agent 'research-agent' is not registered \u2014 unknown agents are untrusted",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "a217e7e8017b46d8",
+      "parent_id": null,
+      "trace_id": "4c5d1518d4c9406598c4c743e25ae9d2",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1789565315.1591697,
+      "end_time": 1789565315.1591697,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

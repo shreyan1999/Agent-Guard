@@ -1,0 +1,61 @@
+{
+  "trace_id": "e05136ece6b640b4a3b63f579c1b2a7c",
+  "agent_id": "support-agent",
+  "task_input": "read send_email",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790417021.6857646,
+  "end_time": 1790417021.7135246,
+  "duration_ms": 27.760028839111328,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "send_email",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "c6372823df9d2322",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "5df0da5b6a0e4258",
+      "parent_id": null,
+      "trace_id": "e05136ece6b640b4a3b63f579c1b2a7c",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790417021.6857646,
+      "end_time": 1790417021.6857646,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'support-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "94a93e1e443741d0",
+      "parent_id": null,
+      "trace_id": "e05136ece6b640b4a3b63f579c1b2a7c",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790417021.6857646,
+      "end_time": 1790417021.7135246,
+      "duration_ms": 27.760028839111328,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

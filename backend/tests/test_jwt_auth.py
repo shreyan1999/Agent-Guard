@@ -108,14 +108,14 @@ def test_issuer_and_audience_are_enforced_when_configured(monkeypatch):
     main.reset_state()
     monkeypatch.setenv("AGT_JWT_SECRET", SECRET)
     monkeypatch.setenv("AGT_JWT_ISSUER", "https://issuer.example")
-    monkeypatch.setenv("AGT_JWT_AUDIENCE", "agt-dashboard")
+    monkeypatch.setenv("AGT_JWT_AUDIENCE", "agentguard")
     main.reload_auth()
     try:
         client = TestClient(main.app)
         good = _mint({"sub": "svc", "roles": ["operator"],
-                      "iss": "https://issuer.example", "aud": "agt-dashboard"})
+                      "iss": "https://issuer.example", "aud": "agentguard"})
         wrong_iss = _mint({"sub": "svc", "roles": ["operator"],
-                           "iss": "https://evil.example", "aud": "agt-dashboard"})
+                           "iss": "https://evil.example", "aud": "agentguard"})
         assert client.get("/agents", headers=_auth(good)).status_code == 200
         assert client.get("/agents", headers=_auth(wrong_iss)).status_code == 401
     finally:

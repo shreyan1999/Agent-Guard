@@ -1,4 +1,4 @@
-"""Client SDK for the AGT governance gateway.
+"""Client SDK for the AgentGuard governance gateway.
 
 A real agent embeds this to talk to the platform: register itself (and store the
 private key issued once at registration), request inline authorization for a tool

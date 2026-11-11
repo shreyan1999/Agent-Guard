@@ -1,0 +1,99 @@
+{
+  "trace_id": "a9fd7c813f8e406eb343640d5f3908be",
+  "agent_id": "billing-agent",
+  "task_input": "export db_query",
+  "task_output": "denied at policy",
+  "start_time": 1790375411.8420396,
+  "end_time": 1790375411.8689678,
+  "duration_ms": 26.928186416625977,
+  "metadata": {
+    "agent.task.name": "export",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "finance-policy",
+    "agent.did": "did:mesh:fbb919ebd4e3414a8b8b81386fcf8f50",
+    "agent.trust_score": 0.88,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "c29d807c26762143",
+  "span_count": 4,
+  "spans": [
+    {
+      "span_id": "9f9ec47936c14a65",
+      "parent_id": null,
+      "trace_id": "a9fd7c813f8e406eb343640d5f3908be",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375411.8420396,
+      "end_time": 1790375411.8420396,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "96f1eb021def401d",
+      "parent_id": null,
+      "trace_id": "a9fd7c813f8e406eb343640d5f3908be",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1790375411.8420396,
+      "end_time": 1790375411.8420396,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "identity_verified": false
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "6586ad6fc4d84a76",
+      "parent_id": null,
+      "trace_id": "a9fd7c813f8e406eb343640d5f3908be",
+      "kind": "policy_check",
+      "name": "gate:policy",
+      "start_time": 1790375411.8420396,
+      "end_time": 1790375411.8420396,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "policy:tenant_isolation: Policy 'finance-policy' belongs to another tenant",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "582a1941365f490c",
+      "parent_id": null,
+      "trace_id": "a9fd7c813f8e406eb343640d5f3908be",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375411.8420396,
+      "end_time": 1790375411.8689678,
+      "duration_ms": 26.928186416625977,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

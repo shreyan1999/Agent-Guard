@@ -1,0 +1,61 @@
+{
+  "trace_id": "47e333b7d8f546e48db2018baeb0eef0",
+  "agent_id": "ghost",
+  "task_input": "read mcp.demo-notes.echo",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375521.7622645,
+  "end_time": 1790375521.7622645,
+  "duration_ms": 0.0,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "mcp.demo-notes.echo",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "ded179d9ef694671",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "eb2f1b5b40194b62",
+      "parent_id": null,
+      "trace_id": "47e333b7d8f546e48db2018baeb0eef0",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375521.7622645,
+      "end_time": 1790375521.7622645,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:unregistered: Agent 'ghost' is not registered \u2014 unknown agents are untrusted",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "cc3d71d8d2994b42",
+      "parent_id": null,
+      "trace_id": "47e333b7d8f546e48db2018baeb0eef0",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375521.7622645,
+      "end_time": 1790375521.7622645,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

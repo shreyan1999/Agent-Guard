@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Plus, X, AlertTriangle, Code } from 'lucide-react';
+import { Plus, X, AlertTriangle, Code } from '../../icons';
 import {
   emptyClause, operatorsFor, findOperator, findField, serialize, parse,
   validateValue, describeGrouping, isComplete,
@@ -79,23 +79,23 @@ export default function ConditionBuilder({ schema, value, onChange }) {
   const complete = isComplete(clauses, schema);
 
   if (!schema) {
-    return <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Loading grammar…</div>;
+    return <div className="meta">Loading grammar…</div>;
   }
 
   if (unrepresentable !== null) {
     return (
-      <div style={box('var(--yellow)')}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 8 }}>
-          <AlertTriangle size={15} color="var(--yellow)" style={{ flexShrink: 0, marginTop: 1 }} />
-          <div style={{ fontSize: 12, color: 'var(--text-2)' }}>
+      <div className="notice notice-warn" style={{ display: 'block' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 10 }}>
+          <AlertTriangle size={15} color="var(--yellow)" style={{ flexShrink: 0, marginTop: 2 }} />
+          <div style={{ fontSize: 16 }}>
             This condition was not written by the builder and uses something it
             cannot represent. It is shown as stored so nothing is silently rewritten.
           </div>
         </div>
-        <code style={{ fontSize: 12, display: 'block', marginBottom: 10, wordBreak: 'break-all' }}>
+        <code style={{ display: 'block', marginBottom: 12, wordBreak: 'break-all' }}>
           {unrepresentable}
         </code>
-        <button className="btn btn-ghost" style={{ fontSize: 11 }}
+        <button className="btn btn-ghost btn-sm"
           onClick={() => { setUnrepresentable(null); setClauses([emptyClause()]); onChange(''); }}>
           Replace with a built condition
         </button>
@@ -121,7 +121,7 @@ export default function ConditionBuilder({ schema, value, onChange }) {
                   value={clause.joiner}
                   onChange={(e) => commit(clauses.map((c, j) =>
                     (j === i ? { ...c, joiner: e.target.value } : c)))}
-                  style={{ width: 74, fontFamily: 'var(--mono)', fontSize: 11 }}
+                  className="mono" style={{ width: 78 }}
                 >
                   <option value="and">and</option>
                   <option value="or">or</option>
@@ -169,37 +169,28 @@ export default function ConditionBuilder({ schema, value, onChange }) {
             </div>
 
             {field?.help && !error && (
-              <div style={hint}>{field.help}</div>
+              <div className="field-hint" style={hintIndent}>{field.help}</div>
             )}
             {op?.value === 'list' && !error && (
-              <div style={hint}>Comma-separated. Each value is quoted for you.</div>
+              <div className="field-hint" style={hintIndent}>Comma-separated. Each value is quoted for you.</div>
             )}
             {error && (
-              <div style={{ ...hint, color: 'var(--red)' }}>{error}</div>
+              <div className="field-hint error" style={hintIndent}>{error}</div>
             )}
           </div>
         );
       })}
 
-      <button className="btn btn-ghost" onClick={() => commit([...clauses, emptyClause()])}
-        style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
+      <button className="btn btn-ghost btn-sm" onClick={() => commit([...clauses, emptyClause()])}
+        style={{ marginTop: 4 }}>
         <Plus size={12} /> Add condition
       </button>
 
-      {grouping && (
-        <div style={{ ...hint, marginTop: 10, marginLeft: 0 }}>{grouping}</div>
-      )}
+      {grouping && <div className="field-hint">{grouping}</div>}
 
-      <div style={{
-        marginTop: 10, padding: '8px 10px', borderRadius: 6,
-        background: 'var(--bg-3)', border: '1px solid var(--border)',
-        display: 'flex', gap: 8, alignItems: 'flex-start',
-      }}>
+      <div className="condition-preview">
         <Code size={13} color="var(--text-3)" style={{ flexShrink: 0, marginTop: 2 }} />
-        <code style={{
-          fontSize: 12, wordBreak: 'break-all',
-          color: complete ? 'var(--text)' : 'var(--text-3)',
-        }}>
+        <code style={{ wordBreak: 'break-all', color: complete ? 'var(--text)' : 'var(--text-3)' }}>
           {preview || (complete ? '' : 'Choose a field, an operator and a value.')}
         </code>
       </div>
@@ -208,15 +199,8 @@ export default function ConditionBuilder({ schema, value, onChange }) {
 }
 
 const joinerLabel = {
-  width: 74, fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--text-3)',
-  letterSpacing: '.08em', textAlign: 'center',
+  width: 78, fontSize: 14, fontFamily: 'var(--mono)', color: 'var(--text-3)',
+  letterSpacing: '.06em', textAlign: 'center', flexShrink: 0,
 };
 
-const hint = {
-  fontSize: 11, color: 'var(--text-3)', marginTop: 4, marginLeft: 82,
-};
-
-const box = (color) => ({
-  padding: '12px 14px', borderRadius: 8,
-  background: 'var(--bg-2)', border: `1px solid ${color}44`,
-});
+const hintIndent = { marginLeft: 86 };

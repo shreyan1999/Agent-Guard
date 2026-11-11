@@ -1,0 +1,61 @@
+{
+  "trace_id": "e119a5f1065c4761b8e9f1b1e02e26af",
+  "agent_id": "etl-agent",
+  "task_input": "drop db_query",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375728.4366806,
+  "end_time": 1790375728.4616125,
+  "duration_ms": 24.931907653808594,
+  "metadata": {
+    "agent.task.name": "drop",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "fb88ecc1ea17c08d",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "71b3236eab234c33",
+      "parent_id": null,
+      "trace_id": "e119a5f1065c4761b8e9f1b1e02e26af",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375728.4366806,
+      "end_time": 1790375728.4366806,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'etl-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "a3907888c8284f01",
+      "parent_id": null,
+      "trace_id": "e119a5f1065c4761b8e9f1b1e02e26af",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375728.4366806,
+      "end_time": 1790375728.4616125,
+      "duration_ms": 24.931907653808594,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+  "agent_id": "support-agent",
+  "task_input": "invoke mcp.demo-notes.lookup_order",
+  "task_output": "allowed",
+  "start_time": 1790375398.9892979,
+  "end_time": 1790375399.0902514,
+  "duration_ms": 100.95357894897461,
+  "metadata": {
+    "agent.task.name": "invoke",
+    "agent.tool.name": "mcp.demo-notes.lookup_order",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:611d6b91016efcca51f2a66fac3d7a22",
+    "agent.trust_score": 0.72,
+    "input_present": false,
+    "agent.policy.decision": "allow",
+    "agent.task.success": true
+  },
+  "total_cost_usd": 0.0,
+  "success": true,
+  "content_hash": "17808e6a729fd1bd",
+  "span_count": 7,
+  "spans": [
+    {
+      "span_id": "30010e25a14f4058",
+      "parent_id": null,
+      "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375398.9892979,
+      "end_time": 1790375398.9892979,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "375d47ca3b0f445f",
+      "parent_id": null,
+      "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1790375398.9892979,
+      "end_time": 1790375398.9892979,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "identity_verified": false
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "21c6f7fa73d04049",
+      "parent_id": null,
+      "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+      "kind": "policy_check",
+      "name": "gate:tenant",
+      "start_time": 1790375398.9892979,
+      "end_time": 1790375398.9892979,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "tenant": "default"
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "1e92aa36dc3d4aa1",
+      "parent_id": null,
+      "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+      "kind": "policy_check",
+      "name": "gate:trust",
+      "start_time": 1790375398.9892979,
+      "end_time": 1790375398.9892979,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "trust_score": 0.72
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "d0742d23c8ea4940",
+      "parent_id": null,
+      "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+      "kind": "policy_check",
+      "name": "gate:govern",
+      "start_time": 1790375398.9892979,
+      "end_time": 1790375398.9941962,
+      "duration_ms": 4.898309707641602,
+      "status": "ok",
+      "attributes": {
+        "ring": "RING_2_STANDARD",
+        "mcp_proxy": true
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "0a1d2131b3d94b10",
+      "parent_id": null,
+      "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+      "kind": "tool_call",
+      "name": "mcp.demo-notes.lookup_order",
+      "start_time": 1790375398.9941962,
+      "end_time": 1790375399.0284162,
+      "duration_ms": 34.219980239868164,
+      "status": "ok",
+      "attributes": {
+        "agent.tool.name": "mcp.demo-notes.lookup_order",
+        "agent.tool.result": "ok"
+      },
+      "input_data": {},
+      "output_data": {
+        "ok": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "11714d480f094b1d",
+      "parent_id": null,
+      "trace_id": "28c2c44f31a64708a3ff5bde2181ec70",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375399.0284162,
+      "end_time": 1790375399.0902514,
+      "duration_ms": 61.835289001464844,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

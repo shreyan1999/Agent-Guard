@@ -1,6 +1,6 @@
-# AGT Governance Dashboard — User Guide (SOP)
+# AgentGuard — User Guide (SOP)
 
-A standard operating procedure for using the AGT Governance Dashboard. It
+A standard operating procedure for using AgentGuard. It
 describes only what the platform actually does. Where a feature is a
 demonstration, a reference, or observational rather than enforcing, this guide
 says so plainly.
@@ -135,6 +135,10 @@ honest caveats:
   their computed compliance and the error-budget burn are reloaded on restart.
   With `AGT_STATE_DIR` unset the SLO stores are in-memory and reset with the
   process.
+- **Decision traces are captured only when this is set** (under
+  `AGT_STATE_DIR/traces/`). With it unset the Audit Log panel says tracing is
+  off rather than showing an empty list, because AGT's default trace directory
+  would write into whatever directory the server was started from.
 - With `AGT_STATE_DIR` set, the app **starts empty** — no demo agents are
   seeded. Real registrations populate it.
 
@@ -165,13 +169,13 @@ Persists the tamper-evident audit chain across restarts.
 | Panel | What it does | Backing |
 |---|---|---|
 | **Overview** | Live counts (agents, policies, calls) and health | Real |
-| **Policy Engine** | Author, lint, evaluate and inspect policies | Real AGT `PolicyEngine` |
+| **Policy Engine** | Author, edit, lint, validate, inherit, evaluate and dry-run policies; inspect authored, resolved and YAML views | Real AGT `PolicyEngine` + `ShadowMode` |
 | **Tool Playground** | Fire a governed tool call through the four gates | Real AGT `govern()` |
-| **Trust & Identity** | Evaluate trust; view/attest Ed25519 identities | Real AGT `TrustPolicy` + `AgentIdentity` |
-| **Agents** | Register, inspect, decommission; onboard Foundry agents | Real AGT `LifecycleManager` |
-| **Agent SRE** | Per-agent SLOs, error budget, kill switch | Real AGT `agent_sre` |
-| **Compliance** | Prompt-defense grade (real) + OWASP live self-assessment | Mixed — see below |
-| **Audit Log** | Merkle-chained event stream with integrity verification | Real AGT `MerkleAuditChain` |
+| **Trust & Identity** | Set/inspect trust, see the execution ring it buys, view AGT's computed reputation, and inspect each agent's signed identity card | Real AGT `TrustPolicy` + `AgentIdentity` + `TrustedAgentCard` + `nexus.ReputationEngine` |
+| **Agents** | Register (with optional admin approval), inspect, suspend/resume, decommission, read each agent's lifecycle trail; onboard Foundry agents | Real AGT `LifecycleManager` |
+| **Agent SRE** | Per-agent SLOs and error budgets, deduplicated alerts, behavioural anomaly detection, adversarial evaluation of the gates, kill switch | Real AGT `agent_sre` (`slo` + `alerts` + `anomaly` + `chaos`) |
+| **Compliance** | Prompt-defense grade (real), OWASP live self-assessment with the last adversarial run attached to each risk, and SOC 2 / GDPR / HIPAA / EU AI Act reports scored from live evidence | Mixed — see below |
+| **Audit Log** | Merkle-chained event stream, per-entry inclusion proofs, durable signed-file verification, accountability/EEOAP export, and per-call decision traces you can open and diff | Real AGT `MerkleAuditChain` + `HashChainVerifier` + `audit_accountability_export` + `agent_sre.replay` |
 
 ---
 
@@ -308,6 +312,39 @@ case they persist across restarts (Section 4.2).
 Note: clearing the audit log starts a **new** chain and records the old root; it
 does not silently erase history.
 
+### SOP 6.8 — Trace how a decision was made
+
+The audit chain answers *whether* a call was allowed and proves the record has
+not been edited. When you need to know *why* it went the way it did — or why one
+call took 400 ms and an identical one took 40 — open its trace.
+
+**Requires `AGT_STATE_DIR`** (see §4.2). Without it the panel says tracing is
+off; it does not show an empty list, which would read as "no calls were made".
+
+1. Go to **Audit Log** and scroll to **Decision traces**. Each row is one
+   governed call: when, what was called, by whom, the outcome, how many spans
+   and the total duration.
+2. Click the call to open its timeline. Each bar is one span:
+
+   | Span | What it covers |
+   |---|---|
+   | `gate:lifecycle` `gate:identity` `gate:tenant` `gate:trust` | The gates that run in this handler, each timed individually |
+   | `gate:govern` | Ring, policy **and** the MCP proxy together — AGT decides all three inside `govern()` and returns one outcome, so this platform cannot time them apart. Three bars here would be three invented numbers |
+   | *tool name* | The remote call, using the round trip the connector itself measured. Absent when nothing was dispatched |
+   | `record:governance` | The audit chain, SLO, alert and receipt writes that follow the decision. On a fast local deny this is most of the request — charging it to whichever gate decided would make that gate look slow |
+
+   The bars add up to the trace's total duration, so there is no unexplained gap.
+3. A denied call's trace **ends on the gate that denied it**, with that span in
+   red and the rule named. Nothing downstream of the denial appears, because
+   nothing downstream ran.
+4. To compare two calls, tick two rows and press **Diff**. AGT's `ReplayEngine`
+   returns typed findings — `status change`, `output mismatch`, `extra span` —
+   rather than a text diff, so "the same call decided differently" is a fact
+   rather than something you have to spot.
+
+Traces survive a restart. Delete one with the bin icon (admin only); the
+deletion is itself audited.
+
 ---
 
 ## 7. Roles and who can do what
@@ -316,7 +353,7 @@ does not silently erase history.
 |---|---|
 | View any panel / list agents, policies, SLOs, audit | `viewer` |
 | Register agents, write policies, fire tool calls, sync Foundry telemetry, update trust, signal SLOs | `operator` |
-| Decommission agents, delete policies, clear audit, kill/resume | `admin` |
+| Decommission agents, delete policies, clear audit, delete a trace, kill/resume | `admin` |
 
 With auth disabled, every caller is an anonymous admin.
 

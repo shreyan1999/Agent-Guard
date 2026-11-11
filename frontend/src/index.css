@@ -1,142 +1,4137 @@
+/* ============================================================================
+   AgentGuard — design system
+
+   Two ideas hold the whole thing together:
+     1. Fluent 2 tokens throughout — Microsoft's palette, type ramp,
+        corner radii and elevation; light is the default
+     2. the app fills the viewport and never scrolls; long lists scroll
+        inside the panel that owns them
+   ========================================================================= */
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #06080f;
-  --bg-2: #0d1117;
-  --bg-3: #13191f;
-  --bg-4: #1a2230;
-  --border: #1e2d3d;
-  --border-2: #253545;
-  --text: #e8edf3;
-  --text-2: #8ba0b4;
-  --text-3: #4d6175;
-  --accent: #00d9ff;
-  --accent-dim: #00d9ff22;
-  --green: #22c55e;
-  --green-dim: #22c55e22;
-  --red: #ef4444;
-  --red-dim: #ef444422;
-  --yellow: #f59e0b;
-  --yellow-dim: #f59e0b22;
-  --purple: #a78bfa;
-  --purple-dim: #a78bfa22;
-  --font: 'IBM Plex Sans', sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
+  /* ---- surfaces — Fluent 2 neutral backgrounds --------------------- */
+  --bg:          #ffffff;   /* pure matte white */
+  --surface:     #ffffff;   /* NeutralBackground1 — cards sit on white */
+  --surface-2:   #f5f5f5;
+  --surface-3:   #ebebeb;
+  --surface-4:   #e0e0e0;
+
+  /* ---- strokes — Fluent 2 NeutralStroke1..3 ------------------------ */
+  --border:      #f0f0f0;
+  --border-2:    #e0e0e0;
+  --border-3:    #d1d1d1;
+  --border-strong: #616161;  /* StrokeAccessible — control outlines */
+
+  /* ---- text — Fluent 2 NeutralForeground1..4 ----------------------- */
+  --text:        #242424;
+  --text-2:      #424242;
+  --text-3:      #616161;
+
+  /* ---- brand ramp — brand80 is the resting fill, darker per state -- */
+  --accent:      #0f6cbd;   /* brand80  — BrandBackground */
+  --accent-2:    #115ea3;   /* brand70  — hover */
+  --accent-3:    #0c3b5e;   /* brand40  — pressed */
+  --accent-ink:  #ffffff;
+  --accent-fg:   #115ea3;   /* BrandForegroundLink — brand text on white */
+  --accent-dim:  #ebf3fc;   /* brand160 — BrandBackground2 */
+  --accent-line: #b4d6fa;   /* brand140 */
+
+  /* ---- shared palette ----------------------------------------------
+     Fluent's shared colours: the set M365 uses for avatars, calendars and
+     badges. Drawing accents from here keeps the UI colourful without
+     inventing hues that sit outside the system. */
+  --sc-blue:       #0078d4;
+  --sc-cornflower: #4f6bed;
+  --sc-lavender:   #7160e8;
+  --sc-teal:       #038387;
+  --sc-green:      #13a10e;
+  --sc-marigold:   #eaa300;
+  --sc-pumpkin:    #ca5010;
+  --sc-magenta:    #bf0077;
+
+  /* Tints of the same hues, for the aurora and for card glare. */
+  --aurora-1: rgba(79, 107, 237, .30);
+  --aurora-2: rgba(3, 131, 135, .26);
+  --aurora-3: rgba(113, 96, 232, .26);
+  --aurora-4: rgba(234, 163, 0, .20);
+  --glare:    rgba(255, 255, 255, .55);
+
+  /* ---- status — Fluent 2 Success / Warning / Danger ---------------- */
+  --green:       #0e700e;
+  --green-dim:   #f1faf1;
+  --green-line:  #9fd89f;
+  --yellow:      #bc4b09;
+  --yellow-dim:  #fdf6f3;
+  --yellow-line: #fdcfb4;
+  --red:         #b10e1c;
+  --red-dim:     #fdf3f4;
+  --red-line:    #eeacb2;
+  --purple:      #5c2e91;
+  --purple-dim:  #f7f4fc;
+  --purple-line: #d8cbeb;
+  --cyan:        #006d75;
+  --cyan-dim:    #eff9fa;
+  --cyan-line:   #a6dde2;
+  --pink:        #a4262c;
+  --pink-dim:    #fdf3f4;
+  --pink-line:   #efb9c8;
+
+  
+  /* Arial throughout. Both faces ship with every platform, so nothing is
+     fetched and the first paint already carries the final metrics. */
+  --font: Arial, Helvetica, sans-serif;
+  --font-display: Arial, Helvetica, sans-serif;
+  --mono: Consolas, "Courier New", Courier, monospace;
+
+  /* ---- spacing — the 4px global ramp -------------------------------
+     2, 6 and 10 sit off the 4x grid on purpose: they absorb the optical
+     padding inside Fluent icons so the icons still land on the grid. */
+  --s-20:  2px;   --s-40:  4px;   --s-60:  6px;   --s-80:  8px;
+  --s-100: 10px;  --s-120: 12px;  --s-160: 16px;  --s-200: 20px;
+  --s-240: 24px;  --s-280: 28px;  --s-320: 32px;  --s-360: 36px;
+  --s-400: 40px;  --s-480: 48px;
+
+  /* ---- corner radii ------------------------------------------------ */
+  --r-none: 0;      /* nav bars, tab bars   */
+  --r-sm:   2px;    /* small badges         */
+  --r:      4px;    /* buttons, dropdowns   */
+  --r-lg:   8px;    /* large buttons, cards */
+  --r-xl:   12px;   /* sheets, popovers, dialogs */
+  --r-card: 0;      /* cards are square-cornered */
+
+
+  /* ---- stroke ------------------------------------------------------ */
+  --stroke-thin:    1px;
+  --stroke-thick:   2px;
+  --stroke-thicker: 3px;
+
+  
+  /* Glass, not paint: the fill is low and the blur is heavy. Blur is what
+     buys legibility — it destroys the high-frequency detail behind the text
+     while letting the backdrop's colour through, which raising the alpha
+     would have killed. */
+  /* Matte white leaves nothing behind a card to refract, so the surfaces are
+     solid and the depth comes entirely from the shadow. */
+  --glass:        #ffffff;
+  --glass-strong: #ffffff;
+  --glass-stroke: rgba(16, 18, 22, .09);
+  --glass-blur:   none;
+
+  --content-max: 1640px;
+  --gap: var(--s-320);
+
+  /* ---- elevation — Fluent 2 shadow ramp ---------------------------- */
+  --shadow-2:  0 0 2px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .14);
+  --shadow-4:  0 0 2px rgba(0, 0, 0, .12), 0 2px 4px rgba(0, 0, 0, .14);
+  --shadow-8:  0 0 2px rgba(0, 0, 0, .12), 0 4px 8px rgba(0, 0, 0, .14);
+  --shadow-16: 0 0 2px rgba(0, 0, 0, .12), 0 8px 16px rgba(0, 0, 0, .14);
+  --shadow-64: 0 0 8px rgba(0, 0, 0, .12), 0 32px 64px rgba(0, 0, 0, .14);
+
+  
+  /* ---- motion — Fluent's duration ramp and easing curves -----------
+     Enter uses a decelerate curve (fast in, settling); exit uses
+     accelerate (slow start, quick away). Larger elements get longer. */
+  --dur-ultra-fast: 50ms;
+  --dur-faster:     100ms;
+  --dur-fast:       150ms;
+  --dur-normal:     200ms;
+  --dur-gentle:     250ms;
+  --dur-slow:       300ms;
+
+  --ease-accel: cubic-bezier(.8, 0, .78, 1);
+  --ease-decel: cubic-bezier(.1, .9, .2, 1);
+  --ease-easy:  cubic-bezier(.33, 0, .67, 1);
+  /* Overshoots slightly on settle — the "jolly" curve. */
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  --t:      var(--dur-fast) var(--ease-easy);
+  --t-slow: var(--dur-slow) var(--ease-decel);
 }
+
+html, body, #root { height: 100%; }
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: 14px;
-  line-height: 1.6;
-  min-height: 100vh;
+  font-size: 16px;      /* Fluent body1 */
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-2); }
-::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+::selection { background: var(--accent-line); color: var(--text); }
 
-button {
-  font-family: var(--font);
-  cursor: pointer;
-  border: none;
-  outline: none;
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
+::-webkit-scrollbar-thumb:hover { background: var(--border-3); background-clip: content-box; }
 
-input, textarea, select {
-  font-family: var(--mono);
-  font-size: 13px;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 6px;
-  padding: 8px 12px;
-  outline: none;
-  transition: border-color .15s;
+/* ============================================================================
+   Shell
+   ========================================================================= */
+
+.app { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
+
+
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.ok { background: var(--green); }
+.status-dot.bad { background: var(--red); }
+.status-dot.idle { background: var(--yellow); }
+
+.main { flex: 1; min-width: 0; display: flex; }
+.container {
+  flex: 1;
+  min-width: 0;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--s-240) var(--s-240) var(--s-320);
+  display: flex;
+  flex-direction: column;
 }
+/* The fixed-height Audit page gives every pixel of padding to its card grid —
+   the 32px floor below the last row was dead space on a page that cannot
+   scroll to reach it anyway. Compliance and Agent SRE scroll now (see their
+   own rules below), so they keep the normal container padding. */
+.container:has(.page > .cols-audit) { padding-bottom: var(--s-160); }
 
-input:focus, textarea:focus, select:focus {
-  border-color: var(--accent);
+/* ============================================================================
+   Page scaffolding
+   ========================================================================= */
+
+.page { display: flex; flex-direction: column; gap: var(--gap); flex: 1; min-height: 0; }
+/* Scoped, not global: only Audit is a fixed-height grid with no page scroll —
+   its three cards actually fit one screen. Compliance and Agent SRE pack four
+   and six differently-sized cards respectively; forcing those onto one screen
+   left every card too short to read, so they keep the region-scrolls-the-page
+   behaviour instead, each card sized to a readable floor (see their own
+   sections below). */
+.page:has(.cols-audit) { overflow: hidden; }
+/* Audit is viewport-locked, so every pixel above the columns is taken straight
+   out of the panels' scroll height. The three summary rows above (header, chain
+   bar, stat strip) don't need a full 32px between them; tightening the gap hands
+   ~50px back to the columns so the receipts table shows more than a row. */
+.page:has(.cols-audit) { gap: var(--s-160); }
+
+/* Title and subtitle sit on one line, not stacked -- the subtitle is a single
+   sentence everywhere it's used, and a whole second line for it was the
+   biggest fixed cost in the header. That line reclaims 40–50px on every page,
+   handed straight to the card grid below. */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  padding-bottom: var(--s-120);
 }
-
-textarea { resize: vertical; min-height: 80px; }
-
-code { font-family: var(--mono); font-size: 12px; }
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-  font-family: var(--mono);
+.page-head-text {
+  min-width: 240px;
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 14px;
 }
-.tag.allow  { background: var(--green-dim); color: var(--green); }
-.tag.deny   { background: var(--red-dim); color: var(--red); }
-.tag.warn   { background: var(--yellow-dim); color: var(--yellow); }
-.tag.info   { background: var(--accent-dim); color: var(--accent); }
-.tag.purple { background: var(--purple-dim); color: var(--purple); }
+/* Material display-small over body-large: the weight stays at 400 and the
+   size carries the hierarchy, which is what makes the heading read as airy. */
+.page-title { font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 36px; letter-spacing: -.4px; white-space: nowrap; }
+.page-sub { font-size: 15px; line-height: 22px; color: var(--text-2); margin-top: 0; max-width: 72ch; }
 
-.btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all .15s;
+@media (max-width: 900px) {
+  /* Too narrow to sit side by side without crowding the actions on the same
+     row -- back to stacked, same as before this change. */
+  .page-head-text { align-items: flex-start; }
+  .page-title { white-space: normal; }
 }
-.btn-primary {
-  background: var(--accent);
-  color: #000;
-}
-.btn-primary:hover { background: #00b8d9; }
+.page-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-.btn-ghost {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-2);
-}
-.btn-ghost:hover { border-color: var(--border-2); color: var(--text); }
+/* the region below the header that takes up whatever height is left */
+.page-fill { flex: 1; min-height: 0; display: grid; gap: var(--gap); }
 
-.btn-danger {
-  background: var(--red-dim);
-  border: 1px solid var(--red);
-  color: var(--red);
+/* `align-content: start` alone leaves auto rows free to be squeezed, and
+   `.panel` carries min-height:0 for the scroll-inside-a-panel case — together
+   that capped these panels at the row height with no way to scroll, so extra
+   content was simply clipped. Rows now size to content; a panel that outgrows
+   70vh keeps its own internal scroll, and the region scrolls past that. */
+.page-fill.fill-start {
+  align-content: start;
+  grid-auto-rows: max-content;
+  overflow-y: auto;
+  overflow-x: clip;
+  overflow-clip-margin: var(--s-160);
+  scroll-behavior: smooth;
 }
-.btn-danger:hover { background: var(--red); color: #fff; }
+.page-fill.fill-start > .panel { min-height: auto; max-height: 70vh; }
+.page-fill.fill-start > .panel.panel-scroll > .panel-body { min-height: 0; }
 
-.card {
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
-}
 
-.card-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-3);
+/* Policy Engine: list · selected policy · evaluator, all full height. */
+.cols-policy { grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(280px, 360px); }
+/* No inner scrollbars on this page — panels clip to their column. */
+.cols-policy > .panel { min-height: 0; }
+.cols-policy > .panel > .panel-body { overflow: hidden; min-height: 0; }
+
+
+.col { display: flex; flex-direction: column; gap: var(--gap); min-height: 0; }
+
+.section-title { font-size: 18px; font-weight: 500; line-height: 28px; color: var(--text); }
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
   margin-bottom: 12px;
 }
+.section-note { font-size: 14px; line-height: 20px; color: var(--text-3); }
 
-.pulse {
-  animation: pulse 2s infinite;
+
+/* Fluent Card: white ground, hairline stroke, shadow4 at rest. */
+.panel {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-4);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  padding: var(--s-160) var(--s-240);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-head-text { min-width: 0; }
+.panel-title { font-size: 18px; font-weight: 500; line-height: 28px; }
+.panel-desc { font-size: 14px; line-height: 20px; color: var(--text-2); margin-top: 2px; }
+.panel-body { padding: var(--s-200) var(--s-240); min-height: 0; }
+.panel-body.flush { padding: 0; }
+.panel-foot { padding: 16px 20px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+/* a panel whose body owns the scrolling */
+.panel-scroll { overflow: hidden; }
+.panel-scroll > .panel-body { flex: 1; overflow-y: auto; }
+
+.card {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--r-card);
+  padding: 20px;
+  box-shadow: var(--shadow-4);
+  transition: box-shadow var(--t), border-color var(--t);
+}
+.card:hover { box-shadow: var(--shadow-8); }
+
+
+/* ============================================================================
+   Buttons
+   ========================================================================= */
+
+button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; color: inherit; }
+
+/* Fluent Button: 32px medium size, 4px corners, flat fills, one state per
+   step down the brand ramp. No gradients — Fluent 2 dropped them. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transition: background var(--t), border-color var(--t), color var(--t), opacity var(--t);
+}
+.btn:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn svg { flex-shrink: 0; }
+
+.btn-primary {
+  background: linear-gradient(120deg, var(--sc-blue), var(--sc-cornflower));
+  color: var(--accent-ink);
+  box-shadow: 0 var(--s-20) var(--s-80) -2px color-mix(in srgb, var(--sc-cornflower) 45%, transparent);
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(120deg, var(--accent-2), var(--sc-lavender));
+  box-shadow: 0 var(--s-40) var(--s-120) -2px color-mix(in srgb, var(--sc-lavender) 50%, transparent);
+}
+.btn-primary:active:not(:disabled) {
+  background: linear-gradient(120deg, var(--accent-3), var(--accent-2));
+  transform: scale(.98);
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .4; }
+/* Fluent's default button: white ground, NeutralStroke1. */
+.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-3); }
+.btn-secondary:hover:not(:disabled) { background: var(--surface-3); border-color: var(--border-3); }
+.btn-secondary:active:not(:disabled) { background: var(--surface-4); }
+
+.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border-3); }
+.btn-ghost:hover:not(:disabled) { background: var(--surface-3); }
+.btn-ghost:active:not(:disabled) { background: var(--surface-4); }
+
+/* Fluent's subtle button: no ground at all until hovered. */
+.btn-quiet { background: transparent; color: var(--text); border-color: transparent; }
+.btn-quiet:hover:not(:disabled) { background: var(--surface-3); }
+.btn-quiet:active:not(:disabled) { background: var(--surface-4); }
+
+.btn-danger { background: var(--surface); color: var(--red); border-color: var(--red-line); }
+.btn-danger:hover:not(:disabled) { background: var(--red-dim); border-color: var(--red); }
+
+.btn.is-on { background: var(--accent-dim); border-color: var(--accent); color: var(--accent-fg); }
+
+.btn-sm { height: 32px; padding: 0 12px; font-size: 16px; gap: 6px; }
+.btn-xs { height: 28px; padding: 0 var(--s-100); font-size: 14px; line-height: 20px; gap: var(--s-40); }
+.btn-block { width: 100%; }
+.btn-icon { width: 36px; height: 36px; padding: 0; }
+.btn-icon.sm { width: 32px; height: 32px; }
+
+/* ============================================================================
+   Forms
+   ========================================================================= */
+
+.field { display: block; margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+
+.field-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.field-hint { font-size: 14px; line-height: 20px; color: var(--text-3); margin-top: 4px; }
+.field-hint.error { color: var(--red); }
+
+/* Fluent Input: 32px tall, hairline box with a heavier bottom stroke that
+   thickens to the brand colour on focus. */
+input, textarea, select {
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-3);
+  border-bottom-color: var(--border-strong);
+  color: var(--text);
+  border-radius: var(--r);
+  padding: var(--s-60) var(--s-120);
+  min-height: 36px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--t), box-shadow var(--t), background var(--t);
+}
+input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) { border-color: var(--text-3); }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--border-3);
+  border-bottom-color: var(--accent);
+  box-shadow: inset 0 -1px 0 0 var(--accent);
+}
+input::placeholder, textarea::placeholder { color: var(--text-3); font-weight: 400; }
+input:disabled, select:disabled, textarea:disabled { opacity: .5; cursor: not-allowed; }
+
+input.mono, textarea.mono, select.mono { font-family: var(--mono); font-size: 14px; font-weight: 400; }
+
+/* the text-input rule above would otherwise stretch a tick box across its row */
+input[type="checkbox"], input[type="radio"] {
+  width: auto;
+  flex: none;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+select option { background: var(--surface); color: var(--text); }
+
+/* Only textareas that hold code opt into the mono face (add `.mono`). */
+textarea { resize: none; min-height: 84px; }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  height: 18px;
+  box-shadow: none;
+}
+input[type="range"]:focus { box-shadow: none; }
+input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: var(--surface-4); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px; margin-top: -5px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,.5);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-track { height: 4px; border-radius: 99px; background: var(--surface-4); }
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border: none; border-radius: 50%; background: var(--text); cursor: pointer;
 }
 
-.animate-in { animation: slideIn .25s ease-out; }
+.range-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: var(--s-40);
+}
+
+
+/* Fluent Badge, "rounded" shape: 4px corners, caption1 type. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-40);
+  padding: 2px 8px;
+  border-radius: var(--r);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  text-transform: none;
+}
+.badge svg { flex-shrink: 0; }
+
+.badge-neutral { background: var(--surface-3);  color: var(--text-2); border-color: var(--border-2); }
+.badge-success { background: var(--green-dim);  color: var(--green);  border-color: var(--green-line); }
+.badge-danger { background: var(--red-dim);    color: var(--red);    border-color: var(--red-line); }
+.badge-warn { background: var(--yellow-dim); color: var(--yellow); border-color: var(--yellow-line); }
+.badge-info { background: var(--accent-dim); color: var(--accent-fg); border-color: var(--accent-line); }
+.badge-purple { background: var(--purple-dim); color: var(--purple); border-color: var(--purple-line); }
+
+.badge-sm { padding: 1px 6px; font-size: 12px; line-height: 16px; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--r);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  background: var(--surface-3);
+  border: 1px solid var(--border-2);
+  color: var(--text-2);
+}
+.chip.on { background: var(--green-dim); border-color: var(--green-line); color: var(--green); }
+.chip.off { color: var(--text-3); }
+
+/* ============================================================================
+   Tables
+   ========================================================================= */
+
+.table-wrap { width: 100%; overflow: auto; min-height: 0; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 16px; }
+/* Fluent DataGrid headers are sentence case at body1-strong — no caps, no
+   tracking; the ruled row does the separating. */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  /* Opaque on purpose: a translucent sticky header lets the rows it is
+     supposed to be masking show straight through it. */
+  background: var(--surface);
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0;
+  color: var(--text-2);
+  padding: 10px 20px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-2);
+}
+.table td {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr { transition: background var(--t); }
+.table tbody tr:hover { background: var(--surface-3); }
+.table .num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 16px; }
+.table th.num { text-align: right; }
+
+.table-flush thead th:first-child, .table-flush td:first-child { padding-left: 0; }
+.table-flush thead th:last-child, .table-flush td:last-child { padding-right: 0; }
+.table-flush thead th { background: var(--surface); }
+.table-flush tbody tr:hover { background: transparent; }
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-120);
+  padding: var(--s-120) 0;
+  border-bottom: 1px solid var(--border);
+}
+.row:last-child { border-bottom: none; }
+
+/* ============================================================================
+   Stats
+   ========================================================================= */
+
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-4);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.stat { padding: 16px 20px; border-right: 1px solid var(--border-2); min-width: 0; }
+.stat:last-child { border-right: none; }
+.stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0;
+  color: var(--text-2);
+}
+/* Fluent title2, Display cut — the one place numerals go large. */
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 40px;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-sub { font-size: 14px; line-height: 20px; color: var(--text-3); margin-top: 2px; }
+
+/* MCP governance roll-up above the decision-traces table (flush panel body). */
+.trace-mcp-summary { padding: 14px 16px 4px; }
+.trace-mcp-summary .stat-strip { box-shadow: none; }
+/* Full-size stat cards wrap 4-across into two 118px rows here, ~250px that came
+   straight out of the panel's scroll height and starved the receipts table
+   beside it. Hold all four on one compact row so the tables get the space. */
+.trace-mcp-summary .stat-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.trace-mcp-summary .stat { padding: 8px 12px; }
+.trace-mcp-summary .stat-label { font-size: 12px; line-height: 16px; }
+.trace-mcp-summary .stat-value { font-size: 20px; line-height: 26px; margin-top: 2px; }
+.trace-mcp-summary .stat-sub { display: none; }
+
+/* ============================================================================
+   Meters
+   ========================================================================= */
+
+.meter { height: 2px; border-radius: 99px; background: var(--surface-4); overflow: hidden; width: 100%; }
+.meter-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+.meter-row { display: flex; align-items: center; gap: 12px; }
+.meter-row .meter { width: 80px; flex-shrink: 0; }
+.meter-value { font-family: var(--mono); font-size: 16px; font-variant-numeric: tabular-nums; }
+
+
+/* Fluent MessageBar. */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-120);
+  padding: var(--s-120) var(--s-160);
+  border-radius: var(--r);
+  font-size: 16px;
+  line-height: 24px;
+  border: 1px solid var(--border-2);
+  background: var(--surface-2);
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+.notice svg { flex-shrink: 0; margin-top: 2px; }
+.notice-body { flex: 1; min-width: 0; }
+.notice-info { background: var(--accent-dim); border-color: var(--accent-line); color: var(--text); }
+.notice-info svg { color: var(--accent-fg); }
+.notice-success svg { color: var(--green); }
+.notice-warn svg { color: var(--yellow); }
+.notice-danger svg { color: var(--red); }
+.notice-success { background: var(--green-dim);  border-color: var(--green-line);  color: var(--text); }
+.notice-warn { background: var(--yellow-dim); border-color: var(--yellow-line); color: var(--text); }
+.notice-danger { background: var(--red-dim);    border-color: var(--red-line);    color: var(--text); }
+.notice-close { color: var(--text-3); padding: 0 2px; line-height: 1; flex-shrink: 0; }
+.notice-close:hover { color: var(--text); }
+
+.result-box {
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  border-left: var(--stroke-thicker) solid var(--border-3);
+  background: var(--surface-2);
+  padding: var(--s-160) var(--s-200);
+  font-size: 16px;
+}
+.result-box.ok { border-color: var(--green-line);  border-left-color: var(--green);  background: var(--green-dim); }
+.result-box.bad { border-color: var(--red-line);    border-left-color: var(--red);    background: var(--red-dim); }
+.result-box.warn { border-color: var(--yellow-line); border-left-color: var(--yellow); background: var(--yellow-dim); }
+
+.decision-why {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-2);
+  border-left: var(--stroke-thick) solid var(--border-3);
+  padding-left: var(--s-120);
+  margin-bottom: var(--s-120);
+}
+
+.gate {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-40);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: var(--s-20) var(--s-80);
+  border-radius: var(--r);
+  border: 1px solid var(--border-2);
+  color: var(--text-3);
+  background: var(--surface-2);
+}
+.gate-pass { border-color: var(--green-line); color: var(--green); }
+.gate-fail { border-color: var(--red-line);   color: var(--red); }
+.gate-skip { opacity: .6; }
+
+.empty {
+  padding: var(--s-320) var(--s-240);
+  text-align: center;
+  color: var(--text-3);
+  font-size: 16px;
+  margin: auto 0;
+}
+
+.grade { font-family: var(--font-display); font-size: 44px; font-weight: 600; line-height: 1; width: 50px; text-align: center; flex-shrink: 0; }
+
+/* ============================================================================
+   Audit
+   ========================================================================= */
+
+.chain-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  padding: var(--s-120) var(--s-200);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.chain-bar.ok { background: var(--green-dim); border-color: var(--green-line); }
+.chain-bar.bad { background: var(--red-dim);   border-color: var(--red-line); }
+
+.audit-table td { padding-top: var(--s-120); padding-bottom: var(--s-120); }
+.audit-table tr.denied td:first-child { box-shadow: inset 2px 0 0 var(--red); }
+.detail-cell {
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.detail-kv { margin-right: var(--s-160); }
+
+/* OWASP coverage: keep the risk id + name column from collapsing */
+.owasp-table td:first-child, .owasp-table th:first-child { min-width: 178px; }
+.owasp-table td:last-child { white-space: nowrap; }
+
+/* ============================================================================
+   Selectable list item
+   ========================================================================= */
+
+.policy-item {
+  padding: var(--s-120) var(--s-160);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--t), border-color var(--t);
+}
+/* Fluent selection: a tinted ground plus a 2px brand rail on the leading edge. */
+.policy-item:hover { background: var(--surface-3); border-color: var(--border-3); }
+.policy-item.active {
+  background: var(--accent-dim);
+  border-color: var(--accent-line);
+  box-shadow: inset var(--stroke-thick) 0 0 0 var(--accent);
+}
+.policy-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ============================================================================
+   Agent + SLO cards
+   ========================================================================= */
+
+.agent-card {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--r-card);
+  padding: var(--s-200);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-4);
+  transition: box-shadow var(--dur-normal) var(--ease-easy),
+              border-color var(--dur-normal) var(--ease-easy),
+              transform var(--dur-slow) var(--ease-decel);
+}
+.agent-card:hover {
+  border-color: var(--border-3);
+  box-shadow: var(--shadow-16);
+  transform: translateY(-4px) scale(1.012);
+}
+.grid-cards { perspective: 1200px; }
+.agent-card { transform: translateY(0); }
+
+.kv-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-160);
+  margin-top: var(--s-160);
+  padding-top: var(--s-160);
+  border-top: var(--stroke-thin) solid var(--border);
+}
+.kv-row dt {
+  font-size: 14px; font-weight: 600; line-height: 20px; letter-spacing: 0;
+  color: var(--text-2); margin-bottom: 2px;
+}
+.kv-row dd { font-size: 16px; color: var(--text); }
+
+.agent-card-foot {
+  margin-top: var(--s-160);
+  padding-top: var(--s-120);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-80);
+}
+
+.slo-card {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  border-top: var(--stroke-thick) solid var(--border-3);
+  box-shadow: var(--shadow-4);
+  border-radius: var(--r-card);
+  padding: var(--s-200);
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--t);
+}
+.slo-card:hover { border-color: var(--border-2); }
+.slo-card.warn { border-top-color: var(--yellow); }
+.slo-card.critical { border-top-color: var(--red); }
+
+/* ============================================================================
+   Modal
+   ========================================================================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 28px;
+}
+.modal {
+  width: min(720px, 100%);
+  max-height: min(86vh, 900px);
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-64);
+}
+.modal > .panel-body { overflow-y: auto; }
+
+/* ============================================================================
+   Code
+   ========================================================================= */
+
+code, .mono { font-family: var(--mono); font-size: 14px; }
+.code-block {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.7;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r);
+  padding: var(--s-120) var(--s-160);
+  overflow: auto;
+  color: var(--text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.inline-code {
+  font-family: var(--mono);
+  font-size: 14px;
+  background: var(--surface-3);
+  border-radius: var(--r);
+  padding: 2px 6px;
+  color: var(--text-2);
+}
+
+details > summary {
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--text-3);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s-80);
+}
+details > summary:hover { color: var(--text-2); }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "\25B8"; font-size: 13px; transition: transform var(--t); }
+details[open] > summary::before { transform: rotate(90deg); }
+
+.condition-preview {
+  margin-top: var(--s-120);
+  padding: var(--s-100) var(--s-120);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  gap: var(--s-80);
+  align-items: flex-start;
+  font-size: 16px;
+}
+
+/* ============================================================================
+   Helpers
+   ========================================================================= */
+
+
+.cluster { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cluster-6 { gap: var(--s-80); }
+.spacer { margin-left: auto; }
+
+.scroll-y { overflow-y: auto; overflow-x: clip; overflow-clip-margin: var(--s-160); min-height: 0; }
+/* A column that scrolls must not also squeeze what it holds: panels carry
+   min-height:0 for the scroll-inside-a-panel case, and in a flex column that
+   lets them shrink under their content and overlap the panel below. */
+.col.scroll-y > * { flex-shrink: 0; }
+
+
+.grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap: 0 16px; }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(310px, 100%), 1fr)); gap: var(--s-160); }
+
+.muted { color: var(--text-2); }
+.faint { color: var(--text-3); }
+.meta { font-size: 16px; color: var(--text-3); }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nowrap { white-space: nowrap; }
+.nums { font-variant-numeric: tabular-nums; }
+
+/* ============================================================================
+   Motion
+   ========================================================================= */
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.animate-in { animation: fadeUp var(--dur-normal) var(--ease-decel); }
+
+/* Top-level transition. Fluent moves between whole destinations with a quick
+   fade rather than sliding them, so nothing implies a spatial hierarchy that
+   the tabs don't actually have. */
+.page-swap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  animation: top-level var(--dur-gentle) var(--ease-decel) backwards;
+}
+@keyframes top-level {
+  from { opacity: 0; transform: perspective(1200px) translate3d(0, 10px, -30px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Staggered entry for the overview. Short offsets, and they stop after the
+   sixth card so the last one never feels like it is lagging. */
+/* backwards, not both: `both` would freeze the final transform and outrank
+   the tilt's own transform once the animation finished. */
+
+
+@keyframes fluent-enter {
+  from { opacity: 0; transform: perspective(1400px) rotateX(-14deg) translate3d(0, 22px, -60px); }
+  to   { opacity: 1; transform: perspective(1400px) rotateX(0) translate3d(0, 0, 0); }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1.1s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ============================================================================
+   Viewport-locked layout
+
+   On a real desktop the app is exactly one screen tall: nothing scrolls except
+   the lists that own their overflow. Smaller viewports fall back to ordinary
+   document scrolling, because locking them would just clip content.
+   ========================================================================= */
+
+@media (min-width: 1100px) and (min-height: 620px) {
+  html, body { overflow: hidden; }
+  .app { height: 100vh; overflow: hidden; }
+  .main { min-height: 0; overflow: hidden; }
+  .container { min-height: 0; overflow: hidden; }
+}
+
+/* ============================================================================
+   Narrow screens
+   ========================================================================= */
+
+@media (max-width: 1280px) {
+  :root { --gap: var(--s-200); }
+  .container { padding: 16px 20px 24px; }
+
+}
+
+@media (max-width: 1099px) {
+  .page-fill { display: flex; flex-direction: column; }
+  .cols-policy, .cols-play { grid-template-columns: minmax(0, 1fr); }
+  .panel-scroll > .panel-body { overflow: visible; }
+}
+
+@media (max-width: 900px) {
+  .app { display: block; }
+
+  .container { padding: 20px 16px 40px; }
+  .page-title { font-size: 28px; line-height: 36px; }
+  .stat-strip { grid-template-columns: repeat(auto-fit, minmax(min(140px, 45%), 1fr)); }
+  .stat { border-bottom: 1px solid var(--border); }
+  .panel-body { padding: 16px; }
+  .table thead th, .table td { padding: var(--s-120) var(--s-160); }
+}
+
+@media (max-width: 560px) {
+  .page-actions { width: 100%; }
+  .stat-value { font-size: 28px; line-height: 36px; }
+}
+
+
+/* `.panel` sets min-height:0 for the panels that scroll their own body. Here
+   that would let a grid item shrink under its content, so the rows collapse
+   and the cards spill; these ones size to what they hold. */
+
+
+/* Tones — every accent in here resolves through these two properties. */
+.tone-accent { --tone: var(--accent-fg); --tone-dim: var(--accent-dim); }
+.tone-green { --tone: var(--green);     --tone-dim: var(--green-dim); }
+.tone-yellow { --tone: var(--yellow);    --tone-dim: var(--yellow-dim); }
+.tone-red { --tone: var(--red);       --tone-dim: var(--red-dim); }
+.tone-purple { --tone: var(--purple);    --tone-dim: var(--purple-dim); }
+.tone-cyan { --tone: var(--cyan);      --tone-dim: var(--cyan-dim); }
+.tone-pink { --tone: var(--pink);      --tone-dim: var(--pink-dim); }
+.tone-muted { --tone: var(--text-3);    --tone-dim: var(--surface-3); }
+
+
+/* The grid is the stage; each tilt wrapper is a card standing on it. */
+
+
+/* Hue assignment — one shared colour per card. */
+
+
+/* The inner well the visual sits in. */
+
+
+/* ---- card 1 - pipeline --------------------------------------------------- */
+
+
+.pipe-dot { fill: var(--border-3); opacity: .5; }
+
+
+/* One keyframe fits every edge because each is normalised to pathLength 1. */
+.pipe-edge-live {
+  stroke: var(--tone);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: .35 .65;
+  animation: pipe-flow 1.6s linear infinite;
+}
+@keyframes pipe-flow {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.pipe-node-box {
+  fill: var(--surface-3);
+  stroke: var(--border-2);
+  stroke-width: 1;
+  transition: fill 300ms ease, stroke 300ms ease;
+}
+.pipe-node svg { color: var(--text-3); transition: color 300ms ease; }
+.pipe-node-label {
+  fill: var(--text-3);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-anchor: middle;
+  transition: fill 300ms ease;
+}
+.pipe-node.lit .pipe-node-box { fill: var(--tone-dim); stroke: var(--tone); }
+.pipe-node.lit svg { color: var(--tone); }
+.pipe-node.lit .pipe-node-label { fill: var(--tone); }
+
+
+/* The hatch is the shadow the tile lifts away from. */
+
+
+/* ---- card 5 - tools ------------------------------------------------------ */
+
+
+@media (prefers-reduced-motion: reduce) {
+  .pipe-edge-live { animation: none; stroke-dashoffset: 0; }
+
+
+}
+
+/* ---- responsive ---------------------------------------------------------- */
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .page-swap { animation: none; opacity: 1; transform: none; }
+
+
+  .agent-card:hover { transform: none; }
+
+}
+
+/* ============================================================================
+   Tool Playground
+
+   Two columns: the tools and the call to make on the left, the decision on the
+   right. Nothing inside a column scrolls — the tool list travels instead.
+   ========================================================================= */
+
+.cols-play { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+/* The marquee track is `width: max-content`, so without this the column
+   stretches to the full length of the strip and blows the grid apart. */
+.cols-play > * { min-width: 0; }
+
+/* Both panels size to what they hold; the region scrolls past them, not the
+   column, and not the page in a fixed-viewport lock.
+
+   The tools row used to be a fixed `clamp(264px, 40vh, 380px)` regardless of
+   how many tools there actually were — with two built-in tools that was a
+   380px card holding one short row of cards and a lot of empty card beneath
+   it. It's `max-content` now: the panel hugs whatever it actually holds, and
+   only gets a ceiling (`max-height` below) so importing a dozen tools later
+   still can't shove Configure call off the bottom of the window — that case
+   gets its own scrollbar again once it actually arrives, rather than being
+   guarded against on every page load by wasting the common case's space. */
+.play-left {
+  display: grid;
+  grid-template-rows: max-content max-content;
+  align-content: start;
+  gap: var(--gap);
+  min-height: 0;
+  min-width: 0;
+  overflow: visible;
+}
+.play-left > .panel { min-height: 0; min-width: 0; }
+
+/* A ceiling, not a floor: the tools panel stays exactly as tall as its
+   content up to this, and only scrolls internally past it -- the guard the
+   old fixed row was trying to be, without the fixed row's wasted space. */
+.play-left > .panel:first-child { max-height: 480px; overflow: visible; }
+.play-left > .panel:first-child > .panel-body { overflow-y: auto; overflow-x: hidden; }
+
+/* The decision panel is height-constrained by the column beside it, so it
+   keeps a scrollbar of its own. overflow-x stays hidden so no horizontal bar
+   appears. */
+.play-decision > .panel-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* The form's own body is left alone to report its natural height -- no
+   internal scrollbar, since the column no longer clips it. Content shorter
+   than the column's stretched height (matching the panel beside it) centers
+   instead of leaving a blank gap below the last field. */
+.play-form > .panel-body {
+  overflow: visible;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.play-left > .panel > .panel-head { padding: var(--s-120) var(--s-200); }
+
+/* The left column is trimmed to fit one screen where it can: two fields per
+   row, a shorter input box, tighter gaps, name-only tool cards. Below roughly
+   1000px of window height it no longer fits, and the panel bodies scroll
+   rather than silently swallowing whatever lands at the bottom. */
+.play-form .grid-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.play-form .field { margin-bottom: var(--s-60); }
+.play-form .field-hint { display: none; }
+.play-form textarea { min-height: 40px; }
+.play-form .btn-block { margin-top: var(--s-120) !important; }
+
+
+/* ---- add menu ------------------------------------------------------------ */
+
+.menu-wrap { position: relative; }
+
+/* Catches the next click anywhere so the menu closes without a global
+   listener fighting the button's own toggle. */
+.menu-scrim { position: fixed; inset: 0; z-index: 40; }
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--s-60));
+  right: 0;
+  z-index: 41;
+  min-width: 260px;
+  padding: var(--s-60);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: var(--r-lg);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--shadow-64);
+  animation: menu-in var(--dur-fast) var(--ease-decel);
+}
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.menu-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-120);
+  width: 100%;
+  padding: var(--s-100) var(--s-120);
+  border-radius: var(--r);
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  transition: background var(--t);
+}
+.menu-item:hover { background: var(--surface-3); }
+.menu-item svg { flex-shrink: 0; margin-top: 2px; color: var(--text-2); }
+.menu-item span { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.menu-item strong { font-size: 14px; font-weight: 600; line-height: 20px; }
+.menu-item small { font-size: 12px; line-height: 16px; color: var(--text-3); }
+
+/* ---- tool carousel ------------------------------------------------------
+   Two tools at a time, held for three seconds and then slid across. A marquee
+   reads as a running queue and never sits still long enough to be read.
+   ---------------------------------------------------------------------- */
+
+.tool-carousel { overflow: hidden; min-width: 0; padding: var(--s-40) 0; }
+.tool-carousel-track {
+  display: flex;
+  transition: transform var(--dur-slow) var(--ease-decel);
+}
+.tool-page {
+  flex: 0 0 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-120);
+  padding: 0 2px;
+}
+
+.tool-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-100);
+  width: 100%;
+  min-width: 0;
+  min-height: 108px;
+  padding: var(--s-120) var(--s-140, var(--s-120));
+  border-radius: var(--r);
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  transition: border-color var(--t);
+}
+.tool-chip:hover { border-color: var(--border-3); }
+.tool-chip code { font-size: 14px; }
+/* The detail lines are the point of the taller card; only the raw endpoint
+   URL is dropped, since it overflows and repeats the kind line. */
+.tool-chip .meta { font-size: 12px; line-height: 17px; margin-top: 3px; }
+.tool-chip .meta.mono { display: none; }
+
+/* The track is a flex row, so every page is as tall as the tallest page and
+   every card as tall as the tallest card in it. Measured at 1400x900 that put
+   a 64px card (`db_query`) in a 227px box, because one MCP descriptor
+   elsewhere in the carousel ran to 201px — most of the tool panel was empty
+   space paid for by a description nobody was looking at. Two lines, with the
+   whole text on hover; the stable carousel height stays, it is just no longer
+   set by the longest sentence any server happened to write. */
+.tool-chip-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* The findings count on a tool chip. It was a `title` tooltip, which could
+   only be hovered for; it is a button now, so it has to read as one without
+   turning into a third badge competing with the risk and category beside it. */
+.chip-findings {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-40);
+  padding: 1px var(--s-60);
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  background: transparent;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background var(--t), border-color var(--t), color var(--t);
+}
+.chip-findings:hover {
+  background: var(--surface-3);
+  border-color: var(--border-2);
+  color: var(--text);
+}
+.chip-findings:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.tool-dots { display: flex; justify-content: center; gap: var(--s-60); margin-top: var(--s-100); }
+.tool-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-3);
+  transition: width var(--t), background var(--t);
+}
+.tool-dot.on { width: 18px; background: var(--accent); }
+
+/* ---- agent carousel -----------------------------------------------------
+   One agent at a time. It advances on its own; the arrows step it manually.
+   ---------------------------------------------------------------------- */
+
+.agent-carousel { display: flex; align-items: center; gap: var(--s-80); min-width: 0; }
+.agent-viewport { flex: 1; min-width: 0; overflow: hidden; }
+.agent-track {
+  display: flex;
+  transition: transform var(--dur-slow) var(--ease-decel);
+}
+.agent-track > * { flex: 0 0 100%; min-width: 0; }
+
+.agent-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 20px;
+  line-height: 1;
+  transition: background var(--t), color var(--t), border-color var(--t);
+}
+.agent-arrow:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+
+/* ---- quick demos, under the run button ----------------------------------- */
+
+.play-demos {
+  margin-top: var(--s-120);
+  padding-top: var(--s-120);
+  border-top: 1px solid var(--border);
+}
+/* The demo chips: a dot stating the verdict each one is expected to produce,
+   so the row reads as a set of use cases rather than eight identical buttons.
+   The tone comes from the label the backend suite verifies. */
+.demo-chip { gap: var(--s-60); }
+.demo-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--tone, var(--text-3));
+}
+.demo-allow { --tone: var(--green); }
+.demo-deny { --tone: var(--red); }
+
+.play-demos-label span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 15px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.play-demos-label {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s-80);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-carousel-track, .agent-track { transition: none; }
+  .menu { animation: none; }
+}
+
+/* ============================================================================
+   Slider
+
+   Fluent's anatomy: a 4px rail, a solid fill, and a thumb drawn as a brand
+   ring around the surface colour. The track is inset by half a thumb at each
+   end so the thumb never overhangs the control.
+   ========================================================================= */
+
+.fslider {
+  /* Slider.js reads the thumb size from here, so the two can't drift apart. */
+  --fslider-thumb: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+  user-select: none;
+}
+
+.fslider.band-low { --fill: var(--red); }
+.fslider.band-mid { --fill: var(--yellow); }
+.fslider.band-high { --fill: var(--green); }
+
+.fslider-rail, .fslider-fill {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--fslider-thumb) / 2);
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 99px;
+  pointer-events: none;
+}
+.fslider-rail { right: calc(var(--fslider-thumb) / 2); background: var(--surface-4); }
+.fslider-fill { background: var(--fill); transition: width var(--t-slow), background var(--t-slow); }
+
+/* The real control: full-size, invisible, and on top of everything. */
+.fslider-input {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.fslider-input:focus { box-shadow: none; }
+.fslider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--fslider-thumb);
+  height: var(--fslider-thumb);
+}
+.fslider-input::-moz-range-thumb {
+  width: var(--fslider-thumb);
+  height: var(--fslider-thumb);
+  border: none;
+}
+
+.fslider-thumb {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  width: var(--fslider-thumb);
+  height: var(--fslider-thumb);
+  margin-top: calc(var(--fslider-thumb) / -2);
+  border-radius: 50%;
+  background: var(--surface);
+  /* Fluent draws the thumb as a ring, not a disc. */
+  box-shadow: inset 0 0 0 3px var(--fill), var(--shadow-2);
+  pointer-events: none;
+  transition: left var(--t-slow), box-shadow var(--t-slow);
+}
+
+.fslider-input:focus-visible ~ .fslider-thumb {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fslider-fill, .fslider-thumb { transition: none; }
+}
+
+/* ============================================================================
+   Dark theme
+
+   Light is the default now, so this is the swap. Values are Fluent 2's
+   webDarkTheme: #292929 cards over a #141414 canvas, and the brand ramp
+   shifted up to brand100 (#479ef5), which clears contrast on a dark ground
+   where brand80 does not.
+   ========================================================================= */
+
+:root[data-theme="dark"] {
+  --bg:          #141414;
+  --surface:     #292929;
+  --surface-2:   #1f1f1f;
+  --surface-3:   #333333;
+  --surface-4:   #3d3d3d;
+
+  --border:      #3d3d3d;
+  --border-2:    #525252;
+  --border-3:    #666666;
+  --border-strong: #757575;
+
+  --glass:        rgba(28, 29, 32, .40);
+  --glass-strong: rgba(28, 29, 32, .62);
+  --glass-stroke: rgba(255, 255, 255, .12);
+
+  --text:        #ffffff;
+  --text-2:      #d6d6d6;
+  --text-3:      #adadad;
+
+  --accent:      #115ea3;
+  --accent-2:    #0f6cbd;
+  --accent-3:    #0c3b5e;
+  --accent-ink:  #ffffff;
+  --accent-fg:   #479ef5;
+  --accent-dim:  #082338;
+  --accent-line: #0e4775;
+
+  /* Shared colours shift lighter and less saturated on a dark ground. */
+  --sc-blue:       #3aa0f3;
+  --sc-cornflower: #93a4f4;
+  --sc-lavender:   #a79cf1;
+  --sc-teal:       #4cc3cb;
+  --sc-green:      #54b054;
+  --sc-marigold:   #e5b93c;
+  --sc-pumpkin:    #f08b57;
+  --sc-magenta:    #ef85c8;
+
+
+  --aurora-1: rgba(58, 160, 243, .20);
+  --aurora-2: rgba(76, 195, 203, .16);
+  --aurora-3: rgba(167, 156, 241, .20);
+  --aurora-4: rgba(229, 185, 60, .12);
+  --glare:    rgba(255, 255, 255, .10);
+
+  --green:       #54b054;
+  --green-dim:   #0d2a0d;
+  --green-line:  #245224;
+  --yellow:      #fbbc74;
+  --yellow-dim:  #3a1e04;
+  --yellow-line: #6b3a0c;
+  --red:         #f1707b;
+  --red-dim:     #3b1116;
+  --red-line:    #6e2c34;
+  --purple:      #b4a0e3;
+  --purple-dim:  #241f33;
+  --purple-line: #493e68;
+  --cyan:        #58d3db;
+  --cyan-dim:    #082b2e;
+  --cyan-line:   #1b565b;
+  --pink:        #ef8fa8;
+  --pink-dim:    #37141d;
+  --pink-line:   #6b2b3c;
+
+  /* Fluent's dark elevation leans on a heavier ambient pass. */
+  --shadow-2:  0 0 2px rgba(0, 0, 0, .24), 0 1px 2px rgba(0, 0, 0, .28);
+  --shadow-4:  0 0 2px rgba(0, 0, 0, .24), 0 2px 4px rgba(0, 0, 0, .28);
+  --shadow-8:  0 0 2px rgba(0, 0, 0, .24), 0 4px 8px rgba(0, 0, 0, .28);
+  --shadow-16: 0 0 2px rgba(0, 0, 0, .24), 0 8px 16px rgba(0, 0, 0, .28);
+  --shadow-64: 0 0 8px rgba(0, 0, 0, .24), 0 32px 64px rgba(0, 0, 0, .28);
+}
+
+/* The few places that hard-code a light-ground value. */
+:root[data-theme="dark"] select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d6d6d6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+
+
+/* The content column lets the backdrop through; the sidebar does not. */
+.main { background: transparent; }
+
+
+/* The pivot is the app's only chrome: tabs on the left, the health readout
+   and theme switch on the right. */
+/* A floating pill rather than a full-width bar: centred, detached from the
+   top edge, and glass so the backdrop moves behind it. */
+.pivotbar {
+  position: sticky;
+  top: var(--s-160);
+  z-index: 49;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-80);
+  width: max-content;
+  max-width: calc(100% - var(--s-320));
+  margin: var(--s-200) auto 0;
+  /* The horizontal padding is deliberately larger than the cap radius
+     (height/2 = 30px): with overflow hidden, anything inside a smaller inset
+     gets sliced by the capsule's curve — which is what was cutting the corner
+     off the first tab. */
+  padding: var(--s-80) var(--s-320);
+  border-radius: 999px;
+  /* Clips the square WebGL canvas the glass container inserts. */
+  overflow: hidden;
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--shadow-16);
+}
+
+.pivot-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-40);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.pivot-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-60);
+  height: 32px;
+  padding: 0 var(--s-120);
+  font-size: 13px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-stroke);
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* Subtle icon button, on the page surface rather than a coloured bar. */
+.topnav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: var(--text-2);
+  background: transparent;
+  transition: background var(--t), color var(--t);
+}
+.topnav-btn:hover { background: var(--surface-3); color: var(--text); }
+.topnav-btn:active { background: var(--surface-4); }
+.topnav-btn:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+
+/* ---- pivot --------------------------------------------------------------- */
+
+.pivotbar {
+  position: sticky;
+  top: 0;
+  z-index: 49;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-2);
+  padding: 0 20px;
+}
+
+.glass-nav {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.glass-nav::-webkit-scrollbar { display: none; }
+
+.glass-nav-pill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 999px;
+  background: var(--glass-strong);
+  box-shadow: var(--shadow-2);
+  transition: transform var(--dur-slow) var(--ease-spring),
+              width var(--dur-slow) var(--ease-spring);
+  pointer-events: none;
+}
+
+.glass-nav-item {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 15px;
+  border: none;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  white-space: nowrap;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: color var(--t), background var(--t);
+}
+.glass-nav-item:hover { color: var(--text); }
+.glass-nav-item.active { color: var(--text); }
+.glass-nav-item:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-nav-pill { transition: none; }
+}
+
+@media (max-width: 1100px) {
+  .pivotbar { padding: 0 8px; }
+}
+
+/* ============================================================================
+   Liquid glass
+
+   The parameter model is taken from the liquid-glass notes — edge refraction,
+   rim lighting, corner boost, specular highlight, tint and blur — and rendered
+   with compositor-friendly CSS rather than a per-element WebGL canvas.
+
+   Why not the library: it samples the page with html2canvas and refracts it in
+   a WebGL canvas per instance. Every glass surface here would re-capture the
+   whole document, and this app repaints on an 8-second poll, so the cost is
+   paid over and over. These rules get the same read — a lit bevel, a bright
+   rim, brighter corners, and a specular that tracks the pointer — for the cost
+   of two pseudo-elements.
+
+   Every surface below is one of the three shapes the notes describe:
+   rounded (cards, dialogs, menus), pill (nav, status, arrows) and circle
+   (icon buttons).
+   ========================================================================= */
+
+:root {
+  --lg-rim:     rgba(255, 255, 255, .70);  /* lit top edge      */
+  --lg-rim-low: rgba(0, 0, 0, .05);        /* shaded bottom     */
+  --lg-edge:    rgba(255, 255, 255, .35);  /* refracted bezel   */
+  --lg-spec:    rgba(255, 255, 255, .55);  /* specular sheen    */
+  --lg-corner:  .22;                       /* corner boost      */
+}
+
+:root[data-theme="dark"] {
+  --lg-rim:     rgba(255, 255, 255, .16);
+  --lg-rim-low: rgba(0, 0, 0, .28);
+  --lg-edge:    rgba(255, 255, 255, .08);
+  --lg-spec:    rgba(255, 255, 255, .10);
+}
+
+/* The bezel: a lit top rim falling to a shaded bottom, plus an inner ring that
+   stands in for the edge refraction the shader would compute.
+
+   `.menu` is deliberately not in this list. It takes the same bezel — its own
+   box-shadow is declared just below — but it must stay `position: absolute`,
+   and this rule comes after the one that says so. A dropdown in flow is not a
+   dropdown: it grew the panel head from 55px to 182px on open and pushed the
+   Configure call panel 93px down the page.
+
+   `.pivotbar` is out for the same reason: it declares `position: sticky` — in
+   both of the blocks that style it — and this rule was quietly demoting the
+   nav to `relative`, so the one piece of chrome meant to stay put was not
+   pinned to anything. Both take the bezel; their box-shadows are declared
+   just below. */
+.panel, .card, .agent-card, .slo-card, .modal, .gov-kpi {
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 0 var(--lg-rim),
+    inset 0 -1px 0 0 var(--lg-rim-low),
+    inset 0 0 0 1px var(--lg-edge),
+    var(--shadow-4);
+}
+
+.modal { box-shadow:
+  inset 0 1px 0 0 var(--lg-rim),
+  inset 0 -1px 0 0 var(--lg-rim-low),
+  inset 0 0 0 1px var(--lg-edge),
+  var(--shadow-64); }
+
+/* The bezel the rule above would have given it, minus the positioning. */
+.menu { box-shadow:
+  inset 0 1px 0 0 var(--lg-rim),
+  inset 0 0 0 1px var(--lg-edge),
+  var(--shadow-64); }
+
+.pivotbar { box-shadow:
+  inset 0 1px 0 0 var(--lg-rim),
+  inset 0 -1px 0 0 var(--lg-rim-low),
+  inset 0 0 0 1px var(--lg-edge),
+  var(--shadow-16); }
+
+/* Corner boost. The shader brightens where two edges meet; a conic gradient
+   masked to the border does the same thing in one paint. */
+.panel::before, .modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from 135deg,
+    var(--lg-edge), transparent 12%, transparent 38%,
+    var(--lg-edge), transparent 62%, transparent 88%,
+    var(--lg-edge));
+  opacity: var(--lg-corner);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Specular highlight. useTilt already publishes the pointer position as
+   --mx/--my, so the sheen tracks the cursor the way the shader's light does. */
+
+
+/* Nested glass. The notes have child surfaces sampling their parent rather
+   than the page; here a surface inside a glass surface takes a lighter rim so
+   it reads as sitting on glass, not as a second sheet of it. */
+.panel .tool-chip {
+  box-shadow: inset 0 1px 0 0 var(--lg-edge);
+}
+
+
+/* ---- glass host ---------------------------------------------------------
+   liquid-glass-js builds its own div with a WebGL canvas behind it, and the
+   content is portalled into that div. So the host is just a positioning box
+   and the library's `.glass-container` is the bar itself.
+
+   The CSS glass stays on it as the floor: the canvas only paints once the page
+   snapshot is captured and WebGL is up, and it never paints at all where WebGL
+   is unavailable. Without this the nav would flash unstyled, or stay that way.
+   -------------------------------------------------------------------- */
+
+.glass-host { display: contents; }
+
+.pivotbar.glass-host > .glass-container, .glass-host > .glass-container {
+  position: sticky;
+  top: var(--s-160);
+  z-index: 49;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-80);
+  width: max-content;
+  max-width: calc(100% - var(--s-320));
+  margin: var(--s-200) auto 0;
+  /* The horizontal padding is deliberately larger than the cap radius
+     (height/2 = 30px): with overflow hidden, anything inside a smaller inset
+     gets sliced by the capsule's curve — which is what was cutting the corner
+     off the first tab. */
+  padding: var(--s-80) var(--s-320);
+  border-radius: 999px;
+  /* Clips the square WebGL canvas the glass container inserts. */
+  overflow: hidden;
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-stroke);
+  box-shadow:
+    inset 0 1px 0 0 var(--lg-rim),
+    inset 0 -1px 0 0 var(--lg-rim-low),
+    inset 0 0 0 1px var(--lg-edge),
+    var(--shadow-16);
+}
+
+/* The library's canvas sits behind the content at z-index -1; it must not
+   stretch the bar or catch clicks. */
+.glass-host > .glass-container > canvas {
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+/* The ShaderGradient backdrop. The library sizes its own canvas to 100% of
+   whatever contains it, so the host is what pins it to the viewport. */
+
+
+/* ============================================================================
+   Dimensional pass
+
+   The navbar in the sketch is the reference: a solid black pill with the
+   active tab lifted out of it as a white one. Everything else follows the same
+   language — a raised object with a lit top edge, a tight contact shadow and a
+   soft ambient one beneath it, and motion that eases rather than snaps.
+
+   Three shadows make the depth read: `--e1` at rest, `--e2` on hover, `--e3`
+   for things that float over the page. Each is a contact shadow plus a wider
+   ambient one, which is what separates a raised object from a flat box with a
+   blur behind it.
+   ========================================================================= */
+
+:root {
+  --e1: 0 1px 2px rgba(16, 18, 22, .07), 0 6px 16px rgba(16, 18, 22, .09);
+  --e2: 0 2px 4px rgba(16, 18, 22, .09), 0 14px 30px rgba(16, 18, 22, .13);
+  --e3: 0 6px 12px rgba(16, 18, 22, .11), 0 28px 56px rgba(16, 18, 22, .17);
+  --lift: cubic-bezier(.2, .8, .2, 1);   /* soft, no overshoot */
+}
+
+:root[data-theme="dark"] {
+  --e1: 0 1px 2px rgba(0, 0, 0, .40), 0 3px 8px rgba(0, 0, 0, .30);
+  --e2: 0 2px 4px rgba(0, 0, 0, .46), 0 10px 22px rgba(0, 0, 0, .38);
+  --e3: 0 4px 8px rgba(0, 0, 0, .50), 0 20px 40px rgba(0, 0, 0, .46);
+}
+
+
+/* Must match the specificity of the earlier `.pivotbar.glass-host > …` rule,
+   or that one keeps the glass fill and the white-on-white nav is unreadable. */
+.pivotbar.glass-host > .glass-container, .glass-host > .glass-container {
+  background: #0c0c0e;
+  border: 1px solid rgba(255, 255, 255, .07);
+  -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, .13),
+    inset 0 -1px 0 0 rgba(0, 0, 0, .55),
+    var(--e3);
+}
+
+.glass-nav-item {
+  color: rgba(255, 255, 255, .68);
+  font-weight: 600;
+  transition: color var(--dur-normal) var(--lift);
+}
+.glass-nav-item:hover { color: rgba(255, 255, 255, .92); background: transparent; }
+.glass-nav-item.active { color: #0c0c0e; }
+.glass-nav-item:focus-visible { outline: 2px solid rgba(255, 255, 255, .8); outline-offset: -3px; }
+
+/* The sliding indicator becomes the white key the active tab sits on. */
+.glass-nav-pill {
+  top: 3px;
+  bottom: 3px;
+  background: #ffffff;
+  box-shadow:
+    inset 0 -1px 0 0 rgba(0, 0, 0, .12),
+    0 1px 2px rgba(0, 0, 0, .30),
+    0 4px 10px rgba(0, 0, 0, .22);
+}
+
+/* The bar's own controls are on black now. */
+.pivot-status {
+  color: rgba(255, 255, 255, .82);
+  border-color: rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .06);
+}
+.topnav-btn { color: rgba(255, 255, 255, .82); }
+.topnav-btn:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+.topnav-btn:active { background: rgba(255, 255, 255, .18); }
+.topnav-btn:focus-visible { outline-color: rgba(255, 255, 255, .85); }
+
+/* ---- every other surface, same language ---------------------------------- */
+
+.panel, .card, .agent-card, .slo-card, .tool-chip, .policy-item, .stat-strip, .gov-kpi {
+  box-shadow:
+    inset 0 1px 0 0 var(--lg-rim),
+    inset 0 -1px 0 0 var(--lg-rim-low),
+    var(--e1);
+  transition:
+    box-shadow var(--dur-slow) var(--lift),
+    transform var(--dur-slow) var(--lift),
+    border-color var(--dur-normal) var(--lift);
+}
+
+.card:hover, .agent-card:hover, .slo-card:hover, .tool-chip:hover, .policy-item:hover, .gov-kpi:hover {
+  box-shadow:
+    inset 0 1px 0 0 var(--lg-rim),
+    inset 0 -1px 0 0 var(--lg-rim-low),
+    var(--e2);
+  transform: translateY(-2px);
+}
+
+
+.modal, .menu { box-shadow: inset 0 1px 0 0 var(--lg-rim), var(--e3); }
+
+/* Controls read as keys: lit on top, seated on a contact shadow, and pressed
+   down rather than merely recoloured. */
+.btn, .chip, .badge, input, textarea, select {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .22), var(--e1);
+  transition:
+    background var(--dur-normal) var(--lift),
+    border-color var(--dur-normal) var(--lift),
+    box-shadow var(--dur-normal) var(--lift),
+    transform var(--dur-fast) var(--lift);
+}
+.btn:hover:not(:disabled) { box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .28), var(--e2); }
+.btn:active:not(:disabled) { transform: translateY(1px); box-shadow: var(--e1); }
+
+input:focus, textarea:focus, select:focus {
+  box-shadow: inset 0 -1px 0 0 var(--accent), var(--e1);
+}
+
+.agent-arrow, .topnav-btn, .tool-dot { transition: all var(--dur-normal) var(--lift); }
+.agent-arrow { box-shadow: var(--e1); }
+.agent-arrow:hover { box-shadow: var(--e2); transform: translateY(-1px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover, .agent-card:hover, .slo-card:hover, .tool-chip:hover, .policy-item:hover, .agent-arrow:hover, .btn:active:not(:disabled), .gov-kpi:hover { transform: none; }
+}
+
+/* ============================================================================
+   Claymorphism
+
+   Clay reads as a soft solid rather than a sheet of paper: generous corners, a
+   deep diffuse drop shadow, a light bounce on the opposite side, and two inset
+   shadows — a bright one top-left and a dim one bottom-right — which is what
+   makes the surface look inflated instead of flat.
+
+   Note this reinstates rounded corners. The squared-off cards asked for
+   earlier cannot read as clay; a hard corner reads as cut card stock.
+   ========================================================================= */
+
+:root {
+  --r-card: 26px;
+
+  --clay:
+    22px 22px 52px rgba(16, 18, 22, .14),
+    -12px -12px 36px rgba(255, 255, 255, .95),
+    inset -7px -7px 16px rgba(16, 18, 22, .05),
+    inset 9px 9px 20px rgba(255, 255, 255, .95);
+
+  --clay-lift:
+    30px 30px 68px rgba(16, 18, 22, .18),
+    -14px -14px 44px rgba(255, 255, 255, .96),
+    inset -7px -7px 16px rgba(16, 18, 22, .06),
+    inset 9px 9px 20px rgba(255, 255, 255, .96);
+
+  /* Small controls take the same recipe at a smaller amplitude. */
+  --clay-sm:
+    8px 8px 18px rgba(16, 18, 22, .11),
+    -5px -5px 14px rgba(255, 255, 255, .92),
+    inset -3px -3px 7px rgba(16, 18, 22, .04),
+    inset 4px 4px 9px rgba(255, 255, 255, .92);
+
+  /* Pressed: the outer shadow collapses and the insets deepen. */
+  --clay-press:
+    inset 5px 5px 12px rgba(16, 18, 22, .13),
+    inset -4px -4px 10px rgba(255, 255, 255, .9);
+}
+
+:root[data-theme="dark"] {
+  --clay:
+    22px 22px 52px rgba(0, 0, 0, .62),
+    -12px -12px 36px rgba(255, 255, 255, .035),
+    inset -7px -7px 16px rgba(0, 0, 0, .45),
+    inset 9px 9px 20px rgba(255, 255, 255, .055);
+
+  --clay-lift:
+    30px 30px 68px rgba(0, 0, 0, .70),
+    -14px -14px 44px rgba(255, 255, 255, .045),
+    inset -7px -7px 16px rgba(0, 0, 0, .50),
+    inset 9px 9px 20px rgba(255, 255, 255, .065);
+
+  --clay-sm:
+    8px 8px 18px rgba(0, 0, 0, .55),
+    -5px -5px 14px rgba(255, 255, 255, .03),
+    inset -3px -3px 7px rgba(0, 0, 0, .40),
+    inset 4px 4px 9px rgba(255, 255, 255, .05);
+
+  --clay-press:
+    inset 5px 5px 12px rgba(0, 0, 0, .55),
+    inset -4px -4px 10px rgba(255, 255, 255, .04);
+}
+
+/* ---- surfaces ------------------------------------------------------------ */
+
+.panel, .card, .agent-card, .slo-card, .stat-strip, .modal, .menu, .gov-kpi {
+  border-radius: var(--r-card);
+  border: none;
+  box-shadow: var(--clay);
+  transition:
+    box-shadow var(--dur-slow) var(--lift),
+    transform var(--dur-slow) var(--lift);
+}
+
+.card:hover, .agent-card:hover, .slo-card:hover, .gov-kpi:hover {
+  box-shadow: var(--clay-lift);
+  transform: translateY(-3px);
+}
+
+
+/* The corner-boost ring belongs to the glass treatment; on clay it reads as a
+   hairline seam around a soft object. */
+.panel::before, .modal::before { display: none; }
+
+
+/* Anything nested inside a clay surface is pressed into it, not stacked on it. */
+.tool-chip, .policy-item {
+  border-radius: 18px;
+  border: none;
+  box-shadow: var(--clay-press);
+}
+.tool-chip:hover, .policy-item:hover { box-shadow: var(--clay-sm); }
+
+/* ---- controls ------------------------------------------------------------ */
+
+.btn, .chip, .badge, .gate, input, textarea, select {
+  border-radius: 999px;
+  border: none;
+  box-shadow: var(--clay-sm);
+}
+.btn:hover:not(:disabled) { box-shadow: var(--clay-lift); }
+.btn:active:not(:disabled) { box-shadow: var(--clay-press); transform: translateY(1px); }
+
+input, textarea, select { border-radius: 16px; box-shadow: var(--clay-press); }
+input:focus, textarea:focus, select:focus {
+  box-shadow: var(--clay-press), 0 0 0 3px var(--accent-dim);
+}
+textarea { border-radius: 18px; }
+
+.agent-arrow { border: none; box-shadow: var(--clay-sm); }
+.agent-arrow:hover { box-shadow: var(--clay-lift); }
+
+/* ---- the navbar stays a capsule, in clay -------------------------------- */
+
+.pivotbar.glass-host > .glass-container, .glass-host > .glass-container {
+  border: none;
+  box-shadow:
+    22px 22px 52px rgba(0, 0, 0, .30),
+    -10px -10px 30px rgba(255, 255, 255, .10),
+    inset -6px -6px 16px rgba(0, 0, 0, .55),
+    inset 8px 8px 20px rgba(255, 255, 255, .10);
+}
+.glass-nav-pill {
+  box-shadow:
+    4px 4px 12px rgba(0, 0, 0, .35),
+    inset -2px -2px 6px rgba(0, 0, 0, .10),
+    inset 3px 3px 8px rgba(255, 255, 255, .95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover, .agent-card:hover, .slo-card:hover, .btn:active:not(:disabled), .gov-kpi:hover { transform: none; }
+}
+
+/* ============================================================================
+   Density + matte black
+
+   Three corrections:
+     1. The clay shadow was too diffuse to separate a white card from a white
+        page. A wide soft blur alone has no edge; adding a tight contact
+        shadow under the card is what actually detaches it.
+     2. Cards no longer react to hover at all — no lift, no shadow change, and
+        no tilt.
+     3. Dark mode becomes the same treatment on matte black: a flat ground with
+        solid surfaces sitting on it, no gradient canvas behind.
+   ========================================================================= */
+
+:root {
+  /* Tight contact shadow first, wide ambient second. */
+  --clay:
+    0 2px 4px rgba(16, 18, 22, .10),
+    14px 16px 34px rgba(16, 18, 22, .22),
+    -10px -10px 30px rgba(255, 255, 255, .92),
+    inset -7px -7px 16px rgba(16, 18, 22, .06),
+    inset 9px 9px 20px rgba(255, 255, 255, .95);
+
+  --clay-lift: var(--clay);
+
+  --clay-sm:
+    0 1px 3px rgba(16, 18, 22, .12),
+    7px 8px 18px rgba(16, 18, 22, .18),
+    -4px -4px 12px rgba(255, 255, 255, .9),
+    inset -3px -3px 7px rgba(16, 18, 22, .05),
+    inset 4px 4px 9px rgba(255, 255, 255, .92);
+}
+
+/* ---- matte black ---------------------------------------------------------- */
+
+:root[data-theme="dark"] {
+  --bg:          #0a0a0b;   /* matte black ground */
+  --surface:     #171719;
+  --surface-2:   #121214;
+  --surface-3:   #1e1e21;
+  --surface-4:   #27272b;
+
+  --border:      #202024;
+  --border-2:    #2b2b30;
+  --border-3:    #3a3a41;
+
+  --glass:        #171719;
+  --glass-strong: #1c1c1f;
+  --glass-stroke: rgba(255, 255, 255, .06);
+
+  /* On black the light bounce has to be nearly absent or it turns grey; the
+     separation comes from a hard contact shadow and a lit top edge instead. */
+  --clay:
+    0 2px 4px rgba(0, 0, 0, .70),
+    14px 16px 34px rgba(0, 0, 0, .62),
+    inset -6px -6px 16px rgba(0, 0, 0, .50),
+    inset 8px 8px 20px rgba(255, 255, 255, .045);
+
+  --clay-lift: var(--clay);
+
+  --clay-sm:
+    0 1px 3px rgba(0, 0, 0, .65),
+    7px 8px 18px rgba(0, 0, 0, .55),
+    inset -3px -3px 8px rgba(0, 0, 0, .45),
+    inset 4px 4px 10px rgba(255, 255, 255, .04);
+
+  --clay-press:
+    inset 5px 5px 14px rgba(0, 0, 0, .70),
+    inset -4px -4px 10px rgba(255, 255, 255, .035);
+}
+
+/* ---- cards are inert on hover -------------------------------------------- */
+
+.panel:hover, .card:hover, .agent-card:hover, .slo-card:hover, .gov-kpi:hover {
+  box-shadow: var(--clay);
+  transform: none;
+  border-color: transparent;
+}
+
+/* The pointer tilt is a hover animation too, so it goes with the rest. The
+   glare it drove goes with it. */
+
+
+/* Nested wells stop reacting as well. */
+.tool-chip:hover { box-shadow: var(--clay-press); }
+
+/* ============================================================================
+   Navbar: inverted per theme, and no glass canvas
+
+   The bar was hard-coded black, so on a black page it disappeared into it.
+   It is now driven by its own token set and flips with the theme: dark bar on
+   the white page, light bar on the matte-black one — the capsule always reads
+   as the opposite of the ground it floats over.
+
+   The liquid-glass canvas goes with it. It refracts an html2canvas snapshot of
+   the page, and against an opaque capsule it contributes nothing except a
+   misaligned white ghost of the active pill leaking past the top-left corner.
+   ========================================================================= */
+
+:root {
+  --nav-bg:       #0c0c0e;   /* capsule fill                     */
+  --nav-fg:       rgba(255, 255, 255, .68);
+  --nav-fg-hi:    rgba(255, 255, 255, .95);
+  --nav-pill:     #ffffff;   /* the key the active tab sits on   */
+  --nav-pill-fg:  #0c0c0e;
+  --nav-rim:      rgba(255, 255, 255, .13);
+  --nav-rim-low:  rgba(0, 0, 0, .55);
+  --nav-chip:     rgba(255, 255, 255, .08);
+  --nav-chip-hi:  rgba(255, 255, 255, .16);
+}
+
+:root[data-theme="dark"] {
+  --nav-bg:       #f2f2f4;
+  --nav-fg:       rgba(12, 12, 14, .62);
+  --nav-fg-hi:    #0c0c0e;
+  --nav-pill:     #0c0c0e;
+  --nav-pill-fg:  #ffffff;
+  --nav-rim:      rgba(255, 255, 255, .85);
+  --nav-rim-low:  rgba(0, 0, 0, .14);
+  --nav-chip:     rgba(12, 12, 14, .07);
+  --nav-chip-hi:  rgba(12, 12, 14, .14);
+}
+
+/* Matches `.pivotbar.glass-host > .glass-container` above; being last in the
+   file is what carries it. */
+.pivotbar.glass-host > .glass-container, .glass-host > .glass-container {
+  background: var(--nav-bg);
+  border: none;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, .22),
+    18px 20px 44px rgba(0, 0, 0, .26),
+    inset 0 1px 0 0 var(--nav-rim),
+    inset 0 -1px 0 0 var(--nav-rim-low);
+}
+
+/* The refraction canvas is what was painting the white sliver. */
+.glass-host > .glass-container > canvas { display: none; }
+
+.glass-nav-item { color: var(--nav-fg); }
+.glass-nav-item:hover { color: var(--nav-fg-hi); background: transparent; }
+.glass-nav-item.active { color: var(--nav-pill-fg); }
+.glass-nav-item:focus-visible { outline-color: var(--nav-fg-hi); }
+
+.glass-nav-pill {
+  background: var(--nav-pill);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, .28),
+    0 4px 10px rgba(0, 0, 0, .20);
+}
+
+.pivot-status {
+  color: var(--nav-fg-hi);
+  border-color: transparent;
+  background: var(--nav-chip);
+}
+.topnav-btn { color: var(--nav-fg); }
+.topnav-btn:hover { background: var(--nav-chip); color: var(--nav-fg-hi); }
+.topnav-btn:active { background: var(--nav-chip-hi); }
+.topnav-btn:focus-visible { outline-color: var(--nav-fg-hi); }
+
+/* ============================================================================
+   A grey card on a white page
+
+   The page stays pure matte white; the cards step down off it. The whole
+   neutral ladder shifts with them so the pressed wells inside a card keep the
+   same separation they had when the card was white — otherwise greying the
+   card alone would swallow every tile nested in it.
+   ========================================================================= */
+
+:root {
+  --surface:     #eaeaee;   /* card fill, and the tiles pressed into it */
+  --surface-2:   #dfdfe4;   /* the deeper wells                         */
+  --surface-3:   #d4d4da;
+  --surface-4:   #c8c8d0;
+
+  --border:      #dcdce2;
+  --border-2:    #cdcdd5;
+  --border-3:    #b9b9c3;
+
+  --glass:        #eaeaee;
+  --glass-strong: #eaeaee;
+}
+
+
+/* ---- the pipeline -------------------------------------------------------- */
+
+.pipe {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.pipe-svg { flex: 1; width: 100%; min-height: 0; display: block; }
+
+.pipe-dot { fill: var(--border-3); opacity: .55; }
+
+/* HUD brackets and the sweep are the futuristic dressing: they say "live
+   instrument" without adding anything the reader has to decode. */
+.pipe-hud path {
+  fill: none;
+  stroke: var(--border-3);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.pipe-scan-edge { stop-color: var(--accent-fg); stop-opacity: 0; }
+.pipe-scan-mid { stop-color: var(--accent-fg); stop-opacity: .10; }
+.pipe-scanline { animation: pipe-sweep 6.5s linear infinite; }
+@keyframes pipe-sweep {
+  from { transform: translateX(0); }
+  to   { transform: translateX(1150px); }
+}
+
+
+/* Both live layers ride the same normalised path: a dashed current underneath
+   and a single bright packet on top. */
+.pipe-edge-live {
+  stroke: var(--tone);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: .04 .05;
+  opacity: .55;
+  animation: pipe-flow 1.7s linear infinite;
+}
+.pipe-packet {
+  stroke: var(--tone);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-dasharray: .035 .965;
+  filter: drop-shadow(0 0 5px var(--tone));
+  animation: pipe-flow 1.7s linear infinite;
+}
+@keyframes pipe-flow {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.pipe-node-box {
+  fill: var(--surface);
+  stroke: var(--border-2);
+  stroke-width: 1.4;
+  transition: fill 320ms ease, stroke 320ms ease;
+}
+.pipe-node svg { color: var(--text-3); transition: color 320ms ease; }
+.pipe-node-label {
+  fill: var(--text-3);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-anchor: middle;
+  transition: fill 320ms ease;
+}
+.pipe-node.lit .pipe-node-box { fill: var(--tone-dim); stroke: var(--tone); }
+.pipe-node.lit svg { color: var(--tone); }
+.pipe-node.lit .pipe-node-label { fill: var(--tone); }
+
+/* The node the packet is leaving gets a ring that breathes and a halo that
+   expands out of it — one cycle per stage. */
+.pipe-ring {
+  fill: none;
+  stroke: var(--tone);
+  stroke-width: 1.3;
+  stroke-dasharray: 4 7;
+  opacity: .55;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pipe-spin 7s linear infinite;
+}
+@keyframes pipe-spin { to { transform: rotate(360deg); } }
+
+.pipe-pulse {
+  fill: none;
+  stroke: var(--tone);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pipe-halo 1.7s var(--ease-decel) infinite;
+}
+@keyframes pipe-halo {
+  from { transform: scale(1);   opacity: .5; }
+  to   { transform: scale(1.9); opacity: 0; }
+}
+
+/* ---- the stage readout --------------------------------------------------- */
+
+.pipe-readout {
+  display: flex;
+  align-items: center;
+  gap: var(--s-160);
+  flex-shrink: 0;
+  padding: var(--s-120) var(--s-160);
+  border-top: 1px solid var(--border-2);
+  background: var(--surface);
+}
+.pipe-stage-n {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--tone);
+  transition: color 320ms ease;
+}
+.pipe-stage-n i { font-size: 12px; font-style: normal; color: var(--text-3); }
+
+.pipe-stage-text { min-width: 0; flex: 1; }
+.pipe-stage-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pipe-stage-note {
+  margin: 2px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipe-ticks { display: flex; gap: 5px; flex-shrink: 0; }
+.pipe-tick {
+  width: 16px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border-3);
+  transition: background 320ms ease, width 320ms var(--ease-decel);
+}
+.pipe-tick.done { background: var(--text-3); }
+.pipe-tick.on { width: 26px; background: var(--tone); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pipe-scanline, .pipe-ring, .pipe-pulse { animation: none; }
+  .pipe-edge-live, .pipe-packet { animation: none; stroke-dashoffset: 0; }
+  .pipe-pulse { opacity: 0; }
+}
+
+/* The policy card is shorter here than in the old five-card bento. Both
+   columns tighten to fit instead of scrolling their last row out of sight —
+   `overflow: visible` is what proves it fits, since `auto` would just hide the
+   shortfall behind a scrollbar again. */
+
+
+/* ============================================================================
+   Square input fields, and the pipeline board label
+
+   Text inputs, textareas and selects are rectangles. The pill radius came from
+   the clay pass, where it was applied to every control at once; on a field you
+   type into it reads as a search box rather than a form input, and it wastes
+   the first and last character of horizontal room.
+   ========================================================================= */
+
+input, textarea, select, input.mono, textarea.mono, select.mono { border-radius: 0; }
+
+/* The range slider keeps its rounded track — it is not a field you type in. */
+input[type="range"] { border-radius: 0; }
+input[type="checkbox"], input[type="radio"] { border-radius: 3px; }
+
+.pipe-board-name {
+  fill: var(--text-3);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-anchor: start;
+  opacity: .7;
+}
+
+/* ============================================================================
+   A pipeline that carries its colour all the time
+
+   Before this, every node and edge was grey until the running stage reached
+   it, so six of the seven nodes were always grey and the board read as a
+   monochrome diagram with one highlight crawling across it. Now each node owns
+   a hue permanently — tinted fill, coloured rule, coloured glyph and label —
+   and the running stage *intensifies* its node rather than being the only
+   thing with any colour in it.
+   ========================================================================= */
+
+.pipe-node-box {
+  fill: var(--tone-dim);
+  stroke: var(--tone);
+  stroke-width: 1.5;
+  opacity: .62;
+  transition: opacity 320ms ease, stroke-width 320ms ease;
+}
+.pipe-node svg { color: var(--tone); opacity: .72; transition: opacity 320ms ease; }
+.pipe-node-label {
+  fill: var(--tone);
+  opacity: .62;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-anchor: middle;
+  transition: opacity 320ms ease;
+}
+
+.pipe-node.lit .pipe-node-box { opacity: 1; stroke-width: 2.2; }
+.pipe-node.lit svg { opacity: 1; }
+.pipe-node.lit .pipe-node-label { opacity: 1; }
+.pipe-node.active .pipe-node-box { filter: drop-shadow(0 0 7px var(--tone)); }
+
+/* Edges keep their own colour too, so the whole route is legible at rest. */
+
+.pipe-edge-tinted { stroke: var(--tone); stroke-width: 1.8; opacity: .34; fill: none; }
+
+.pipe-dot { fill: var(--border-3); opacity: .5; }
+
+/* ============================================================================
+   Black cards on the light page
+
+   The card is now a local palette scope rather than just a dark background.
+   Redefining the neutral and tone tokens *on the card element* means every
+   descendant — buttons, inputs, tracks, chips, the pipeline board — resolves
+   against the dark ground automatically, and nothing inside needs its own
+   override. The page header stays outside that scope, so it keeps dark text on
+   the white ground.
+
+   The tone-dim fills and tone foregrounds are swapped for their dark-theme
+   values here too: the light `--green-dim` is #f1faf1, and a near-white "dim"
+   tint on a black card is not dim, it is a white block.
+   ========================================================================= */
+
+.panel, .card, .agent-card, .slo-card, .stat-strip, .modal, .menu, .gov-kpi {
+  /* ---- neutrals ---- */
+  --surface:     #191b20;
+  --surface-2:   #111216;
+  --surface-3:   #23262d;
+  --surface-4:   #2e323b;
+  --border:      #24272e;
+  --border-2:    #2d313a;
+  --border-3:    #3d424d;
+  --text:        #f4f5f7;
+  --text-2:      #c1c6cf;
+  --text-3:      #8b919c;
+  --glass:        #191b20;
+  --glass-strong: #1f222a;
+  --glass-stroke: rgba(255, 255, 255, .07);
+
+  /* ---- tones bright enough to sit on black ---- */
+  --accent-fg:   #479ef5;
+  --accent-dim:  #0c2338;
+  --green:       #54b054;  --green-dim:  #0d2a0d;  --green-line:  #245224;
+  --yellow:      #fbbc74;  --yellow-dim: #3a1e04;  --yellow-line: #6b3a0c;
+  --red:         #f1707b;  --red-dim:    #3b1116;  --red-line:    #6e2c34;
+  --purple:      #b4a0e3;  --purple-dim: #241f33;  --purple-line: #493e68;
+  --cyan:        #58d3db;  --cyan-dim:   #082b2e;  --cyan-line:   #1b565b;
+  --pink:        #ef8fa8;  --pink-dim:   #37141d;  --pink-line:   #6b2b3c;
+
+  /* ---- heavy clay ----
+     A tight contact shadow, a deep ambient one, and a wide white bounce off
+     the page itself — that bounce is what makes a black object read as sitting
+     *on* a white surface rather than as a hole cut through it. The two insets
+     inflate it: lit from the top-left, falling away bottom-right. */
+  --clay:
+    0 3px 8px rgba(12, 14, 20, .30),
+    26px 30px 62px rgba(12, 14, 20, .30),
+    -16px -16px 44px rgba(255, 255, 255, .95),
+    inset -11px -11px 24px rgba(0, 0, 0, .70),
+    inset 13px 13px 28px rgba(255, 255, 255, .085);
+  --clay-lift: var(--clay);
+  --clay-sm:
+    0 2px 5px rgba(12, 14, 20, .34),
+    10px 11px 22px rgba(0, 0, 0, .34),
+    inset -4px -4px 9px rgba(0, 0, 0, .55),
+    inset 5px 5px 11px rgba(255, 255, 255, .07);
+  --clay-press:
+    inset 7px 7px 18px rgba(0, 0, 0, .78),
+    inset -5px -5px 13px rgba(255, 255, 255, .055);
+
+  /* The sheen is what reads as 3D: a lit top-left face falling to an unlit
+     bottom-right one, under the inset highlights above. */
+  /* Solid colour under the gradient: `background: <gradient>` resets
+     background-color to transparent, which leaves the white page showing
+     through anywhere the gradient does not paint. */
+  background-color: #191b20;
+  background-image: linear-gradient(158deg, #23262d 0%, #191b20 44%, #121317 100%);
+  color: var(--text);
+  border: none;
+  box-shadow: var(--clay);
+}
+
+/* On the black page there is no white surface to bounce off, so that layer
+   goes and the separation comes from contact and rim light instead. */
+:root[data-theme="dark"] .panel, :root[data-theme="dark"] .card, :root[data-theme="dark"] .agent-card, :root[data-theme="dark"] .slo-card, :root[data-theme="dark"] .stat-strip, :root[data-theme="dark"] .modal, :root[data-theme="dark"] .menu, :root[data-theme="dark"] .gov-kpi {
+  --clay:
+    0 3px 8px rgba(0, 0, 0, .78),
+    22px 26px 54px rgba(0, 0, 0, .66),
+    inset -10px -10px 22px rgba(0, 0, 0, .60),
+    inset 12px 12px 26px rgba(255, 255, 255, .07);
+  --clay-lift: var(--clay);
+  background-color: #17191e;
+  background-image: linear-gradient(158deg, #212429 0%, #17191e 46%, #101115 100%);
+}
+
+/* Hover stays inert — the cards were made non-reactive earlier and the new
+   shadow must not quietly reintroduce a lift. */
+.panel:hover, .card:hover, .agent-card:hover, .slo-card:hover, .gov-kpi:hover { box-shadow: var(--clay); }
+
+/* The page title sits on the white ground, not on a card. */
+.page-title, .page-sub, .page-head { color: inherit; }
+
+/* ============================================================================
+   Type hierarchy
+
+   The scale had inverted itself. An earlier pass raised sizes across the board
+   without re-checking the relationships, and it left metadata and field labels
+   at 16px while the things they describe — rule names, conditions, values —
+   sat at 14px. The least important text on the page was the largest.
+
+   The order below is the intended one, loudest first:
+
+     page title 40  >  panel title 21  >  value / rule name 15
+       >  body 14  >  condition 13  >  description 13  >  label / meta 12
+
+   Labels and metadata become quiet eyebrows; the content they introduce is
+   what carries the weight.
+   ========================================================================= */
+
+.panel-title {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -.012em;
+  color: var(--text);
+}
+.panel-desc {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+/* A label announces a value; it should never outweigh one. */
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+.field-hint { font-size: 12px; line-height: 16px; }
+
+.meta { font-size: 12px; line-height: 17px; color: var(--text-3); }
+.badge { font-size: 12px; line-height: 18px; }
+
+/* ---- policy rules -------------------------------------------------------- */
+
+.rule-body { min-width: 0; flex: 1; }
+
+/* The rule name is the thing you scan for, so it leads the row. */
+.rule-name {
+  display: block;
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--text);
+}
+
+/* The condition is the rule's actual content — second loudest, and set on a
+   tinted ground so it reads as code rather than as more prose. */
+.rule-cond {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--text-2);
+  word-break: break-word;
+}
+
+.rule-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--text-3);
+}
+
+/* Priority is a footnote on the row, not a competing headline. */
+.rule-prio {
+  flex-shrink: 0;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The policy list: name leads, the rest is supporting detail. */
+.policy-item .mono { font-size: 15px; font-weight: 600; }
+
+/* Some panel titles are wrapped in `.mono` to render a policy name in the
+   monospace face. `.mono` also carries font-size: 14px, which silently shrank
+   those headings to two-thirds of the others on the same row — the face was
+   meant to change, not the scale. */
+.panel-title .mono, .panel-title code { font-size: inherit; font-weight: inherit; }
+
+
+/* ---- agent cards --------------------------------------------------------- */
+
+.agent-id {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--text);
+}
+
+/* Three equal columns forced "default-policy" to ellipsise next to two
+   single-digit counts. The name gets the room; the numbers take what they
+   need. */
+.kv-row {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--s-200);
+}
+.kv-row dt {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 3px;
+}
+.kv-row dd { font-size: 15px; font-weight: 600; line-height: 20px; color: var(--text); }
+
+.meter-value { font-size: 17px; font-weight: 700; }
+
+/* The footer is provenance, not headline material. */
+.agent-card-foot { gap: var(--s-60); }
+.agent-card-foot .meta, .agent-card-foot code { font-size: 11px; line-height: 16px; }
+
+/* ---- Compliance: the OWASP table owns the full right column --------------
+   Down to three cards now that MCP governance controls opens as its own
+   floating card from the page header instead of sitting here permanently —
+   grader and framework report share the left column, OWASP takes the right
+   at full height. */
+
+.cols-compliance {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.cols-compliance > .panel:nth-child(1) { grid-area: 1 / 1 / 2 / 2; }
+.cols-compliance > .panel:nth-child(2) { grid-area: 1 / 2 / 3 / 3; }
+.cols-compliance > .panel:nth-child(3) { grid-area: 2 / 1 / 3 / 2; }
+
+@media (max-width: 1100px) {
+  .cols-compliance {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: minmax(280px, auto);
+    overflow-y: auto;
+    flex: 1;
+  }
+  .cols-compliance > .panel:nth-child(1), .cols-compliance > .panel:nth-child(2),
+  .cols-compliance > .panel:nth-child(3) { grid-area: auto; }
+}
+
+
+:root[data-theme="dark"] .panel, :root[data-theme="dark"] .card, :root[data-theme="dark"] .agent-card, :root[data-theme="dark"] .slo-card, :root[data-theme="dark"] .stat-strip, :root[data-theme="dark"] .modal, :root[data-theme="dark"] .menu, :root[data-theme="dark"] .gov-kpi {
+  --surface:     #f2f2f5;
+  --surface-2:   #e6e6eb;
+  --surface-3:   #dadae1;
+  --surface-4:   #cbcbd4;
+  --border:      #e1e1e7;
+  --border-2:    #d2d2da;
+  --border-3:    #bababf;
+  --text:        #16181c;
+  --text-2:      #4b515a;
+  --text-3:      #6f7580;
+  --glass:        #f6f6f8;
+  --glass-strong: #ffffff;
+  --glass-stroke: rgba(16, 18, 22, .10);
+
+  --accent-fg:   #115ea3;  --accent-dim:  #eff6fc;
+  --green:       #0e700e;  --green-dim:   #f1faf1;  --green-line:  #9fd89f;
+  --yellow:      #bc4b09;  --yellow-dim:  #fdf6f3;  --yellow-line: #fdcfb4;
+  --red:         #b10e1c;  --red-dim:     #fdf3f4;  --red-line:    #eeacb2;
+  --purple:      #5c2e91;  --purple-dim:  #f7f4fc;  --purple-line: #d8cbeb;
+  --cyan:        #006d75;  --cyan-dim:    #eff9fa;  --cyan-line:   #a6dde2;
+  --pink:        #a4262c;  --pink-dim:    #fdf3f4;  --pink-line:   #efb9c8;
+
+  /* A black page reflects nothing, so there is no bounce layer to add here —
+     the depth is a hard contact shadow plus the lit top-left inset. */
+  --clay:
+    0 3px 8px rgba(0, 0, 0, .58),
+    26px 30px 62px rgba(0, 0, 0, .55),
+    inset -11px -11px 24px rgba(16, 18, 22, .11),
+    inset 13px 13px 28px rgba(255, 255, 255, .95);
+  --clay-lift: var(--clay);
+  --clay-sm:
+    0 2px 5px rgba(0, 0, 0, .45),
+    9px 10px 20px rgba(0, 0, 0, .30),
+    inset -4px -4px 9px rgba(16, 18, 22, .08),
+    inset 5px 5px 11px rgba(255, 255, 255, .92);
+  --clay-press:
+    inset 7px 7px 18px rgba(16, 18, 22, .13),
+    inset -5px -5px 13px rgba(255, 255, 255, .92);
+
+  background-color: #f6f6f8;
+  background-image: linear-gradient(158deg, #ffffff 0%, #f4f4f7 46%, #e9e9ef 100%);
+  color: var(--text);
+}
+
+/* `.btn-primary` paints itself with a gradient, which leaves background-color
+   at transparent. Its label is --accent-ink (white), so anywhere the gradient
+   does not paint — a failed parse, a forced-colors mode, a print stylesheet —
+   the button renders as white text on whatever is behind it. On a white card
+   that is invisible. A solid blue underneath costs nothing and removes the
+   whole class of failure. */
+.btn-primary { background-color: var(--sc-blue); }
+
+/* A bare <button> after a stack of .field blocks inherits none of their
+   spacing, so it butted straight against the textarea above it.
+
+   It is also sticky. The panel scrolls internally, and the action was landing
+   below its own fold — you had to scroll a form to find the button that
+   submits it. Sticky keeps it on screen at any panel height, which a taller
+   row alone would not: that only moves the cliff to a shorter window. The
+   button is opaque, so the form scrolling under it reads correctly. */
+.form-action {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-top: var(--s-160);
+}
+
+/* The region scrolls, not the fold: a fixed one-screen grid squeezed every
+   card down to a sliver (the grader's button hidden, the MCP table showing
+   zero rows) trying to make four very differently sized cards share one
+   viewport with nothing left over. Each card instead gets a floor sized to
+   its own real content, the page scrolls past that, and every card is a card
+   again rather than a strip. */
+.cols-compliance {
+  grid-template-rows: none;
+  grid-auto-rows: max-content;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: clip;
+  padding-bottom: var(--s-160);
+}
+.cols-compliance > .panel { min-height: 0; max-height: none; }
+.cols-compliance > .panel > .panel-body { min-height: 0; }
+
+/* Floors, chosen from what each card actually needs to show without its own
+   internal scrollbar for the common case -- the grader's full form including
+   the Grade Prompt button, the report's controls, a first few OWASP/MCP rows. */
+.cols-compliance > .panel:nth-child(1) { min-height: 460px; } /* grader           */
+.cols-compliance > .panel:nth-child(2) { min-height: 560px; } /* OWASP Top 10     */
+.cols-compliance > .panel:nth-child(3) { min-height: 260px; } /* framework report */
+.cols-compliance > .panel:nth-child(4) { min-height: 460px; } /* MCP controls     */
+
+/* ============================================================================
+   Metro / Microsoft Design Language
+
+   Replaces the Soft 3D pass, and is close to its exact inverse:
+
+     soft 3D                     metro
+     16/24/32px radii            zero radius, everywhere
+     dual extrusion shadows      no shadows at all — flatness is the point
+     Quicksand / Inter           Segoe UI, oversized and light for hierarchy
+     soft floating objects       edge-to-edge tiles; the surface IS the chrome
+     calm 200ms ease             fast 120ms, content-first motion
+
+   Colour is unchanged, as asked: black cards on the white page, white cards on
+   the black one, and the existing seven accent tones. Metro's own palette
+   (#2d89ef, #e51400, #6a00ff, tile green and teal) is not adopted — what is
+   adopted is how Metro *uses* colour: as flat, unmodulated fills with no
+   gradient and no light model over them.
+
+   It also removes the white halo that was showing around buttons, because
+   there are no outer shadows left to cast one.
+   ========================================================================= */
+
+:root {
+  --radius-sm: 0; --radius-md: 0; --radius-lg: 0; --radius-pill: 0;
+  --r-none: 0; --r-sm: 0; --r: 0; --r-lg: 0; --r-xl: 0; --r-card: 0;
+
+  /* Fast and near-linear. Metro moves content, it does not animate chrome. */
+  --ease-standard: cubic-bezier(.1, .9, .2, 1);
+  --dur-metro: 120ms;
+
+  --font: "Segoe UI", "Segoe UI Light", system-ui, -apple-system, Arial, sans-serif;
+  --font-display: "Segoe UI Light", "Segoe UI", system-ui, Arial, sans-serif;
+  --mono: Consolas, "Cascadia Mono", ui-monospace, "Courier New", monospace;
+}
+
+/* ---- square, flat, unshadowed -------------------------------------------- */
+
+.panel, .card, .agent-card, .slo-card, .stat-strip, .modal, .menu, .tool-chip, .policy-item, .result-box, .notice, .code-block, .pipe-readout, .rule-cond, .btn, .btn-sm, .btn-xs, .btn-icon, .badge, .chip, input, textarea, select, .agent-arrow, .gov-kpi {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* A flat surface still needs an edge, and in Metro that edge is a hairline
+   rule rather than a shadow. */
+.panel, .card, .agent-card, .slo-card, .stat-strip, .modal, .menu, .gov-kpi {
+  border: 1px solid var(--border-2);
+}
+.tool-chip, .policy-item, .result-box, .notice, .code-block, .pipe-readout {
+  border: 1px solid var(--border);
+}
+.rule-cond { border: none; background: var(--surface-2); }
+
+/* ---- typography: oversized and light ------------------------------------- */
+
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -.02em;
+}
+.panel-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -.01em;
+}
+
+/* ---- controls: the tile is the button ------------------------------------ */
+
+.btn {
+  border: 1px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-weight: 600;
+  transition: background-color var(--dur-metro) var(--ease-standard),
+              color var(--dur-metro) var(--ease-standard),
+              border-color var(--dur-metro) var(--ease-standard);
+}
+.btn:hover:not(:disabled), .btn:active:not(:disabled) { transform: none; }
+.btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+.btn-secondary, .btn-ghost, .btn-quiet { border-color: var(--border-3); }
+.btn-secondary:hover:not(:disabled), .btn-ghost:hover:not(:disabled) {
+  background: var(--accent-fg);
+  color: var(--accent-ink);
+  border-color: var(--accent-fg);
+}
+
+/* Metro's primary action is a solid colour field, not a gradient. */
+.btn-primary {
+  background-image: none;
+  background-color: var(--accent-fg);
+  color: var(--accent-ink);
+  border-color: var(--accent-fg);
+}
+.btn-primary:hover:not(:disabled) { background-image: none; filter: brightness(1.14); }
+.btn-primary:active:not(:disabled) { background-image: none; filter: brightness(.86); }
+
+.badge, .chip { text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+
+/* Fields lose their box and keep a single underline. */
+input, textarea, select {
+  border: none;
+  border-bottom: 2px solid var(--border-3);
+  background: var(--surface-2);
+  transition: border-color var(--dur-metro) var(--ease-standard);
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-bottom-color: var(--accent-fg);
+  box-shadow: none;
+}
+input[type="checkbox"], input[type="radio"] {
+  border: 1px solid var(--border-3);
+  border-bottom-width: 1px;
+}
+
+/* ---- flat interaction ---------------------------------------------------- */
+
+.policy-item, .tool-chip {
+  cursor: pointer;
+  transition: background-color var(--dur-metro) var(--ease-standard),
+              border-color var(--dur-metro) var(--ease-standard);
+}
+.policy-item:hover, .tool-chip:hover {
+  transform: none;
+  background: var(--surface-3);
+  border-color: var(--border-3);
+}
+.agent-arrow {
+  border: 1px solid var(--border-3);
+  transition: background-color var(--dur-metro) var(--ease-standard);
+}
+.agent-arrow:hover { transform: none; background: var(--surface-3); }
+
+.glass-nav-item { transition: color var(--dur-metro) var(--ease-standard); }
+.glass-nav-item:hover:not(.active) { transform: none; }
+
+/* Content slides in; chrome does not animate. */
+@keyframes metro-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.modal, .result-box, .notice { animation: metro-in 160ms var(--ease-standard); }
+
+.panel:hover, .card:hover, .agent-card:hover, .slo-card:hover, .gov-kpi:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--border-2);
+}
+
+/* Everything inside the floating nav goes square too. */
+.pivotbar.glass-host > .glass-container, .glass-host > .glass-container { box-shadow: none; }
+.glass-nav-pill { border-radius: 0; box-shadow: none; }
+.glass-nav-item { border-radius: 0; }
+.pivot-status { border-radius: 0; }
+.topnav-btn { border-radius: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .policy-item, .tool-chip, .agent-arrow, .glass-nav-item, input, textarea, select { transition: none; }
+  .modal, .result-box, .notice { animation: none; }
+}
+
+/* ============================================================================
+   Audit Log — the tile layout from the sketch
+
+   One full-width bar across the top, then a narrow full-height Events column
+   on the left with receipts over traces on the right.
+   ========================================================================= */
+
+/* All three of these are browsable logs, and locking the grid to the viewport
+   left each one a window barely taller than a single row. Measured at
+   1400x900: the receipts body was 47px tall holding 277px of rows — and 40px
+   of that 47 was the sticky header, so seven pixels of one row were reachable
+   — while traces had 81px against 3640px, which is the half-row clipped at
+   the bottom edge. Both were a slit you had to hit with the pointer to scroll
+   at all.
+
+   So the region scrolls and the rows size to their panels. Each panel keeps
+   its own scrollbar, but only as the overflow of a window tall enough to read
+   — a floor of six or seven rows — and a ceiling in vh so one long table
+   cannot push the others off the screen. */
+/* All three of these are browsable logs, and the page was locked to the
+   viewport with two of them stacked in one column. Measured at 1400x900: the
+   receipts body was 47px tall holding 277px of rows — and 40px of that 47 was
+   the sticky header, so seven pixels of one row were reachable — while traces
+   had 81px against 3640px, which is the half-row clipped at the bottom edge.
+   Both were a slit you had to hit with the pointer to scroll at all.
+
+   Sideways was no better, and that was the layout fighting the content rather
+   than a height being wrong: these tables want 1151px (Events), 924px
+   (receipts) and 1112px (traces) of natural width. Two of them side by side
+   need 2263px, so in a 1400px window Events was given 362px and scrolled
+   789px horizontally — a six-column table showing two columns.
+
+   So instead: two columns, fixed to the viewport rather than the flow.
+   Events is the one that is read continuously, so it takes the tall left
+   column at full height; receipts and traces are checked less often and share
+   the right column, split toward traces since its table carries two more
+   columns. Every panel scrolls its own overflow -- the page itself never
+   does. */
+.cols-audit {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--gap);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.cols-audit > .panel:nth-child(1) { grid-column: 1; grid-row: 1; min-height: 0; max-height: none; }
+.cols-audit > .col-audit-right {
+  grid-column: 2; grid-row: 1;
+  display: flex; flex-direction: column; gap: var(--gap); min-height: 0;
+  overflow: hidden;
+}
+/* The two right-hand panels each keep their own scrollbar and stay pinned to
+   the column: receipts takes a smaller share since it holds only a handful of
+   rows, traces the larger since its log is the long one. min-height: 0 lets the
+   bodies actually shrink so their own overflow scrolls instead of pushing the
+   sibling off the column. */
+.cols-audit > .col-audit-right > .panel:nth-child(1) { flex: 1 1 50%; min-height: 0; }
+.cols-audit > .col-audit-right > .panel:nth-child(2) { flex: 1 1 50%; min-height: 0; }
+
+/* Stacked two-high, the head is the tax on every panel: at full padding with a
+   two-line wrapped description it ran 107px, and two of those left almost no
+   body to scroll. Tighten the padding and hold each description to one line so
+   the rows get the height back. */
+.cols-audit > .col-audit-right > .panel > .panel-head {
+  padding-top: var(--s-120); padding-bottom: var(--s-120);
+}
+.cols-audit > .col-audit-right > .panel > .panel-head .panel-desc {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* The receipts head carries two action buttons that wrapped to a second row in
+   the narrow column and added a row's worth of head height. Keep them on one
+   line — the title beside them already truncates — so that height goes to rows. */
+.cols-audit > .col-audit-right > .panel > .panel-head > .cluster { flex-wrap: nowrap; }
+
+/* Reaching the end of one table should not hand the wheel to the page — that
+   hand-off is most of what made these feel uncontrollable. Applies to every
+   audit panel body, left column and right. */
+.cols-audit .panel-body { overscroll-behavior: contain; }
+
+/* The shared thumb (--border-2) sits almost on top of the panel ground in the
+   dark themes, so the receipts body — which hides only its last row — read as
+   having no scrollbar at all. Reserve the gutter and give the audit scroll
+   bodies a thumb and track with real contrast so the scroll is visible. */
+.cols-audit .panel-scroll > .panel-body { scrollbar-gutter: stable; }
+.cols-audit .panel-scroll > .panel-body::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+}
+.cols-audit .panel-scroll > .panel-body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text) 34%, transparent);
+  background-clip: content-box;
+}
+.cols-audit .panel-scroll > .panel-body::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text) 50%, transparent);
+  background-clip: content-box;
+}
+
+/* The receipts table carries a full did:mesh DID and an args hash, which in the
+   narrow right column overran the panel width and raised a horizontal scrollbar
+   — and that scrollbar, not a lack of rows, is what hid the entries. A fixed
+   layout makes every column fit the width available: the DID takes what is left
+   and ellipsises, so the table never overflows sideways and the rows scroll
+   vertically like every other panel. */
+.table-receipts { table-layout: fixed; }
+.table-receipts th, .table-receipts td { padding-left: 14px; padding-right: 14px; }
+.table-receipts col.c-receipt, .table-receipts th:nth-child(1), .table-receipts td:nth-child(1) { width: 84px; }
+.table-receipts th:nth-child(2), .table-receipts td:nth-child(2) { width: 26%; }
+.table-receipts th:nth-child(3), .table-receipts td:nth-child(3) { width: 76px; }
+.table-receipts th:nth-child(4), .table-receipts td:nth-child(4) { width: auto; }
+/* "Args hash" header (~72px) plus a 10-char hash need ~100px; at 96px they
+   overran the flush right edge and were hard-clipped by overflow-x:hidden. */
+.table-receipts th:nth-child(5), .table-receipts td:nth-child(5) { width: 116px; }
+.table-receipts th:nth-child(5), .table-receipts td:nth-child(5) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table-receipts th:nth-child(5), .table-receipts td:nth-child(5) { padding-left: 8px; padding-right: 10px; }
+.table-receipts td.truncate { max-width: 0; }
+.table-receipts td.mono { overflow: hidden; text-overflow: ellipsis; }
+/* Fixed columns already fit; clip the sub-pixel rounding so no thin sideways
+   scrollbar returns to hide the rows. */
+.cols-audit > .col-audit-right > .panel:nth-child(1) > .panel-body { overflow-x: hidden; }
+
+/* Agent ids were wrapping mid-word in a column narrow enough to split
+   "scraper-agent" over two lines, and a two-line cell sets the height of every
+   row in the table — 72px a row, so a fifth of the traces panel went on one
+   wrapped id. They are short and there is width to spare now, so the column
+   takes what it needs and the rows come back to 62px. */
+.cols-audit .table td > code { white-space: nowrap; }
+
+/* Events has its filters back beside the title, the full-width head having
+   room for them again. They are capped rather than stretched: a text input as
+   wide as the page invites a sentence into a field that takes an agent id. */
+.cols-audit > .panel:nth-child(1) > .panel-head > .cluster { gap: var(--s-80); }
+.audit-filter { width: clamp(140px, 14vw, 220px); min-width: 0; }
+
+@media (max-width: 1100px) {
+  .cols-audit {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    flex: none;
+    overflow: visible;
+  }
+  .page:has(.cols-audit) { overflow-y: auto; }
+  .cols-audit > .panel:nth-child(1) { max-height: 58vh; }
+  .cols-audit > .col-audit-right { display: contents; }
+  .cols-audit > .col-audit-right > .panel { max-height: 46vh; }
+  /* Single column, the page is the scroller. Receipts is only a handful of rows,
+     so capping it made a nested inner scroll of ~one row that trapped the wheel
+     against the page; let it size to content so the page scrolls it whole. */
+  .cols-audit > .col-audit-right > .panel:nth-child(1) { max-height: none; }
+  /* And where an inner scroll does remain (the long traces table), let the wheel
+     chain to the page once it bottoms out instead of dead-ending. */
+  .cols-audit .panel-body { overscroll-behavior: auto; }
+}
+
+@media (max-width: 860px) {
+  .cols-audit > .panel:nth-child(1) > .panel-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--s-120);
+  }
+  .cols-audit > .panel:nth-child(1) > .panel-head > .cluster {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .audit-filter { width: 100%; }
+}
+
+/* ============================================================================
+   Trace replay - the call, walked along its own spans
+
+   The same visual language as the pipeline board on the Overview: a node per
+   stage, lit as the call reaches it, the link between them filling as it
+   travels. What differs is where the stages come from. Those are illustrative
+   and loop forever; these are the spans one real call recorded, so the rail is
+   exactly as long as that trace and stops where the call stopped.
+
+   Colour comes entirely through `--tone`, set by the `.tone-*` class the
+   component puts on each step, so this block introduces no new colour of its
+   own - and the modal is in the surface family, so all of it inverts with the
+   theme like every other card.
+   ========================================================================= */
+
+.treplay {
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-card);
+  background: var(--surface-2);
+  padding: var(--s-120) var(--s-160) var(--s-160);
+  margin-bottom: var(--s-160);
+}
+
+.treplay-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-120);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-200);
+}
+.treplay-count { font-family: var(--mono); font-size: 14px; color: var(--text-2); }
+.treplay-count i { font-style: normal; color: var(--text-3); }
+.treplay-caption {
+  flex: 1 1 260px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--text-3);
+}
+
+.treplay-rail {
+  display: flex;
+  align-items: flex-start;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.treplay-step {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  transition: opacity var(--dur-gentle) var(--ease-easy);
+}
+.treplay-step.is-pending { opacity: .42; }
+
+/* The whole step is the hit target, so reading one is a click rather than a
+   wait for the replay to come round again. */
+.treplay-hit {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-40);
+  text-align: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.treplay-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--r); }
+.treplay-hit:hover .treplay-label { color: var(--text); }
+.treplay-hit:hover .treplay-node { border-color: var(--tone); }
+
+/* The link running in from the step before. Every step is the same width, so
+   -50% to 50% lands exactly on the two node centres. */
+.treplay-link {
+  position: absolute;
+  top: 18px;
+  left: -50%;
+  right: 50%;
+  height: 2px;
+  background: var(--border-2);
+}
+.treplay-step:first-child .treplay-link { display: none; }
+.treplay-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tone);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-slow) var(--ease-easy);
+}
+.treplay-step.is-active .treplay-link::after,
+.treplay-step.is-done .treplay-link::after { transform: scaleX(1); }
+
+.treplay-node {
+  position: relative;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-3);
+  border: 1px solid var(--border-2);
+  color: var(--text-3);
+  transition: background var(--t), border-color var(--t), color var(--t);
+}
+.treplay-step.is-done .treplay-node,
+.treplay-step.is-active .treplay-node {
+  background: var(--tone-dim);
+  border-color: var(--tone);
+  color: var(--tone);
+}
+
+/* The gate that stopped the call keeps a ring of its own, so it stays the
+   thing your eye lands on once the replay has run past it to the record step
+   — which is where a denial really does end. */
+.treplay-step.is-stopped .treplay-node { box-shadow: 0 0 0 3px var(--tone-dim); }
+
+/* One ring leaving the node the call is standing on. */
+.treplay-halo {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid var(--tone);
+  animation: treplay-ping 1.15s var(--ease-decel) infinite;
+}
+@keyframes treplay-ping {
+  0%   { transform: scale(.78); opacity: .6; }
+  70%  { transform: scale(1.2);  opacity: 0; }
+  100% { transform: scale(1.2);  opacity: 0; }
+}
+
+.treplay-label {
+  font-size: 12px;
+  line-height: 16px;
+  min-height: 32px;               /* two lines, so every timing sits on one line */
+  font-weight: 500;
+  color: var(--text-3);
+  padding: 0 var(--s-40);
+  overflow-wrap: anywhere;
+  transition: color var(--t);
+}
+.treplay-step.is-done .treplay-label,
+.treplay-step.is-active .treplay-label { color: var(--text); }
+.treplay-ms {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--text-3);
+}
+
+/* The readout under the rail. A fixed floor, so the panel does not jump as the
+   call steps from a one-line note to a three-line denial reason. */
+.treplay-readout {
+  margin-top: var(--s-200);
+  min-height: 78px;
+  padding: var(--s-100) var(--s-120);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--tone);
+  border-radius: 0 var(--r) var(--r) 0;
+}
+.treplay-readout-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-80);
+  flex-wrap: wrap;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.treplay-readout-note {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+/* Under about 620px the rail cannot hold seven nodes across, so it becomes a
+   list running down the page - same states, same order, no horizontal scroll. */
+@media (max-width: 620px) {
+  .treplay-rail { flex-direction: column; align-items: stretch; }
+  .treplay-hit {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--s-120);
+    text-align: left;
+    padding: var(--s-60) 0;
+  }
+  .treplay-link { top: -50%; bottom: 50%; left: 18px; right: auto; width: 2px; height: auto; }
+  .treplay-link::after { transform: scaleY(0); transform-origin: center top; }
+  .treplay-step.is-active .treplay-link::after,
+  .treplay-step.is-done .treplay-link::after { transform: scaleY(1); }
+  .treplay-label { flex: 1; padding: 0; min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .treplay-halo { display: none; }
+  .treplay-link::after { transition: none; }
+  .treplay-step { transition: none; }
+}
+
+
+/* Sliders were the last rounded thing left. Windows Phone drew them as a flat
+   rectangular track with a solid bar for a thumb, so that is what they become
+   — the ring thumb belonged to the Fluent pass. */
+.fslider-input { border-radius: 0; }
+.fslider-rail, .fslider-fill { border-radius: 0; height: 6px; margin-top: -3px; }
+.fslider-thumb {
+  border-radius: 0;
+  width: 10px;
+  margin-left: 5px;
+  background: var(--fill);
+  box-shadow: none;
+}
+.fslider-input:focus-visible ~ .fslider-thumb { outline: 2px solid var(--text); outline-offset: 2px; }
+
+/* The native track and thumb, for any range input not wrapped in .fslider. */
+input[type="range"]::-webkit-slider-runnable-track, input[type="range"]::-moz-range-track { border-radius: 0; }
+input[type="range"]::-webkit-slider-thumb, input[type="range"]::-moz-range-thumb { border-radius: 0; }
+
+/* ============================================================================
+   Primary button — layered light bevel
+
+   The original is three nested elements: a wrapper div with a 4px gradient
+   ring, a button with its own 4px pad and drop shadow, and an inner div with
+   the panel gradient. All six primary CTAs in this app are a single <button>,
+   so rather than wrapping every call site, the same three rings are built out
+   of that one element's own boxes:
+
+     border-box   (4px transparent border) -> the outer stone ring,  r16
+     padding-box  (4px pad)                -> the button face,        r12
+     content-box                           -> the inner panel,        r8
+
+   The radii nest on their own: a padding box is the border radius minus the
+   border width, and a content box is that minus the padding, which is exactly
+   the 16 / 12 / 8 the original hard-codes.
+
+   Size is preserved: `box-sizing: border-box` is global, so the heights are
+   untouched, and the horizontal border + padding add up to the padding each
+   size had before (4 + 10 = 14 on the default, 4 + 8 = 12 on sm).
+
+   This is the one place the Metro pass is overridden — the effect is the
+   request, and it needs a radius and a shadow to exist at all.
+   ========================================================================= */
+
+.btn-primary {
+  border: 4px solid transparent;
+  border-radius: 16px;
+  padding: 4px 10px;
+
+  /* stone-100 under the stack, so the button is opaque wherever the gradients
+     fade to transparent — on a black card that matters. */
+  background-color: #f5f5f4;
+  background-image:
+    linear-gradient(to bottom, rgba(231, 229, 228, .40), rgba(255, 255, 255, .80)),
+    linear-gradient(to bottom, #ffffff, rgba(231, 229, 228, .40)),
+    linear-gradient(to bottom, rgba(214, 211, 209, .40), transparent);
+  background-clip: content-box, padding-box, border-box;
+  background-origin: content-box, padding-box, border-box;
+  background-repeat: no-repeat;
+
+  color: #1c1917;                       /* the face is light now, so is the ink */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .5);
+  transition: box-shadow 120ms cubic-bezier(.1, .9, .2, 1),
+              transform 120ms cubic-bezier(.1, .9, .2, 1);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: none;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+}
+
+/* The press flattens the shadow and barely shrinks — the original's tell. */
+.btn-primary:active:not(:disabled) {
+  filter: none;
+  box-shadow: 0 0 1px rgba(0, 0, 0, .5);
+  transform: scale(.995);
+}
+
+.btn-primary:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.btn-primary:disabled { box-shadow: 0 1px 3px rgba(0, 0, 0, .3); }
+
+/* Icons and text inside inherit the dark ink. */
+.btn-primary svg { color: currentColor; }
+
+/* Earlier passes styled :hover and :active with the `background` *shorthand*,
+   which resets background-clip and background-color along with the image. Left
+   alone, pressing the button dropped the three-ring clip and flashed it
+   transparent. The stack is restated on both states so the bevel survives. */
+.btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled) {
+  background-image:
+    linear-gradient(to bottom, rgba(231, 229, 228, .40), rgba(255, 255, 255, .80)),
+    linear-gradient(to bottom, #ffffff, rgba(231, 229, 228, .40)),
+    linear-gradient(to bottom, rgba(214, 211, 209, .40), transparent);
+  background-clip: content-box, padding-box, border-box;
+  background-origin: content-box, padding-box, border-box;
+  background-repeat: no-repeat;
+}
+.btn-primary:active:not(:disabled) { background-color: #ebe9e7; }
+
+/* Smaller sizes keep their original overall padding: border + padding. */
+.btn-primary.btn-sm { padding: 4px 8px; border-radius: 14px; }
+.btn-primary.btn-xs { padding: 3px 7px; border-width: 3px; border-radius: 12px; }
+.btn-primary.btn-icon { padding: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary { transition: none; }
+  .btn-primary:active:not(:disabled) { transform: none; }
+}
+
+
+/* ---- the two faces ------------------------------------------------------- */
+
+.page, :root[data-theme="dark"] .panel, :root[data-theme="dark"] .card, :root[data-theme="dark"] .agent-card, :root[data-theme="dark"] .modal, :root[data-theme="dark"] .menu {
+  /* on a LIGHT ground */
+  --btn-ring-a: rgba(87, 83, 78, .95);
+  --btn-ring-b: rgba(12, 10, 9, .95);
+  --btn-face-a: #44403c;
+  --btn-face-b: rgba(28, 25, 23, .95);
+  --btn-panel-a: rgba(12, 10, 9, .55);
+  --btn-panel-b: rgba(68, 64, 60, .85);
+  --btn-bg: #1c1917;
+  --btn-bg-hover: #292524;
+  --btn-bg-active: #171412;
+  --btn-ink: #fafaf9;
+}
+
+:root[data-theme="dark"] .page, .panel, .card, .agent-card, .modal, .menu {
+  /* on a DARK ground */
+  --btn-ring-a: rgba(214, 211, 209, .40);
+  --btn-ring-b: transparent;
+  --btn-face-a: #ffffff;
+  --btn-face-b: rgba(231, 229, 228, .40);
+  --btn-panel-a: rgba(231, 229, 228, .40);
+  --btn-panel-b: rgba(255, 255, 255, .80);
+  --btn-bg: #f5f5f4;
+  --btn-bg-hover: #ffffff;
+  --btn-bg-active: #ebe9e7;
+  --btn-ink: #1c1917;
+}
+
+/* The dark theme flips both: its page is black, its cards are white. Listed
+   after so it wins over the two blocks above for that theme. */
+:root[data-theme="dark"] .page {
+  --btn-ring-a: rgba(214, 211, 209, .40);
+  --btn-ring-b: transparent;
+  --btn-face-a: #ffffff;
+  --btn-face-b: rgba(231, 229, 228, .40);
+  --btn-panel-a: rgba(231, 229, 228, .40);
+  --btn-panel-b: rgba(255, 255, 255, .80);
+  --btn-bg: #f5f5f4;
+  --btn-bg-hover: #ffffff;
+  --btn-bg-active: #ebe9e7;
+  --btn-ink: #1c1917;
+}
+:root[data-theme="dark"] .panel, :root[data-theme="dark"] .card, :root[data-theme="dark"] .agent-card, :root[data-theme="dark"] .modal, :root[data-theme="dark"] .menu {
+  --btn-ring-a: rgba(87, 83, 78, .95);
+  --btn-ring-b: rgba(12, 10, 9, .95);
+  --btn-face-a: #44403c;
+  --btn-face-b: rgba(28, 25, 23, .95);
+  --btn-panel-a: rgba(12, 10, 9, .55);
+  --btn-panel-b: rgba(68, 64, 60, .85);
+  --btn-bg: #1c1917;
+  --btn-bg-hover: #292524;
+  --btn-bg-active: #171412;
+  --btn-ink: #fafaf9;
+}
+
+/* ---- one rule for every primary button ----------------------------------- */
+
+.btn-primary, .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled) {
+  background-image:
+    linear-gradient(to bottom, var(--btn-panel-a), var(--btn-panel-b)),
+    linear-gradient(to bottom, var(--btn-face-a), var(--btn-face-b)),
+    linear-gradient(to bottom, var(--btn-ring-a), var(--btn-ring-b));
+  background-clip: content-box, padding-box, border-box;
+  background-origin: content-box, padding-box, border-box;
+  background-repeat: no-repeat;
+  color: var(--btn-ink);
+  filter: none;
+}
+.btn-primary { background-color: var(--btn-bg); }
+.btn-primary:hover:not(:disabled) { background-color: var(--btn-bg-hover); }
+.btn-primary:active:not(:disabled) { background-color: var(--btn-bg-active); }
+
+/* ============================================================================
+   Agent SRE — the two-column layout from the sketch
+
+   Left: agent control, adversarial evaluation, alerts, (conditionally)
+   behavioural anomalies. Right: the SLO form over the active SLOs.
+
+   The region scrolls, not the fold: forcing every panel to share one fixed
+   viewport height left each one too short to read -- the SLO form's own
+   button clipped, agents cut off mid-list. Every panel now sizes to its own
+   content with a floor, and the *region* scrolls past that, so a card is a
+   card at any window height instead of a compressed strip. -------------- */
+
+.cols-sre {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr);
+  gap: var(--gap);
+  align-content: start;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: clip;
+  padding-bottom: var(--s-160);
+}
+
+.cols-sre > .col { gap: var(--gap); min-height: 0; overflow: visible; }
+.cols-sre > .col > .panel { flex: none; min-height: auto; max-height: none; }
+
+/* Floors, chosen from what each card needs to show without its own internal
+   scroll for the common case (a handful of agents, the full SLO form). */
+.sre-left > .panel:nth-child(1) { min-height: 320px; } /* agent control          */
+.sre-left > .panel:nth-child(2) { min-height: 340px; } /* adversarial evaluation */
+.sre-left > .panel:nth-child(3) { min-height: 320px; } /* alerts                 */
+.sre-left > .panel:nth-child(4) { min-height: 320px; } /* behavioural anomalies  */
+.sre-right > .panel:first-child { min-height: 380px; } /* create/reset an SLO    */
+.sre-right > .panel:last-child { min-height: 480px; }  /* active SLOs            */
+
+/* Panels size to content now, so their bodies don't need their own
+   scrollbar too -- that nesting was half the claustrophobia. */
+.cols-sre > .col > .panel > .panel-body { overflow: visible; max-height: none; }
+
+@media (max-width: 1100px) {
+  .cols-sre { grid-template-columns: minmax(0, 1fr); }
+}
+
+
+/* ============================================================================
+   Overview — governance posture dashboard
+
+   Laid out as a KPI strip, the decision flow beside what needs attention, and
+   posture + activity along the bottom. Built entirely from the existing Fluent
+   tokens: no new colours, no new radii, and the panels are the same `.panel`
+   surface every other page uses.
+
+   `.ov` used to be a three-column grid holding three showcase cards. It is now
+   a vertical flow — each band below owns its own grid — because the bands have
+   different column counts and stacking them is what makes the page read top to
+   bottom at a glance.
+   ========================================================================= */
+
+.gov {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  flex: 1;
+  min-height: 0;
+  overflow-y: hidden;
+  overflow-x: clip;
+  overflow-clip-margin: var(--s-240);
+  scroll-behavior: smooth;
+  padding-bottom: 4px;
+}
+
+/* The staggered entrance the previous overview had, kept for continuity. */
+.gov > * { animation: fluent-enter var(--dur-slow) var(--ease-decel) backwards; }
+.gov > :nth-child(1) { animation-delay: 0ms; }
+.gov > :nth-child(2) { animation-delay: 40ms; }
+.gov > :nth-child(3) { animation-delay: 80ms; }
+
+/* ---- KPI strip ----------------------------------------------------------- */
+
+.gov-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-160);
+  height: 100%;
+}
+
+.gov-kpi {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-120);
+  min-width: 0;
+  padding: var(--s-160);
+  /* Surface, radius and shadow come from the card family this tile is now a
+     member of — the same groups that make .panel invert against the page.
+     Setting them here again would fight the theme rather than follow it. */
+}
+
+/* The icon chip carries the tile's tone; the numbers stay neutral so a row of
+   five does not read as five competing alerts. */
+.gov-kpi-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-lg);
+  color: var(--tone, var(--accent-fg));
+  background: var(--tone-dim, var(--accent-dim));
+}
+
+.gov-kpi-text { min-width: 0; }
+
+.gov-kpi-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gov-kpi-value {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.gov-kpi-unit {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--text-3);
+  margin-left: 2px;
+}
+
+.gov-kpi-sub {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--text-3);
+}
+
+/* The compliance dial replaces the icon chip, so the tile keeps the same
+   footprint as the four counts beside it. */
+.gov-kpi-dial { align-items: center; }
+.gov-dial { width: 52px; height: 52px; flex-shrink: 0; transform: rotate(-90deg); }
+.gov-dial-track { fill: none; stroke: var(--surface-3); stroke-width: 6; }
+.gov-dial-fill {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--dur-slow) var(--ease-decel);
+}
+
+/* ---- live badge in the page header --------------------------------------- */
+
+.gov-live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-60);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+}
+.gov-live .status-dot { background: var(--green); }
+.gov-live.off { color: var(--red); }
+.gov-live.off .status-dot { background: var(--red); }
+.gov-live i {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--text-3);
+  margin-left: var(--s-40);
+}
+
+/* ---- bands --------------------------------------------------------------- */
+
+/* Bento: the whole overview fits one screen, so it is a fixed-height grid rather
+   than a flow. Four columns, four equal rows; every card's body scrolls inside
+   its own card if a short window cannot fit it -- the page itself never scrolls.
+
+       ┌──────┬────────────┬────────┐
+       │      │ hero       │        │
+       │ tall │ (flow)     │ policy │
+       │      ├────────────┤        │
+       │      │ wide       ├────────┤
+       │      │ (posture)  │ attn   │
+       └──────┴────────────┴────────┘                                        */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: minmax(0, .9fr) minmax(0, .9fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
+  gap: var(--s-160);
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+.bento-cell { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.bento-cell > * { flex: 1; min-height: 0; }
+
+.bento-tall      { grid-column: 1;          grid-row: 1 / span 4; }
+.bento-hero      { grid-column: 2 / span 2; grid-row: 1 / span 2; }
+.bento-wide      { grid-column: 2 / span 2; grid-row: 3 / span 2; }
+.bento-policy    { grid-column: 4;          grid-row: 1 / span 3; }
+.bento-attention { grid-column: 4;          grid-row: 4; }
+
+/* Cards are compact and own their scrolling. */
+.bento .panel { overflow: hidden; }
+.bento .panel > .panel-head { padding: var(--s-100) var(--s-160); }
+.bento .panel > .panel-body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--s-100) var(--s-160); }
+
+/* The diagram scales to the card (its SVG keeps its aspect ratio) instead of
+   holding a 320px floor that would push the grid past the screen. */
+.bento .gov-flow .pipe { min-height: 0; }
+.bento .gov-flow .panel-body { display: flex; flex-direction: column; overflow: hidden; }
+
+/* ---- header: title + actions on one line, five tiles on the next, full width
+   The title used to share its row with the tiles, which is exactly what was
+   squeezing them down to a sliver -- 32px icons, 22px values. Its own row
+   frees the whole width for the tiles, so they can actually read as the
+   dashboard's headline numbers rather than a side note. */
+.gov-head { flex-direction: column; align-items: stretch; gap: var(--s-160); padding-bottom: 0; }
+
+.gov-head-top {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--s-160);
+}
+.gov-head-top .page-head-text { flex: 1; min-width: 0; }
+.gov-head .page-sub { font-size: 15px; line-height: 21px; margin-top: 0; max-width: 48ch; }
+.gov-head-top .page-actions { flex: 0 0 auto; }
+
+.gov-head .gov-kpis {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--s-160);
+  height: auto;
+}
+.gov-head .gov-kpi { padding: var(--s-160) var(--s-200); gap: var(--s-160); }
+.gov-head .gov-kpi-icon { width: 44px; height: 44px; }
+.gov-head .gov-kpi-icon svg { width: 22px; height: 22px; }
+.gov-head .gov-kpi-value { font-size: 32px; line-height: 38px; }
+.gov-head .gov-kpi-label { font-size: 13px; }
+.gov-head .gov-kpi-sub { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gov-head .gov-dial { width: 56px; height: 56px; }
+.gov-head .gov-kpi-dial .gov-kpi-value { font-size: 26px; line-height: 32px; }
+
+.gov-flow .panel-body { display: flex; flex-direction: column; overflow: hidden; }
+
+/* Counts as one slim row of four. */
+.bento .gov-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-120); }
+.bento .gov-kpi { padding: var(--s-100, 10px) var(--s-120); }
+.bento .gov-kpi-icon { width: 32px; height: 32px; }
+.bento .gov-kpi-value { font-size: 24px; line-height: 28px; }
+.bento .gov-kpi-dial { height: 100%; }
+
+.gov-flow .panel-body { padding-top: var(--s-80); }
+.gov-flow .pipe { min-height: 320px; }
+
+/* ---- attention required --------------------------------------------------- */
+
+.gov-attn { display: flex; flex-direction: column; gap: var(--s-40); }
+
+.gov-attn-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-120);
+  padding: var(--s-120);
+  border-radius: var(--r-card);
+  /* A tinted left edge rather than a tinted card: severity should be scannable
+     without the panel turning into a block of colour. */
+  border-left: 3px solid var(--tone, var(--text-3));
+  background: var(--surface-2);
+}
+
+.gov-attn-icon { flex-shrink: 0; color: var(--tone, var(--text-3)); margin-top: 1px; }
+.gov-attn-text { min-width: 0; flex: 1; }
+.gov-attn-title { font-size: 13px; font-weight: 600; line-height: 18px; color: var(--text); }
+.gov-attn-msg {
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+.gov-attn-meta { font-size: 11px; line-height: 16px; color: var(--text-3); margin-top: 2px; }
+.gov-attn-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--s-40);
+  flex-shrink: 0;
+}
+.gov-attn-ago { font-size: 11px; color: var(--text-3); white-space: nowrap; }
+
+.gov-note { font-size: 11px; color: var(--text-3); margin-top: var(--s-120); }
+
+/* ---- shared table treatment ---------------------------------------------- */
+
+.gov-table { width: 100%; font-size: 12px; }
+.gov-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.gov-table td { vertical-align: middle; }
+.gov-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.gov-sub {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-3);
+  margin-bottom: var(--s-80);
+}
+.gov-sub-gap { margin-top: var(--s-200); }
+
+.gov-rule { display: block; font-weight: 600; color: var(--text); }
+.gov-rule-cond {
+  display: block;
+  font-size: 11px;
+  color: var(--text-3);
+  overflow-wrap: anywhere;
+}
+
+.gov-agent { display: block; font-weight: 600; color: var(--text); }
+.gov-agent-sub { display: block; font-size: 11px; color: var(--text-3); }
+
+/* Said in words, not as a zero: an unmeasured indicator is not a score of 0. */
+.gov-none { font-size: 11px; color: var(--text-3); font-style: italic; }
+
+/* ---- reliability --------------------------------------------------------- */
+
+.gov-slos { display: flex; flex-direction: column; gap: var(--s-120); }
+.gov-slo { display: flex; flex-direction: column; gap: var(--s-40); }
+.gov-slo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-80);
+  font-size: 12px;
+}
+.gov-slo-none { font-size: 11px; color: var(--text-3); }
+
+/* ---- audit activity ------------------------------------------------------- */
+
+.gov-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: var(--s-120);
+  background: var(--surface-2);
+  border-radius: var(--r-lg);
+}
+.gov-tab {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: var(--s-40) var(--s-120);
+  border-radius: var(--r-sm);
+  color: var(--text-3);
+  background: transparent;
+  transition: color var(--dur-fast) var(--ease-easy),
+              background var(--dur-fast) var(--ease-easy);
+}
+.gov-tab:hover { color: var(--text); }
+.gov-tab.on { color: var(--accent-ink); background: var(--accent); }
+
+.gov-feed { display: flex; flex-direction: column; }
+.gov-feed-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-100);
+  padding: var(--s-80) 0;
+  border-bottom: 1px solid var(--border);
+}
+.gov-feed-row:last-child { border-bottom: 0; }
+.gov-feed-time { font-size: 11px; color: var(--text-3); flex-shrink: 0; }
+.gov-feed-icon { color: var(--tone, var(--text-3)); display: grid; place-items: center; flex-shrink: 0; }
+.gov-feed-text { min-width: 0; flex: 1; }
+.gov-feed-agent {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gov-feed-type {
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Feed rows carry the decision tone through the same custom property the rest
+   of the page uses, so allow/deny colouring needs no second palette. */
+.gov-feed-row.tone-success { --tone: var(--green); }
+.gov-feed-row.tone-danger { --tone: var(--red); }
+.gov-feed-row.tone-neutral { --tone: var(--text-3); }
+.gov-attn-row.tone-danger { --tone: var(--red); }
+.gov-attn-row.tone-warn { --tone: var(--yellow); }
+.gov-attn-row.tone-info { --tone: var(--accent-fg); }
+.gov-attn-row.tone-neutral { --tone: var(--text-3); }
+
+/* ---- responsive ----------------------------------------------------------- */
+
+/* Too narrow for a one-screen grid: stack it and let the page scroll. */
+@media (max-width: 1100px) {
+  .gov { overflow-y: auto; }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; flex: none; }
+  .bento-tall { grid-column: 1 / -1; grid-row: auto; max-height: 420px; }
+  .bento-hero, .bento-wide { grid-column: 1 / -1; grid-row: auto; }
+  .bento-policy, .bento-attention { grid-column: auto; grid-row: auto; }
+  .bento .gov-flow .pipe { min-height: 260px; }
+  .bento .panel > .panel-body { overflow-y: visible; }
+  .bento-tall .panel > .panel-body { overflow-y: auto; }
+}
+
+@media (max-width: 760px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .gov-head .gov-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+
+/* ---- KPI tiles: a mild halo ------------------------------------------------
+   Composed with `--clay` rather than replacing it, so the tile keeps the depth
+   every other card has and only gains a soft bloom around the edge. The colour
+   is the brand accent at low alpha, and it flips with the theme because the
+   tile itself inverts: on a light page the card is dark and the glow has to
+   read against white, and vice versa. Kept deliberately faint — five of these
+   sit in a row, and a strong glow on each would read as five alerts. */
+
+/* Deliberately NOT `var(--clay)`.
+
+   Clay carries `rgba(255,255,255,.95) -16px -16px 44px` — a near-opaque white
+   bloom thrown up and to the left. On a `.panel`, which sits alone with a 32px
+   gutter, that reads as soft studio lighting. These tiles sit five abreast with
+   a 16px gap, so each card's bloom lands on the dark face of its neighbour and
+   washes the right-hand edge out. Same shadow, wrong density.
+
+   A compact drop does the lifting instead, and the halo supplies the glow. The
+   card still gets its depth from the family's background gradient. */
+.gov-kpi {
+  --gov-halo: 0 0 16px -7px rgba(15, 108, 189, .30);
+  box-shadow:
+    0 1px 2px rgba(12, 14, 20, .26),
+    0 10px 22px -14px rgba(12, 14, 20, .42),
+    var(--gov-halo);
+  transition: box-shadow var(--dur-slow) var(--ease-decel);
+}
+
+/* Inverted the other way: a white card on a dark page, where a dark drop does
+   the separating and the halo runs cooler so it does not glare. */
+:root[data-theme="dark"] .gov-kpi {
+  --gov-halo: 0 0 20px -7px rgba(124, 178, 255, .26);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, .50),
+    0 14px 28px -18px rgba(0, 0, 0, .60),
+    var(--gov-halo);
+}
+
+/* A touch brighter on hover, no movement: the tiles are a readout, not a
+   control, so they should not invite a click they do not answer. */
+.gov-kpi:hover { --gov-halo: 0 0 20px -6px rgba(15, 108, 189, .40); transform: none; }
+:root[data-theme="dark"] .gov-kpi:hover { --gov-halo: 0 0 24px -6px rgba(124, 178, 255, .36); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gov-kpi { transition: none; }
+}

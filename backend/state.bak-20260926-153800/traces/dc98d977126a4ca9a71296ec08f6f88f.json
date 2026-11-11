@@ -1,0 +1,79 @@
+{
+  "trace_id": "dc98d977126a4ca9a71296ec08f6f88f",
+  "agent_id": "chaos-attacker-8256611e",
+  "task_input": "execute_command execute_command",
+  "task_output": "denied at identity",
+  "start_time": 1790375375.1360092,
+  "end_time": 1790375375.1549802,
+  "duration_ms": 18.970966339111328,
+  "metadata": {
+    "agent.task.name": "execute_command",
+    "agent.tool.name": "execute_command",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:bdbc315459a3905cfd2a9c567cce4076",
+    "agent.trust_score": 0.92,
+    "input_present": true,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "765efb7c5f82097c",
+  "span_count": 3,
+  "spans": [
+    {
+      "span_id": "0d4f6753617447fd",
+      "parent_id": null,
+      "trace_id": "dc98d977126a4ca9a71296ec08f6f88f",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375375.1360092,
+      "end_time": 1790375375.1360092,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "d2778c4a3f504972",
+      "parent_id": null,
+      "trace_id": "dc98d977126a4ca9a71296ec08f6f88f",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1790375375.1360092,
+      "end_time": 1790375375.1360092,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "identity:attestation_required: Attestation required \u2014 present a signed attestation (AGT_REQUIRE_ATTESTATION is enabled)",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "34bfeb5c49934057",
+      "parent_id": null,
+      "trace_id": "dc98d977126a4ca9a71296ec08f6f88f",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375375.1360092,
+      "end_time": 1790375375.1549802,
+      "duration_ms": 18.970966339111328,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

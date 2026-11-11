@@ -1,0 +1,139 @@
+{
+  "trace_id": "8a5a8a50e1694ed498bf5b1b3ab652da",
+  "agent_id": "support-agent",
+  "task_input": "invoke mcp.demo-notes.purge_bucket",
+  "task_output": "denied at mcp_proxy",
+  "start_time": 1791380251.822268,
+  "end_time": 1791380251.8592439,
+  "duration_ms": 36.975860595703125,
+  "metadata": {
+    "agent.task.name": "invoke",
+    "agent.tool.name": "mcp.demo-notes.purge_bucket",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:847ad251cc8aac9076698a1ede099fc3",
+    "agent.trust_score": 0.72,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "1a97f9c194f9f1e8",
+  "span_count": 6,
+  "spans": [
+    {
+      "span_id": "f2297cb22a8b4138",
+      "parent_id": null,
+      "trace_id": "8a5a8a50e1694ed498bf5b1b3ab652da",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1791380251.822268,
+      "end_time": 1791380251.822268,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "f84c3b88d0fb4e95",
+      "parent_id": null,
+      "trace_id": "8a5a8a50e1694ed498bf5b1b3ab652da",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1791380251.822268,
+      "end_time": 1791380251.822268,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "identity_verified": false
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "35e67aad880f4f0e",
+      "parent_id": null,
+      "trace_id": "8a5a8a50e1694ed498bf5b1b3ab652da",
+      "kind": "policy_check",
+      "name": "gate:tenant",
+      "start_time": 1791380251.822268,
+      "end_time": 1791380251.822268,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "tenant": "default"
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "27f2686acc524b20",
+      "parent_id": null,
+      "trace_id": "8a5a8a50e1694ed498bf5b1b3ab652da",
+      "kind": "policy_check",
+      "name": "gate:trust",
+      "start_time": 1791380251.822268,
+      "end_time": 1791380251.822268,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "trust_score": 0.72
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "352b4edf37924f27",
+      "parent_id": null,
+      "trace_id": "8a5a8a50e1694ed498bf5b1b3ab652da",
+      "kind": "policy_check",
+      "name": "gate:mcp_proxy",
+      "start_time": 1791380251.822268,
+      "end_time": 1791380251.8282518,
+      "duration_ms": 5.983829498291016,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "mcp_proxy:min_trust: Trust score 720 below minimum 800 for 'mcp.demo-notes.purge_bucket'",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "90d1609af829431d",
+      "parent_id": null,
+      "trace_id": "8a5a8a50e1694ed498bf5b1b3ab652da",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1791380251.8282518,
+      "end_time": 1791380251.8592439,
+      "duration_ms": 30.99203109741211,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

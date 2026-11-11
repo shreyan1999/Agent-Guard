@@ -1,0 +1,165 @@
+{
+  "trace_id": "016d18d87def4ee3afaab004158bb266",
+  "agent_id": "support-agent",
+  "task_input": "read mcp.poke.get_pokemon_info",
+  "task_output": "allowed",
+  "start_time": 1790009624.9512367,
+  "end_time": 1790009626.2273145,
+  "duration_ms": 1276.0777473449707,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "mcp.poke.get_pokemon_info",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:611d6b91016efcca51f2a66fac3d7a22",
+    "agent.trust_score": 0.72,
+    "input_present": false,
+    "agent.policy.decision": "allow",
+    "agent.task.success": true
+  },
+  "total_cost_usd": 0.0,
+  "success": true,
+  "content_hash": "e6e4a5cdac233296",
+  "span_count": 7,
+  "spans": [
+    {
+      "span_id": "8624a9906e14492a",
+      "parent_id": null,
+      "trace_id": "016d18d87def4ee3afaab004158bb266",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790009624.9512367,
+      "end_time": 1790009624.9512367,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "2311080a45f84395",
+      "parent_id": null,
+      "trace_id": "016d18d87def4ee3afaab004158bb266",
+      "kind": "policy_check",
+      "name": "gate:identity",
+      "start_time": 1790009624.9512367,
+      "end_time": 1790009624.9512367,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "identity_verified": false
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "b5dd48247a6e4a8d",
+      "parent_id": null,
+      "trace_id": "016d18d87def4ee3afaab004158bb266",
+      "kind": "policy_check",
+      "name": "gate:tenant",
+      "start_time": 1790009624.9512367,
+      "end_time": 1790009624.9512367,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "tenant": "default"
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "30a30622b61645c0",
+      "parent_id": null,
+      "trace_id": "016d18d87def4ee3afaab004158bb266",
+      "kind": "policy_check",
+      "name": "gate:trust",
+      "start_time": 1790009624.9512367,
+      "end_time": 1790009624.9512367,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "trust_score": 0.72
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "fce437b7c21044e5",
+      "parent_id": null,
+      "trace_id": "016d18d87def4ee3afaab004158bb266",
+      "kind": "policy_check",
+      "name": "gate:govern",
+      "start_time": 1790009624.9512367,
+      "end_time": 1790009624.960193,
+      "duration_ms": 8.956193923950195,
+      "status": "ok",
+      "attributes": {
+        "ring": "RING_2_STANDARD",
+        "mcp_proxy": true
+      },
+      "input_data": {},
+      "output_data": {
+        "passed": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "056123a352d64254",
+      "parent_id": null,
+      "trace_id": "016d18d87def4ee3afaab004158bb266",
+      "kind": "tool_call",
+      "name": "mcp.poke.get_pokemon_info",
+      "start_time": 1790009624.960193,
+      "end_time": 1790009626.189383,
+      "duration_ms": 1229.1901111602783,
+      "status": "ok",
+      "attributes": {
+        "agent.tool.name": "mcp.poke.get_pokemon_info",
+        "agent.tool.result": "ok"
+      },
+      "input_data": {},
+      "output_data": {
+        "ok": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "2704af6e2dac4ba9",
+      "parent_id": null,
+      "trace_id": "016d18d87def4ee3afaab004158bb266",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790009626.189383,
+      "end_time": 1790009626.2273145,
+      "duration_ms": 37.93144226074219,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

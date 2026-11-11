@@ -1,17 +1,29 @@
 import { useState, useEffect } from 'react';
-import { Zap, Power, Play, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { Power, Play, TrendingUp, TrendingDown, AlertTriangle, BellRing, Activity, FlaskConical, Swords, ShieldCheck, ShieldX } from '../icons';
 import { api } from '../api';
+import Slider from '../Slider';
+import { PageHeader, Panel, Badge, Field, Notice, Empty, Meter } from '../ui';
 
 export default function SREPanel() {
   const [slos, setSlos] = useState([]);
   const [agents, setAgents] = useState([]);
   const [newSlo, setNewSlo] = useState({ agent_id: '', slo_name: '', target: 0.99 });
   const [msg, setMsg] = useState('');
+  // AGT's AlertManager feed and AnomalyDetector findings.
+  const [alerts, setAlerts] = useState({ alerts: [], stats: {} });
+  const [anomalies, setAnomalies] = useState({ anomalies: [], summary: {} });
+  // AGT AdversarialEvaluator: attacks fired at the real gates.
+  const [chaos, setChaos] = useState(null);
+  const [attacking, setAttacking] = useState(false);
 
   const load = async () => {
-    const [sl, ag] = await Promise.all([api.sre.slos(), api.agents.list()]);
+    const [sl, ag, al, an] = await Promise.all([
+      api.sre.slos(), api.agents.list(), api.sre.alerts(50), api.sre.anomalies(),
+    ]);
     setSlos(sl);
     setAgents(ag);
+    setAlerts(al);
+    setAnomalies(an);
   };
   useEffect(() => { load(); const t = setInterval(load, 5000); return () => clearInterval(t); }, []);
 
@@ -40,175 +52,368 @@ export default function SREPanel() {
     load();
   };
 
+  const clearAlerts = async () => {
+    await api.sre.clearAlerts();
+    setMsg('Alert feed cleared — AGT\u2019s deduplicator was rearmed, so a still-firing condition alerts again.');
+    load();
+  };
+
+  const runChaos = async () => {
+    setAttacking(true);
+    try {
+      const r = await api.sre.runChaos({});
+      setChaos(r);
+      setMsg(r.breached === 0
+        ? `Every vector was blocked \u2014 grade ${r.grade}.`
+        : `${r.breached} of ${r.total} vectors were not blocked \u2014 grade ${r.grade}.`);
+      load();
+    } catch (e) { setMsg(e.message); }
+    finally { setAttacking(false); }
+  };
+
+  const gradeTone = (g) => g === 'A' ? 'success' : g === 'B' ? 'success'
+    : g === 'C' ? 'warn' : 'danger';
+
+  const alertTone = (sev) => sev === 'critical' ? 'danger'
+    : sev === 'warning' ? 'warn'
+    : sev === 'resolved' ? 'success' : 'neutral';
+
   const budgetColor = (pct) => pct <= 20 ? 'var(--red)' : pct <= 40 ? 'var(--yellow)' : 'var(--green)';
-  const statusColor = (s) => s === 'healthy' ? 'var(--green)'
-    : s === 'warning' ? 'var(--yellow)'
-    : (s === 'critical' || s === 'exhausted') ? 'var(--red)'
-    : 'var(--text-3)';
-  const statusTag = (s) => s === 'healthy' ? 'allow'
+  const statusTone = (s) => s === 'healthy' ? 'success'
     : s === 'warning' ? 'warn'
-    : (s === 'critical' || s === 'exhausted') ? 'deny' : '';
+    : (s === 'critical' || s === 'exhausted') ? 'danger' : 'neutral';
+  // normal → warning → critical, expressed as how loudly a card is drawn
+  const emphasis = (s) => s === 'warning' ? 'warn'
+    : (s === 'critical' || s === 'exhausted') ? 'critical' : '';
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-        <Zap size={22} color="var(--red)" />
-        <div>
-          <h2 style={{ fontSize: 18, fontWeight: 700 }}>Agent SRE</h2>
-          <p style={{ color: 'var(--text-2)', fontSize: 12 }}>
-            Kill switch · real <code>agent_sre</code> SLOs, error budgets and burn rate
-          </p>
-        </div>
-      </div>
+    <div className="page">
+      <PageHeader
+        title="Agent SRE"
+        subtitle="Error budgets, burn rate, deduplicated alerts, behavioural anomalies, adversarial evaluation and the per-agent kill switch."
+      />
 
-      {msg && (
-        <div style={{ padding: '10px 14px', background: 'var(--accent-dim)', borderRadius: 6, marginBottom: 16, fontSize: 12, color: 'var(--accent)' }}>
-          {msg} <button onClick={() => setMsg('')} style={{ float: 'right', background: 'none', color: 'var(--text-3)' }}>✕</button>
-        </div>
-      )}
+      {msg && <Notice tone="info" onClose={() => setMsg('')}>{msg}</Notice>}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
-        {/* Agent kill switch */}
-        <div className="card">
-          <div className="card-title">Agent Kill Switch</div>
-          {agents.map(a => (
-            <div key={a.id} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '10px 0', borderBottom: '1px solid var(--border)'
-            }}>
-              <div>
-                <div style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{a.id}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
-                  trust: {(a.trust_score * 100).toFixed(0)}% · calls: {a.calls}
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span className={`tag ${a.status === 'active' ? 'allow' : 'deny'}`}>{a.status}</span>
-                {a.status === 'active'
-                  ? <button className="btn btn-danger" style={{ padding: '5px 12px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}
-                      onClick={() => kill(a.id)}>
-                      <Power size={11} /> Kill
-                    </button>
-                  : <button className="btn btn-ghost" style={{ padding: '5px 12px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}
-                      onClick={() => resume(a.id)}>
-                      <Play size={11} /> Resume
-                    </button>
-                }
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Create SLO */}
-        <div className="card">
-          <div className="card-title">Create / Reset SLO</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div>
-              <label style={lbl}>Agent ID</label>
-              <select value={newSlo.agent_id} onChange={e => setNewSlo(s => ({ ...s, agent_id: e.target.value }))} style={{ width: '100%' }}>
-                <option value="">Select agent</option>
-                {agents.map(a => <option key={a.id}>{a.id}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={lbl}>SLO Name</label>
-              <input value={newSlo.slo_name} onChange={e => setNewSlo(s => ({ ...s, slo_name: e.target.value }))}
-                placeholder="e.g. research-agent-reliability" style={{ width: '100%' }} />
-            </div>
-            <div>
-              <label style={lbl}>Task-success target: {(newSlo.target * 100).toFixed(1)}%</label>
-              <input type="range" min="0.9" max="0.9999" step="0.0001" value={newSlo.target}
-                onChange={e => setNewSlo(s => ({ ...s, target: parseFloat(e.target.value) }))}
-                style={{ width: '100%', accentColor: 'var(--green)' }} />
-            </div>
-            <button className="btn btn-primary" onClick={createSlo}>Create / Reset SLO</button>
-          </div>
-        </div>
-      </div>
-
-      {/* SLO Cards */}
-      <div className="card-title" style={{ marginBottom: 12 }}>Active SLOs (agent_sre)</div>
-      {slos.length === 0 && (
-        <div style={{ color: 'var(--text-3)', fontSize: 12 }}>No SLOs yet. Create one above, or make a governed tool call to start recording measurements.</div>
-      )}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: 16 }}>
-        {slos.map(s => {
-          const eb = s.error_budget || {};
-          const remaining = eb.remaining_percent ?? 100;
-          const agentId = s.agent_id;
-          const alerts = eb.firing_alerts || [];
-          return (
-            <div key={s.name} className="card" style={{ borderColor: `${statusColor(s.status)}44` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>{s.name}</div>
-                  {agentId && <code style={{ fontSize: 10, color: 'var(--text-3)' }}>{agentId}</code>}
-                </div>
-                <span className={`tag ${statusTag(s.status)}`}>{s.status}</span>
-              </div>
-
-              {/* Error budget */}
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-3)', marginBottom: 4 }}>
-                  <span>Error Budget Remaining</span>
-                  <span style={{ fontFamily: 'var(--mono)', color: budgetColor(remaining) }}>{remaining.toFixed(1)}%</span>
-                </div>
-                <div style={{ height: 6, background: 'var(--bg-4)', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ width: `${remaining}%`, height: '100%', background: budgetColor(remaining), borderRadius: 3, transition: 'width .5s' }} />
-                </div>
-                {typeof eb.burn_rate === 'number' && (
-                  <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 4 }}>
-                    burn rate: {eb.burn_rate.toFixed(2)}× {eb.is_exhausted && '· EXHAUSTED'}
+      <div className="page-fill cols-sre">
+        {/* Control column */}
+        {/* Four panels in a viewport-locked page: the column scrolls rather
+            than crushing the first one to nothing. */}
+        <div className="col sre-left">
+          <Panel
+            title="Agent control"
+            desc="Halting an agent stops every governed call it makes"
+            scroll
+            bodyStyle={{ padding: agents.length ? '4px 20px' : 20 }}
+          >
+            {agents.length === 0
+              ? <Empty>No agents registered.</Empty>
+              : agents.map(a => (
+                <div key={a.id} className="row">
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div className="mono truncate" style={{ color: 'var(--text)' }}>{a.id}</div>
+                    <div className="meta">trust {(a.trust_score * 100).toFixed(0)}% · {a.calls} calls</div>
                   </div>
-                )}
-              </div>
+                  <Badge tone={a.status === 'active' ? 'success' : 'danger'} dot size="sm">{a.status}</Badge>
+                  {a.status === 'active'
+                    ? <button className="btn btn-danger btn-sm" onClick={() => kill(a.id)}>
+                        <Power size={12} /> Kill
+                      </button>
+                    : <button className="btn btn-secondary btn-sm" onClick={() => resume(a.id)}>
+                        <Play size={12} /> Resume
+                      </button>}
+                </div>
+              ))}
+          </Panel>
 
-              {/* Indicators */}
-              <div style={{ marginBottom: 12 }}>
-                {(s.indicators || []).map(ind => {
-                  const compliant = ind.compliance != null ? ind.compliance >= 1 : null;
-                  const pct = ind.compliance != null ? (ind.compliance * 100).toFixed(0) : '—';
-                  return (
-                    <div key={ind.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, padding: '4px 0' }}>
-                      <span style={{ color: 'var(--text-2)' }}>{ind.name}</span>
-                      <span style={{ fontFamily: 'var(--mono)', color: compliant === null ? 'var(--text-3)' : compliant ? 'var(--green)' : 'var(--red)' }}>
-                        {ind.measurement_count === 0 ? 'no data' : `${pct}% · n=${ind.measurement_count}`}
-                      </span>
+
+          {/* The empirical counterpart to every other panel: the rest report
+              what the platform would do, this attacks it and reports what it
+              did. A run that could not fail would prove nothing, so a breach is
+              shown as plainly as a block. */}
+          <Panel
+            title="Adversarial evaluation"
+            desc="AGT fires attack vectors at the real gates. Throwaway attackers; no real agent’s numbers are touched."
+            scroll
+            actions={
+              <button className="btn btn-danger btn-sm" onClick={runChaos} disabled={attacking}>
+                <Swords size={13} /> {attacking ? 'Attacking' : 'Run attack'}
+              </button>
+            }
+            bodyStyle={{ padding: chaos ? '4px 16px 12px' : 20 }}
+          >
+            {!chaos
+              ? <Empty>
+                  Fires AGT&rsquo;s eight built-in vectors plus four aimed at this platform&rsquo;s
+                  own gates, as a registered, high-trust attacker — so an attack that is
+                  blocked is blocked by a gate worth testing, not by &ldquo;who are you&rdquo;.
+                </Empty>
+              : (
+                <>
+                  <div className="cluster cluster-6" style={{ padding: '10px 0 14px' }}>
+                    <Badge tone={gradeTone(chaos.grade)}>grade {chaos.grade}</Badge>
+                    <span className="meter-value"
+                      style={{ color: chaos.breached ? 'var(--red)' : 'var(--green)' }}>
+                      {(chaos.resilience_score * 100).toFixed(0)}%
+                    </span>
+                    <span className="meta">
+                      {chaos.held}/{chaos.total} vectors blocked
+                      {chaos.breached > 0 && ` · ${chaos.breached} got through`}
+                    </span>
+                  </div>
+
+                  {Object.keys(chaos.gates_that_held || {}).length > 0 && (
+                    <div className="meta cluster cluster-6" style={{ marginBottom: 12 }}>
+                      <span>Stopped by:</span>
+                      {Object.entries(chaos.gates_that_held).map(([gate, n]) => (
+                        <Badge key={gate} tone="neutral" size="sm">{gate} &times;{n}</Badge>
+                      ))}
                     </div>
+                  )}
+
+                  {chaos.results.map(v => (
+                    <div key={v.vector} className="row" style={{ alignItems: 'flex-start' }}>
+                      {v.held
+                        ? <ShieldCheck size={14} color="var(--green)" style={{ flexShrink: 0, marginTop: 3 }} />
+                        : <ShieldX size={14} color="var(--red)" style={{ flexShrink: 0, marginTop: 3 }} />}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="cluster cluster-6">
+                          <code style={{ color: 'var(--text)' }}>{v.vector}</code>
+                          <Badge tone="neutral" size="sm">
+                            {String(v.category).replace(/_/g, ' ').toLowerCase()}
+                          </Badge>
+                        </div>
+                        <div className="meta" style={{ marginTop: 2 }}>
+                          {v.held
+                            ? <>blocked at the <strong>{v.denied_by}</strong> gate
+                                {v.rule ? ` · ${v.rule}` : ''}</>
+                            : <span style={{ color: 'var(--red)' }}>
+                                not blocked — no gate refused this payload
+                              </span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {chaos.recommendations?.length > 0 && (
+                    <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+                      <div className="meta" style={{ marginBottom: 6 }}>AGT recommends</div>
+                      {chaos.recommendations.map((r, i) => (
+                        <div key={i} className="meta" style={{ marginBottom: 4 }}>&bull; {r}</div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+          </Panel>
+
+          {/* AGT AlertManager. The suppressed count is the reason this is not
+              just a list: a retrying agent would otherwise flood the feed. */}
+          <Panel
+            title="Alerts"
+            desc={alerts.stats?.suppressed
+              ? `${alerts.stats.suppressed} duplicate${alerts.stats.suppressed === 1 ? '' : 's'} suppressed by AGT\u2019s deduplicator`
+              : 'Deduplicated governance events, newest first'}
+            scroll
+            actions={
+              <button className="btn btn-ghost btn-sm" onClick={clearAlerts}
+                disabled={!alerts.alerts?.length}>Clear</button>
+            }
+            bodyStyle={{ padding: alerts.alerts?.length ? '4px 16px 12px' : 20 }}
+          >
+            {!alerts.alerts?.length
+              ? <Empty>No alerts. Denials, burning error budgets and behavioural anomalies land here.</Empty>
+              : alerts.alerts.slice(0, 12).map((a, i) => (
+                <div key={`${a.dedup_key}-${i}`} className="row" style={{ alignItems: 'flex-start' }}>
+                  {a.source === 'anomaly'
+                    ? <Activity size={14} color="var(--purple)" style={{ flexShrink: 0, marginTop: 3 }} />
+                    : <BellRing size={14}
+                        color={a.severity === 'critical' ? 'var(--red)' : 'var(--yellow)'}
+                        style={{ flexShrink: 0, marginTop: 3 }} />}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="cluster cluster-6">
+                      <Badge tone={alertTone(a.severity)} size="sm">{a.severity}</Badge>
+                      <span style={{ fontSize: 16 }}>{a.title}</span>
+                    </div>
+                    <div className="meta" style={{ marginTop: 2 }}>{a.message}</div>
+                    <div className="meta faint" style={{ marginTop: 2 }}>
+                      {a.source}{a.agent_id ? ` \u00b7 ${a.agent_id}` : ''}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </Panel>
+
+          {/* Behavioural deviation. Distinct from the SLO: every one of these
+              calls may be compliant, and the agent still stopped behaving like
+              itself. Advisory — it never denies. */}
+          {anomalies.anomalies?.length > 0 && (
+            <Panel
+              title="Behavioural anomalies"
+              desc="AGT AnomalyDetector · advisory, never denies a call"
+              scroll
+              bodyStyle={{ padding: '4px 16px 12px' }}
+            >
+              {anomalies.anomalies.slice(0, 6).map((an, i) => (
+                <div key={i} className="row" style={{ alignItems: 'flex-start' }}>
+                  <Activity size={14} color="var(--purple)" style={{ flexShrink: 0, marginTop: 3 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="cluster cluster-6">
+                      <Badge tone={alertTone(an.severity)} size="sm">
+                        {String(an.anomaly_type).replace(/_/g, ' ')}
+                      </Badge>
+                      {typeof an.score === 'number' && <code className="meta">score {an.score.toFixed(2)}</code>}
+                    </div>
+                    <div className="meta" style={{ marginTop: 2 }}>{an.message}</div>
+                  </div>
+                </div>
+              ))}
+            </Panel>
+          )}
+        </div>
+
+        {/* Right column: the SLO you are about to create, over the ones that
+            already exist. */}
+        <div className="col sre-right">
+          <Panel title="Create or reset an SLO" desc="Re-using a name resets its measurements">
+            <div className="grid-form">
+              <Field label="Agent">
+                <select value={newSlo.agent_id} onChange={e => setNewSlo(s => ({ ...s, agent_id: e.target.value }))}>
+                  <option value="">Select agent</option>
+                  {agents.map(a => <option key={a.id}>{a.id}</option>)}
+                </select>
+              </Field>
+              <Field label="SLO name">
+                <input className="mono" value={newSlo.slo_name}
+                  onChange={e => setNewSlo(s => ({ ...s, slo_name: e.target.value }))}
+                  placeholder="research-agent-reliability" />
+              </Field>
+            </div>
+            <Field label={`Task-success target — ${(newSlo.target * 100).toFixed(1)}%`}>
+              <Slider min={0.9} max={0.9999} step={0.0001} value={newSlo.target}
+                band="high" ariaLabel="Task-success target"
+                onChange={v => setNewSlo(s => ({ ...s, target: v }))} />
+              <div className="range-scale"><span>90%</span><span>99.99%</span></div>
+            </Field>
+            <button className="btn btn-primary btn-block" onClick={createSlo} style={{ marginTop: 6 }}>
+              Create or reset SLO
+            </button>
+          </Panel>
+
+        <Panel
+          title="Active SLOs"
+          desc={`${slos.length} tracked · refreshed every 5s`}
+          scroll
+          bodyStyle={{ padding: 20 }}
+        >
+          {slos.length === 0
+            ? <Empty>No SLOs yet. Create one, or make a governed tool call to start recording measurements.</Empty>
+            : (
+              <div className="grid-cards">
+                {slos.map(s => {
+                  const eb = s.error_budget || {};
+                  const remaining = eb.remaining_percent ?? 100;
+                  const agentId = s.agent_id;
+                  const alerts = eb.firing_alerts || [];
+                  return (
+                    <section key={s.name} className={`slo-card ${emphasis(s.status)}`}>
+                      <div className="cluster" style={{ justifyContent: 'space-between', flexWrap: 'nowrap', alignItems: 'flex-start' }}>
+                        <div style={{ minWidth: 0 }}>
+                          <div className="truncate" style={{ fontWeight: 600, fontSize: 16 }}>{s.name}</div>
+                          {agentId && <code className="meta truncate" style={{ display: 'block', marginTop: 2 }}>{agentId}</code>}
+                        </div>
+                        <Badge tone={statusTone(s.status)} dot size="sm">{s.status}</Badge>
+                      </div>
+
+                      <div style={{ marginTop: 18 }}>
+                        <div className="cluster" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                          <span className="meta">Error budget remaining</span>
+                          <span className="meter-value" style={{ color: budgetColor(remaining) }}>{remaining.toFixed(1)}%</span>
+                        </div>
+                        <Meter value={remaining} color={budgetColor(remaining)} />
+                        {typeof eb.burn_rate === 'number' && (
+                          <div className="meta" style={{ marginTop: 8 }}>
+                            Burn rate {eb.burn_rate.toFixed(2)}×
+                            {eb.is_exhausted && <span style={{ color: 'var(--red)', fontWeight: 600 }}> · exhausted</span>}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* An SLO built partly from demo clicks is not evidence,
+                          and has to say so where the number is read. */}
+                      {s.synthetic_measurements > 0 && (
+                        <div className="meta cluster cluster-6" style={{ marginTop: 10, color: 'var(--yellow)' }}>
+                          <FlaskConical size={12} />
+                          <span>
+                            {s.synthetic_measurements} of {s.task_measurements} measurements
+                            hand-entered — not evidence
+                          </span>
+                        </div>
+                      )}
+
+                      {(s.indicators || []).length > 0 && (
+                        <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+                          {(s.indicators || []).map(ind => {
+                            const compliant = ind.compliance != null ? ind.compliance >= 1 : null;
+                            const pct = ind.compliance != null ? (ind.compliance * 100).toFixed(0) : '—';
+                            return (
+                              <div key={ind.name} className="cluster"
+                                style={{ justifyContent: 'space-between', flexWrap: 'nowrap', padding: '4px 0' }}>
+                                <span className="muted truncate" style={{ fontSize: 16 }}>
+                                  {ind.name}
+                                  {ind.window && (
+                                    <span className="muted" style={{ marginLeft: 6, fontSize: 12, opacity: 0.7 }}>
+                                      ({ind.window})
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="meter-value"
+                                  style={{ color: compliant === null ? 'var(--text-3)' : compliant ? 'var(--green)' : 'var(--red)' }}>
+                                  {ind.measurement_count === 0
+                                    ? 'no data'
+                                    : `${ind.current_value != null ? `${ind.current_value} · ` : ''}${pct}% · n=${ind.measurement_count}`}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {alerts.length > 0 && (
+                        <div className="cluster cluster-6" style={{ marginTop: 14 }}>
+                          {alerts.map(a => (
+                            <Badge key={a} tone="danger" size="sm"><AlertTriangle size={10} /> {a}</Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {agentId && (
+                        <div style={{ marginTop: 'auto', paddingTop: 16 }}>
+                          <div className="meta" style={{ marginBottom: 6 }}>
+                            Demo signals — recorded as synthetic
+                          </div>
+                          <div className="cluster" style={{ flexWrap: 'nowrap', gap: 8 }}>
+                            <button className="btn btn-ghost btn-sm" style={{ flex: 1 }}
+                              title="Records a hand-entered success. Tagged synthetic; it moves the budget but is not evidence."
+                              onClick={() => signal(agentId, true)}>
+                              <TrendingUp size={12} color="var(--green)" /> Success
+                            </button>
+                            <button className="btn btn-ghost btn-sm" style={{ flex: 1 }}
+                              title="Records a hand-entered failure. Tagged synthetic; it moves the budget but is not evidence."
+                              onClick={() => signal(agentId, false)}>
+                              <TrendingDown size={12} color="var(--red)" /> Failure
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </section>
                   );
                 })}
               </div>
-
-              {/* Firing alerts */}
-              {alerts.length > 0 && (
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-                  {alerts.map(a => (
-                    <span key={a} className="tag deny" style={{ fontSize: 9, display: 'flex', alignItems: 'center', gap: 3 }}>
-                      <AlertTriangle size={9} /> {a}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Signal buttons */}
-              {agentId && (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button className="btn btn-ghost" style={{ flex: 1, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
-                    onClick={() => signal(agentId, true)}>
-                    <TrendingUp size={11} color="var(--green)" /> Success
-                  </button>
-                  <button className="btn btn-ghost" style={{ flex: 1, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
-                    onClick={() => signal(agentId, false)}>
-                    <TrendingDown size={11} color="var(--red)" /> Failure
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
+            )}
+        </Panel>
+        </div>
       </div>
     </div>
   );
 }
-
-const lbl = { display: 'block', fontSize: 11, color: 'var(--text-3)', marginBottom: 4, fontWeight: 600, letterSpacing: '.5px', textTransform: 'uppercase' };

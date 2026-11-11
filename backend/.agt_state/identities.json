@@ -1,0 +1,227 @@
+{
+  "research-agent": {
+    "did": "did:mesh:7dab9f419366a864f7dcf5ce95fab90a",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "j5iX4txBFgLn-GCD6gOQPLxZFWIJKtu2n2Td950k-Eg",
+      "kid": "did:mesh:7dab9f419366a864f7dcf5ce95fab90a",
+      "use": "sig"
+    },
+    "card": {
+      "name": "research-agent",
+      "description": "",
+      "capabilities": [
+        "Seeded demo agent"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.501503+00:00",
+      "agent_did": "did:mesh:7dab9f419366a864f7dcf5ce95fab90a",
+      "public_key": "j5iX4txBFgLn+GCD6gOQPLxZFWIJKtu2n2Td950k+Eg=",
+      "card_signature": "tTFqCGBJ5EDD+oRsqpZTlb8G4SiKbMtoCGpv6FpDqQfVdJeLR3X3uLpASAtMERUYnPazTzVMYDbf5gyT8rslBA==",
+      "signature_timestamp": "2026-09-15T18:39:00.503494+00:00"
+    },
+    "attested_at": null
+  },
+  "data-agent": {
+    "did": "did:mesh:f701447c4e8e9fda4db2884729ccdbe6",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "jJu-65lYnF9KztC-TdRrQ_iY1Qzwjy4K_su_qqjBR8o",
+      "kid": "did:mesh:f701447c4e8e9fda4db2884729ccdbe6",
+      "use": "sig"
+    },
+    "card": {
+      "name": "data-agent",
+      "description": "",
+      "capabilities": [
+        "Seeded demo agent"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.530182+00:00",
+      "agent_did": "did:mesh:f701447c4e8e9fda4db2884729ccdbe6",
+      "public_key": "jJu+65lYnF9KztC+TdRrQ/iY1Qzwjy4K/su/qqjBR8o=",
+      "card_signature": "HvjZMHD3culnUPHwXASQnAUtcqT1sY5OYDXE+vbETU6/uZZfI7ZEA+7WCA8MOoJQIgy/XLCCpaFw2FPmr3AEDQ==",
+      "signature_timestamp": "2026-09-15T18:39:00.530419+00:00"
+    },
+    "attested_at": null
+  },
+  "email-agent": {
+    "did": "did:mesh:a8e4f0617607a3ff658acb572bf9e543",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "E7B5hHj0Phk_dOsX2Wx6_xAF6C7QxM1RBCVafYQVpPc",
+      "kid": "did:mesh:a8e4f0617607a3ff658acb572bf9e543",
+      "use": "sig"
+    },
+    "card": {
+      "name": "email-agent",
+      "description": "",
+      "capabilities": [
+        "Seeded demo agent"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.553363+00:00",
+      "agent_did": "did:mesh:a8e4f0617607a3ff658acb572bf9e543",
+      "public_key": "E7B5hHj0Phk/dOsX2Wx6/xAF6C7QxM1RBCVafYQVpPc=",
+      "card_signature": "sU58laassHw8WUwqHkIn4rkFWmFixKyN7FVK1mFQx1rKOzDoPSSCLbvTtlQB+Z6FJfjLO6r3N8Na4wOkFOqOCw==",
+      "signature_timestamp": "2026-09-15T18:39:00.554363+00:00"
+    },
+    "attested_at": null
+  },
+  "untrusted-agent": {
+    "did": "did:mesh:52c2ba8ce275fbcecfa177626e111251",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "tlEMp-pdgG7U8QH7GlqHgs-20Ry7ifhUewF3cSBaHHY",
+      "kid": "did:mesh:52c2ba8ce275fbcecfa177626e111251",
+      "use": "sig"
+    },
+    "card": {
+      "name": "untrusted-agent",
+      "description": "",
+      "capabilities": [
+        "Seeded demo agent"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.584807+00:00",
+      "agent_did": "did:mesh:52c2ba8ce275fbcecfa177626e111251",
+      "public_key": "tlEMp+pdgG7U8QH7GlqHgs+20Ry7ifhUewF3cSBaHHY=",
+      "card_signature": "rii1ECWpXrFTpsfgK1MhtuApLl7/XPvcBEkQbfy7KIOvNN+ibJPnYriuE3tNR03smFdI/gO1ye2SQcfj0tRDCg==",
+      "signature_timestamp": "2026-09-15T18:39:00.584807+00:00"
+    },
+    "attested_at": null
+  },
+  "billing-agent": {
+    "did": "did:mesh:33c4775d5145fc97eca3ee115168c781",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "Bk4Jqdf7PyFlq98Gw9-a53sh4QFw-eyodP58S1tuLPo",
+      "kid": "did:mesh:33c4775d5145fc97eca3ee115168c781",
+      "use": "sig"
+    },
+    "card": {
+      "name": "billing-agent",
+      "description": "",
+      "capabilities": [
+        "Reconciles invoices"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.604755+00:00",
+      "agent_did": "did:mesh:33c4775d5145fc97eca3ee115168c781",
+      "public_key": "Bk4Jqdf7PyFlq98Gw9+a53sh4QFw+eyodP58S1tuLPo=",
+      "card_signature": "/8HNlEKtSDpkicBsUKtpa9aH7GMGv/jXmpq64tCb3R9bdhGzoYSXnQCTwCR+tH+9M8MDkMHvgjwbUC6+mWfpDg==",
+      "signature_timestamp": "2026-09-15T18:39:00.604755+00:00"
+    },
+    "attested_at": null
+  },
+  "support-agent": {
+    "did": "did:mesh:ff437ea7b998b028619ad757165f9b77",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "7-LtDbUSu7C5Wp8-isvl6axyZ4-iNFbzlpatTDOGjCI",
+      "kid": "did:mesh:ff437ea7b998b028619ad757165f9b77",
+      "use": "sig"
+    },
+    "card": {
+      "name": "support-agent",
+      "description": "",
+      "capabilities": [
+        "Answers customer tickets"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.630219+00:00",
+      "agent_did": "did:mesh:ff437ea7b998b028619ad757165f9b77",
+      "public_key": "7+LtDbUSu7C5Wp8+isvl6axyZ4+iNFbzlpatTDOGjCI=",
+      "card_signature": "nTLOT5FoKkEN1Ypy7y17WZgBe5yVqNzSLhCbxlvvMfXPbkvSNtBW/6f24U2/H3AdRb0jkkwT2v+ty2Xq2XNwCg==",
+      "signature_timestamp": "2026-09-15T18:39:00.631208+00:00"
+    },
+    "attested_at": null
+  },
+  "etl-agent": {
+    "did": "did:mesh:03e84f618aec547724664e962af89ab7",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "mZ7MXR0XbWu9oSQeBJqvqVZ9ixqR4Xe7dOoy717Wiqo",
+      "kid": "did:mesh:03e84f618aec547724664e962af89ab7",
+      "use": "sig"
+    },
+    "card": {
+      "name": "etl-agent",
+      "description": "",
+      "capabilities": [
+        "Moves records between stores"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.651157+00:00",
+      "agent_did": "did:mesh:03e84f618aec547724664e962af89ab7",
+      "public_key": "mZ7MXR0XbWu9oSQeBJqvqVZ9ixqR4Xe7dOoy717Wiqo=",
+      "card_signature": "V/kwtAM8DN5+whR4mqYJ6F4Zpnro2f7y0avKHCpTs9YMd6GIzPx/w/XjayrdtVs+6n+3QZYELTks/QSKZxHnDg==",
+      "signature_timestamp": "2026-09-15T18:39:00.651157+00:00"
+    },
+    "attested_at": null
+  },
+  "scraper-agent": {
+    "did": "did:mesh:02e7f64ef2eec8aebbcd9adf65bdfbac",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "w7r7WMAOzosD2fyVOgWRWkqbzK-IcEJ5WI_PVS4qWYE",
+      "kid": "did:mesh:02e7f64ef2eec8aebbcd9adf65bdfbac",
+      "use": "sig"
+    },
+    "card": {
+      "name": "scraper-agent",
+      "description": "",
+      "capabilities": [
+        "Collects public pages"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.672109+00:00",
+      "agent_did": "did:mesh:02e7f64ef2eec8aebbcd9adf65bdfbac",
+      "public_key": "w7r7WMAOzosD2fyVOgWRWkqbzK+IcEJ5WI/PVS4qWYE=",
+      "card_signature": "H/ST2epcOIlBJNdj2w2HJqk5lr94AOl3zl+d4PjjAtyTFDZo6xF/mQacqHowOGjNLNdWAlCrSWIsUuvIhTXCCA==",
+      "signature_timestamp": "2026-09-15T18:39:00.672109+00:00"
+    },
+    "attested_at": null
+  },
+  "intern-agent": {
+    "did": "did:mesh:5005f575c87a2157665ad2c4cf45747f",
+    "public_jwk": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "ylS5fkHGBdRTcN3HHhQnwcqXkd32SAy321bt9PEJPRc",
+      "kid": "did:mesh:5005f575c87a2157665ad2c4cf45747f",
+      "use": "sig"
+    },
+    "card": {
+      "name": "intern-agent",
+      "description": "",
+      "capabilities": [
+        "Unproven, sandboxed"
+      ],
+      "trust_score": 1.0,
+      "metadata": {},
+      "created_at": "2026-09-15T18:39:00.698030+00:00",
+      "agent_did": "did:mesh:5005f575c87a2157665ad2c4cf45747f",
+      "public_key": "ylS5fkHGBdRTcN3HHhQnwcqXkd32SAy321bt9PEJPRc=",
+      "card_signature": "uoPGdOeCslQpXI/TtRV/m5WIu2v71KjDQ6Tf2rn6UG2i5PnEUoFIK4W01GqiCUuEVljE6V598Dqm9QJTnm7kCA==",
+      "signature_timestamp": "2026-09-15T18:39:00.698030+00:00"
+    },
+    "attested_at": null
+  }
+}

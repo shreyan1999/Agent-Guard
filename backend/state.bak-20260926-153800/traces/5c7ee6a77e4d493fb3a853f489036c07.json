@@ -1,0 +1,61 @@
+{
+  "trace_id": "5c7ee6a77e4d493fb3a853f489036c07",
+  "agent_id": "email-agent",
+  "task_input": "web_search web_search",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375600.6402588,
+  "end_time": 1790375600.6661906,
+  "duration_ms": 25.931835174560547,
+  "metadata": {
+    "agent.task.name": "web_search",
+    "agent.tool.name": "web_search",
+    "agent.policy.name": "default-policy",
+    "agent.did": "",
+    "agent.trust_score": 0.0,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "2deb0a462aa67967",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "37bfa775f3ac4d41",
+      "parent_id": null,
+      "trace_id": "5c7ee6a77e4d493fb3a853f489036c07",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375600.6402588,
+      "end_time": 1790375600.6402588,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:decommissioned: Agent 'email-agent' is decommissioned, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "f68917638ab3448c",
+      "parent_id": null,
+      "trace_id": "5c7ee6a77e4d493fb3a853f489036c07",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375600.6402588,
+      "end_time": 1790375600.6661906,
+      "duration_ms": 25.931835174560547,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

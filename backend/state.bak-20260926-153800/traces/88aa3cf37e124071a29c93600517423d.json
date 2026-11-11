@@ -1,0 +1,61 @@
+{
+  "trace_id": "88aa3cf37e124071a29c93600517423d",
+  "agent_id": "research-agent",
+  "task_input": "read db_query",
+  "task_output": "denied at signature",
+  "start_time": 1790375829.7998528,
+  "end_time": 1790375829.8008525,
+  "duration_ms": 0.9996891021728516,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:5006fde00ad4c9e82ac4a689233a6bf3",
+    "agent.trust_score": 0.9,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "344183fe52e80cb2",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "8c1439f349ac4b7e",
+      "parent_id": null,
+      "trace_id": "88aa3cf37e124071a29c93600517423d",
+      "kind": "policy_check",
+      "name": "gate:signature",
+      "start_time": 1790375829.7998528,
+      "end_time": 1790375829.8008525,
+      "duration_ms": 0.9996891021728516,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "call_signature:incomplete: A signed call needs all three of x-agentguard-nonce, x-agentguard-timestamp and x-agentguard-signature.",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "753043173f634b14",
+      "parent_id": null,
+      "trace_id": "88aa3cf37e124071a29c93600517423d",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375829.8008525,
+      "end_time": 1790375829.8008525,
+      "duration_ms": 0.0,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "trace_id": "87a7ca07f4a94347a62f9159b73ae7d6",
+  "agent_id": "newbie",
+  "task_input": "read db_query",
+  "task_output": "denied at lifecycle",
+  "start_time": 1790375342.6540606,
+  "end_time": 1790375342.6754494,
+  "duration_ms": 21.388769149780273,
+  "metadata": {
+    "agent.task.name": "read",
+    "agent.tool.name": "db_query",
+    "agent.policy.name": "default-policy",
+    "agent.did": "did:mesh:9002149a47d060e04a7dd029d02e2821",
+    "agent.trust_score": 0.8,
+    "input_present": false,
+    "agent.policy.decision": "deny",
+    "agent.task.success": false
+  },
+  "total_cost_usd": 0.0,
+  "success": false,
+  "content_hash": "13d9e840d494352b",
+  "span_count": 2,
+  "spans": [
+    {
+      "span_id": "c8b29744063b4f3d",
+      "parent_id": null,
+      "trace_id": "87a7ca07f4a94347a62f9159b73ae7d6",
+      "kind": "policy_check",
+      "name": "gate:lifecycle",
+      "start_time": 1790375342.6540606,
+      "end_time": 1790375342.6540606,
+      "duration_ms": 0.0,
+      "status": "error",
+      "attributes": {},
+      "input_data": {},
+      "output_data": {},
+      "error": "lifecycle:pending_approval: Agent 'newbie' is pending_approval, not active",
+      "cost_usd": 0.0
+    },
+    {
+      "span_id": "bf85d3eb73a8495d",
+      "parent_id": null,
+      "trace_id": "87a7ca07f4a94347a62f9159b73ae7d6",
+      "kind": "internal",
+      "name": "record:governance",
+      "start_time": 1790375342.6540606,
+      "end_time": 1790375342.6754494,
+      "duration_ms": 21.388769149780273,
+      "status": "ok",
+      "attributes": {
+        "writes": "audit chain, SLO, alerts, receipt"
+      },
+      "input_data": {},
+      "output_data": {
+        "recorded": true
+      },
+      "error": null,
+      "cost_usd": 0.0
+    }
+  ]
+}

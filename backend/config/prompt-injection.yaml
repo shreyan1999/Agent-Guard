@@ -1,0 +1,96 @@
+# Prompt-injection detection rules - policy as code.
+#
+# MCPSecurityScanner builds a PromptInjectionDetector internally and passes it
+# no config, so AGT's second warning fires even once mcp-security.yaml is
+# supplied, and those rules stay un-tunable through the scanner's constructor.
+# backend/mcp_security_config.py loads this file with AGT's own
+# load_prompt_injection_config() and injects the configured detector into the
+# scanner, which is the only way to reach it.
+#
+# A separate document because AGT's loader reads `detection_patterns` from the
+# top level; nesting this inside mcp-security.yaml would feed that file's MCP
+# patterns to the injection detector instead.
+#
+# As with mcp-security.yaml: this REPLACES the built-in set, every AGT default
+# below is reproduced verbatim and pinned by a test, and an invalid regex is
+# refused at load rather than silently skipped.
+
+detection_patterns:
+  direct_override:
+    - 'ignore\s+(all\s+)?previous\s+instructions'
+    - 'you\s+are\s+now\b'
+    - 'new\s+role\s*:'
+    - 'forget\s+(everything|all|your)\b'
+    - 'disregard\s+(all\s+)?(above|prior|previous)\b'
+    - 'override\s+(previous\s+)?instructions'
+    - 'do\s+not\s+follow\s+(your|the)\s+(previous\s+)?instructions'
+  delimiter:
+    - '^-{3,}\s*$'
+    - '^#{3,}\s*$'
+    - '^```\s*$'
+    - 'END\s+SYSTEM'
+    - 'BEGIN\s+USER'
+    - '<\|im_start\|>'
+    - '<\|im_end\|>'
+    - '\[INST\]'
+    - '<<SYS>>'
+    - '<\|system\|>'
+    - '<\|user\|>'
+    - '<\|assistant\|>'
+  role_play:
+    - 'pretend\s+you\s+are'
+    - 'act\s+as\s+if\s+you\s+have\s+no\s+restrictions'
+    - '\bjailbreak\b'
+    - '\bDAN\s+mode\b'
+    - 'developer\s+mode\s+override'
+    - 'bypass\s+(all\s+)?(safety|content)\s+(filters?|restrictions?)'
+    - 'you\s+have\s+no\s+(limitations?|restrictions?|rules?)'
+  context_manipulation:
+    - 'the\s+above\s+instructions\s+are\s+wrong'
+    - 'actually\s+your\s+real\s+instructions\s+are'
+    - 'the\s+developer\s+told\s+me\s+to\s+tell\s+you'
+    - 'secret\s+password\s+is'
+    - 'your\s+true\s+purpose\s+is'
+    - 'the\s+real\s+system\s+prompt\s+is'
+  multi_turn:
+    - 'as\s+I\s+mentioned\s+before.*you\s+agreed\s+to'
+    - 'you\s+already\s+said\s+yes'
+    - 'continuing\s+from\s+where\s+you\s+unlocked'
+    - 'you\s+previously\s+confirmed'
+    - 'we\s+already\s+established\s+that\s+you\s+can'
+  encoding:
+    - '\\x[0-9a-fA-F]{2}(?:\\x[0-9a-fA-F]{2}){3,}'
+    - '\\u[0-9a-fA-F]{4}(?:\\u[0-9a-fA-F]{4}){3,}'
+    - '\brot13\b'
+    - '\bbase64\s*decode\b'
+    - '\bhex\s*decode\b'
+  base64_pattern: '[A-Za-z0-9+/]{20,}={0,2}'
+
+suspicious_decoded_keywords:
+  - 'ignore'
+  - 'override'
+  - 'system'
+  - 'password'
+  - 'secret'
+  - 'admin'
+  - 'root'
+  - 'exec'
+  - 'eval'
+  - 'import os'
+
+# Confidence needed before a detection is reported, per sensitivity
+# level, and the lowest threat level each will report.
+sensitivity_thresholds:
+  strict: 0.3
+  balanced: 0.5
+  permissive: 0.7
+sensitivity_min_threat:
+  strict: 'low'
+  balanced: 'low'
+  permissive: 'high'
+
+disclaimer: >-
+  Pattern matching over descriptor text. It catches known shapes and will not
+  catch a payload written to avoid them, so it is one layer beside the
+  connector's own grading, the trust proxy's argument scan and the response
+  scanner - not a guarantee.
